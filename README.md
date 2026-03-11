@@ -1,69 +1,39 @@
 # 📖 Folio
 
-**A single-file audiobook + ebook reader that runs entirely in your browser.**
-No installation. No account. No server. Just open and read.
+**An audiobook + ebook reader that runs in your browser — syncs your text to your audio word by word.**
+
+> 🔗 **[Open Folio →](finleytan.github.io/folio-reader/ )**
 
 ---
 
-## What it does
+## Quick start
 
-Folio syncs your ebook text to your audiobook audio in real time. With a Whisper transcript, it highlights the exact word being spoken — word by word, driven by actual timestamps at 60 fps. Without one, it falls back to sentence-level sync or lets your browser read the book aloud via text-to-speech.
+1. Visit the link above in Chrome, Edge, Firefox, or Safari
+2. Click **+ Add Book**
+3. Add your audio file, ebook, and (optionally) a Whisper transcript
+4. Start reading
 
-Everything — your library, reading positions, display settings, and sync anchors — is saved locally in your browser. Only the audio file needs to be re-selected each session (a browser security limitation).
-
----
-
-## Features
-
-- **Word-level highlight** driven by Whisper JSON timestamps at 60 fps
-- **Sentence sync** — active sentence scrolls into view as audio plays
-- **TTS fallback** — browser speech synthesis if you have no audio file
-- **EPUB, TXT, HTML, MD** ebook support with auto-generated table of contents
-- **Folder picker** — drop a book folder and Folio auto-assigns all files
-- **Book Info modal** — hot-swap audio, ebook, or transcript without leaving the player
-- **PWA mode** — install to home screen; scans your library folder automatically on launch
-- **Rate presets** — 0.75× · 1× · 1.25× · 1.5× · 2× plus custom input
-- **Themes** — Dark, Parchment, Night
-- **Fully offline** — single HTML file, no build step, no dependencies (JSZip loaded on demand for EPUB only)
-
----
-
-## Getting started
-
-### In a browser (simplest)
-
-1. Download [`audiobook-reader.html`](audiobook-reader.html)
-2. Open it in Chrome, Edge, Firefox, or Safari
-3. Click **+ Add Book** and add your files
-
-Your library persists in `localStorage` between sessions.
-
-### As a PWA on Android (recommended for mobile)
-
-Host Folio on GitHub Pages (free, ~5 minutes):
-
-1. Fork or upload this repo and rename `audiobook-reader.html` → `index.html`
-2. Go to **Settings → Pages → Branch: main / root → Save**
-3. Visit `https://yourusername.github.io/your-repo-name` in Chrome on your phone
-4. Tap **⋮ → Add to Home Screen**
-
-In PWA mode, Folio can scan a library folder on your device automatically — no re-selecting files each session.
+Your library, reading positions, and settings are all saved in your browser automatically.
 
 ---
 
 ## Adding a book
 
-Click **+ Add Book** and either browse a folder or drop files into the individual slots:
+Click **+ Add Book**, then either use the folder picker or drop files into the three slots individually.
 
-| Slot | Formats |
+**Folder picker (easiest):** click **📁 Browse Folder**, select the folder containing your book files, and Folio auto-assigns everything. The title defaults to the folder name.
+
+| Slot | Accepted formats |
 |---|---|
 | 🎧 Audio | MP3, M4A, M4B, OGG, WAV, AAC, FLAC, OPUS |
 | 📄 Ebook | EPUB, TXT, HTML, HTM, XHTML, MD |
 | 📝 Transcript *(optional)* | Whisper JSON, plain TXT |
 
-**Folder picker:** click **📁 Browse Folder**, select your book folder, and Folio auto-assigns the files. The title defaults to the folder name.
+> **Ebook only?** No problem — Folio will read it aloud using your browser's built-in text-to-speech. You can link an audio file later from inside the player.
 
-### PWA library folder structure
+### On Android (PWA)
+
+Folio scans your library folder automatically. Keep one subfolder per book:
 
 ```
 Folio Library/
@@ -76,22 +46,24 @@ Folio Library/
 │   └── ProjectHailMary.epub
 ```
 
+Each time you open the app, tap the one-tap permission prompt to reload your library. This is a browser security requirement and can't be skipped.
+
 ---
 
 ## Text sync
 
-### 1. Whisper JSON — most accurate
+Folio uses the best sync method available for each book:
 
-Folio aligns each ebook sentence to the matching run in the Whisper transcript, then maps a real timestamp to every ebook word. The word highlight advances exactly when the narrator speaks each word.
+### Whisper JSON — word-level highlight
 
-Generate a transcript (requires Python and ffmpeg):
+With a Whisper transcript, Folio highlights the exact word being spoken in real time as you listen. Generate one on your computer (requires Python and ffmpeg):
 
 ```bash
 pip install openai-whisper
 whisper "audiobook.mp3" --model medium --output_format json --word_timestamps True
 ```
 
-Drop the `.json` file into the transcript slot.
+Drop the `.json` output file into the transcript slot. Use `--model large-v3` for accented speech or older recordings.
 
 | Model | Speed | Best for |
 |---|---|---|
@@ -100,16 +72,16 @@ Drop the `.json` file into the transcript slot.
 | `medium` | Moderate | Most audiobooks *(recommended)* |
 | `large-v3` | Slow | Accented speech, older recordings |
 
-### 2. Plain text transcript
+### Plain text transcript — sentence sync
 
-A `.txt` file of the narration. Folio aligns sentences by word overlap and estimates timing from the audio duration.
+Drop a `.txt` file of the narration into the transcript slot. Folio aligns it to the ebook by word overlap and estimates timing from the audio duration.
 
-### 3. Manual sync anchors
+### No transcript — manual anchors
 
-No transcript? Use the **⚙ Sync** panel at the bottom of the player:
+Use the **⚙ Sync** panel at the bottom of the player:
 
-1. Play to where narration starts → **Set audio start**
-2. Click the matching sentence in the ebook → **Set text start**
+1. Play to where narration starts → click **Set audio start**
+2. Click the matching sentence in the ebook → click **Set text start**
 3. After seeking, tap **↺ Resync** to re-align
 
 ---
@@ -118,80 +90,69 @@ No transcript? Use the **⚙ Sync** panel at the bottom of the player:
 
 ### Top bar
 
-| | |
+| Button | Action |
 |---|---|
-| ← | Return to library (saves progress) |
+| ← | Return to library (saves your position) |
 | ⏮ / ⏭ | Skip −15 / +15 seconds |
 | ▶ / ⏸ | Play / Pause |
-| ☰ | Table of contents |
-| 📝 | Transcript manager |
-| ℹ | Book Info — swap any file slot |
-| ⚙ | Options (Playback / Display / Advanced) |
+| ☰ | Toggle table of contents |
+| 📝 | Add or replace transcript |
+| ℹ | Book Info — swap any file slot without leaving the player |
+| ⚙ | Options panel |
+
+### Seek strip
+
+Speed presets sit directly below the scrub bar: **0.75× 1× 1.25× 1.5× 2×** — click to activate, or type a custom value in the box next to them.
 
 ### Bottom bar
 
-| | |
+| Control | Action |
 |---|---|
 | ▶ ⏸ ⏹ | Play / Pause / Stop |
-| −10 −5 −1 +1 +5 +10 | Jump by sentences |
-| Auto-scroll | Keep active sentence in view |
-| ↺ Resync | Snap text to audio position |
-| ⚙ Sync | Manual sync anchor panel |
+| −10 −5 −1 +1 +5 +10 | Jump forward or backward by sentences |
+| Auto-scroll | Keep the active sentence scrolled into view |
+| ↺ Resync | Snap text position to current audio time |
+| ⚙ Sync | Expand the manual sync panel |
 
-**Click any sentence** to jump playback there.
-**Click any word** to jump to that word (Whisper transcript required).
-**Swipe left/right** on the reading area to step one sentence (mobile).
+**Click any sentence** to jump playback to it.  
+**Click any word** to jump to that word (Whisper transcript required).  
+**Swipe left / right** on the reading area to step one sentence (mobile).
 
 ---
 
 ## Options
 
+Open with **⚙** in the top bar.
+
 | Tab | Settings |
 |---|---|
-| **Playback** | Volume, WPM, sentence pause, word highlight |
-| **Display** | Theme, font, font size, line height, max width, alignment |
-| **Advanced** | About |
+| **Playback** | Volume, scroll speed (WPM), sentence pause, word highlight on/off |
+| **Display** | Theme (Dark / Parchment / Night), font, size, line height, max width, alignment |
 
-Speed presets in the seek strip: **0.75× 1× 1.25× 1.5× 2×** plus a custom value input.
+All settings save automatically and restore on next visit.
+
+---
+
+## Audio re-linking
+
+Browsers can't permanently store audio files. Each session, books that need their audio re-linked will show a warning on the card. Click the card, pick the same file, and you resume exactly where you left off — position, speed, and sync anchors all preserved.
+
+Your ebook and transcript are fully saved and never need re-linking.
 
 ---
 
 ## What gets saved
 
-| Data | How |
+| Data | Storage |
 |---|---|
 | Ebook content | ✅ localStorage |
 | Transcript | ✅ localStorage |
 | Reading position | ✅ localStorage |
 | Audio position | ✅ localStorage |
-| Speed, WPM, settings | ✅ localStorage |
+| Speed, WPM, all settings | ✅ localStorage |
 | Sync anchors | ✅ localStorage |
-| Library folder (PWA) | ✅ IndexedDB |
+| Library folder handle (PWA) | ✅ IndexedDB |
 | Audio file | ❌ Re-select each session |
-
----
-
-## Browser support
-
-| Browser | Standard | PWA folder scan |
-|---|---|---|
-| Chrome / Edge | ✅ | ✅ |
-| Firefox | ✅ | ❌ |
-| Safari (macOS) | ✅ | ❌ |
-| Chrome Android | ✅ | ✅ |
-| Safari iOS | ✅ | ❌ |
-
-PWA folder scanning uses the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API), currently only supported in Chromium-based browsers.
-
----
-
-## Files
-
-| File | Purpose |
-|---|---|
-| `audiobook-reader.html` | The entire app |
-| `sw.js` | Service worker (offline caching) |
-| `manifest.json` | PWA manifest (Add to Home Screen) |
 
 ---
 
