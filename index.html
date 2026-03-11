@@ -316,6 +316,19 @@ audio{display:none;}
 .book-card-prog-wrap{margin-top:6px;}
 .book-card-pct{font-size:9px;color:var(--text3);text-align:right;margin-bottom:2px;}
 
+/* ── BOOK INFO MODAL ── */
+.binfo-slots{display:flex;flex-direction:column;gap:8px;margin:4px 0 12px;}
+.binfo-slot{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;transition:all .15s;}
+.binfo-slot:hover{border-color:var(--accent);background:var(--hl-bg);}
+.binfo-slot.empty{opacity:.6;border-style:dashed;}
+.binfo-slot-icon{font-size:18px;flex-shrink:0;}
+.binfo-slot-info{flex:1;min-width:0;}
+.binfo-slot-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:2px;}
+.binfo-slot-name{font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.binfo-slot-name.empty{color:var(--text3);font-style:italic;font-weight:400;}
+.binfo-slot-action{font-size:11px;color:var(--accent);flex-shrink:0;font-weight:600;}
+.binfo-slot-badge{font-size:9px;padding:2px 6px;border-radius:20px;background:var(--accent);color:white;font-weight:700;flex-shrink:0;}
+
 /* ── SETTINGS PERSISTENCE ── */
 
 /* ── PWA FIRST-RUN ── */
@@ -368,11 +381,14 @@ audio{display:none;}
 <div id="pwaRegrant" style="display:none">
   <div class="pwa-regrant-card">
     <div class="pwa-regrant-icon">📚</div>
-    <div class="pwa-regrant-title">Re-open your library</div>
-    <p class="pwa-regrant-sub" id="pwaRegrantSub">Tap below to grant access to your library folder and load your books.</p>
-    <button class="btn btn-primary pwa-setup-btn" onclick="pwaRegrantAccess()">📂 Open Library Folder</button>
-    <div style="margin-top:12px">
-      <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="pwaPickFolder()">Choose a different folder</button>
+    <div class="pwa-regrant-title">Tap to open Folio</div>
+    <p class="pwa-regrant-sub" id="pwaRegrantSub">One tap needed to reload your library. This is a browser security requirement.</p>
+    <button class="btn btn-primary pwa-setup-btn" id="pwaRegrantBtn" onclick="pwaRegrantAccess()">📂 Open Library</button>
+    <p style="font-size:11px;color:var(--text3);margin-top:16px;max-width:280px">
+      Chrome requires this once per session. Your books and progress are always saved.
+    </p>
+    <div style="margin-top:8px">
+      <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="pwaPickFolder()">Choose a different folder</button>
     </div>
   </div>
 </div>
@@ -404,6 +420,7 @@ audio{display:none;}
       <div class="vdiv"></div>
       <button class="ic-btn" onclick="toggleToc()" title="Contents">☰</button>
       <button class="ic-btn" id="transcriptBtn" onclick="openTranscriptModal()" title="Transcript">📝</button>
+      <button class="ic-btn" id="bookInfoBtn" onclick="openBookInfoModal()" title="Book files">ℹ</button>
       <button class="ic-btn" id="optBtn" onclick="toggleOpts()">⚙</button>
     </div>
 
@@ -703,6 +720,27 @@ audio{display:none;}
     <div class="modal-acts">
       <button class="btn btn-ghost" onclick="closeLinkAudioModal()">Cancel</button>
       <button class="btn btn-primary" id="linkAudioSaveBtn" disabled onclick="saveLinkAudio()">Link & Switch</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ BOOK INFO MODAL ════ -->
+<div class="modal-overlay" id="bookInfoModal" style="display:none" onclick="if(event.target===this)closeBookInfoModal()">
+  <div class="modal">
+    <div class="modal-title">Book Files</div>
+    <p class="modal-sub" id="bookInfoSub">Files assigned to this book. Click a slot to change it.</p>
+
+    <div class="binfo-slots" id="bookInfoSlots">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- hidden file inputs for re-assigning -->
+    <input type="file" id="biAudioInput" accept=".mp3,.m4a,.m4b,.ogg,.wav,.aac,.flac,.opus" style="display:none" onchange="biReassign(event,'audio')">
+    <input type="file" id="biEbookInput" accept=".txt,.epub,.html,.htm,.md,.xhtml" style="display:none" onchange="biReassign(event,'ebook')">
+    <input type="file" id="biTxInput" accept=".json,.txt" style="display:none" onchange="biReassign(event,'transcript')">
+
+    <div class="modal-acts">
+      <button class="btn btn-ghost" onclick="closeBookInfoModal()">Close</button>
     </div>
   </div>
 </div>
@@ -2520,19 +2558,46 @@ async function pwaScanAndRender(){
   const badge=document.getElementById('pwaFolderBadge');
   if(badge) badge.style.display='';
 
+  // Show scanning indicator
+  showScreen('library');
+  const grid=document.getElementById('libGrid');
+  if(grid) grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">🔍 Scanning library…</div>';
+
   const scanned = [];
+  const skipped = [];
   for await (const [name, entry] of pwaRootHandle.entries()){
     if(entry.kind !== 'directory') continue;
+    if(name.startsWith('.')) continue; // skip hidden folders
     const book = await pwaScanBookFolder(name, entry);
     if(book) scanned.push(book);
+    else skipped.push(name);
   }
   scanned.sort((a,b)=>a.title.localeCompare(b.title));
 
   const saved = getPwaProgress();
   library = scanned.map(b=>{ const prog=saved[b.id]||{}; return {...b,...prog}; });
 
-  showScreen('library');
   renderLib();
+
+  // If nothing found, show a helpful message
+  if(scanned.length===0 && grid){
+    const hint = skipped.length > 0
+      ? `Found ${skipped.length} folder(s) but none contained a recognised audio or ebook file.
+
+Folders need at least one of: MP3/M4A/M4B/EPUB/TXT/HTML/MD
+
+Skipped: ${skipped.slice(0,5).join(', ')}${skipped.length>5?'…':''}`
+      : 'No book folders found.\n\nCreate a subfolder inside your library folder for each book and put the audio/ebook files inside it.';
+    grid.innerHTML=`<div style="grid-column:1/-1;padding:32px 20px;color:var(--text3);font-size:13px;line-height:1.7;white-space:pre-line">${xh(hint)}</div>`;
+    // Re-add the refresh card
+    const add=document.createElement('div');
+    add.className='add-card';
+    add.innerHTML='<div class="add-card-icon" style="font-size:20px">🔄</div><span>Refresh Library</span>';
+    add.onclick=()=>pwaScanAndRender();
+    grid.appendChild(add);
+  }
+
+  if(skipped.length>0) console.log('Folio PWA: skipped folders (no recognisable files):', skipped);
 }
 
 async function pwaScanBookFolder(folderName, dirHandle){
@@ -2545,7 +2610,8 @@ async function pwaScanBookFolder(folderName, dirHandle){
     else if(ext==='json' && !transcriptFile) transcriptFile={name,handle:entry,ext};
     else if(ext==='txt' && !transcriptFile && !ebookFile) transcriptFile={name,handle:entry,ext};
   }
-  if(!audioFile || !ebookFile) return null;
+  // Need at least one of audio or ebook to make a valid book
+  if(!audioFile && !ebookFile) return null;
   const id = 'pwa_' + folderName.toLowerCase().replace(/[^a-z0-9]/g,'_');
   return {
     id, title:folderName,
@@ -2582,25 +2648,33 @@ function savePwaProgress(){
 async function pwaOpenBook(i){
   const b=library[i];
   curBookIdx=i;
-  try{
-    const audioFile=await b.audioHandle.getFile();
-    if(b.audioUrl) URL.revokeObjectURL(b.audioUrl);
-    b.audioUrl=URL.createObjectURL(audioFile);
-  }catch(e){
-    alert('Could not read audio file: '+b.audioName+'\n\nTry re-opening your library folder.');
-    return;
-  }
-  try{
-    const ebookFile=await b.ebookHandle.getFile();
-    if(b.ebookType==='epub'){
-      const ab=await ebookFile.arrayBuffer();
-      const bytes=new Uint8Array(ab);
-      let bin=''; for(let i=0;i<bytes.byteLength;i++) bin+=String.fromCharCode(bytes[i]);
-      b.ebookData=btoa(bin);
-    } else {
-      b.ebookData=await ebookFile.text();
+  if(b.audioHandle){
+    try{
+      const audioFile=await b.audioHandle.getFile();
+      if(b.audioUrl) URL.revokeObjectURL(b.audioUrl);
+      b.audioUrl=URL.createObjectURL(audioFile);
+    }catch(e){
+      alert('Could not read audio file: '+b.audioName+'\n\nTry re-opening your library folder.');
+      return;
     }
-  }catch(e){ alert('Could not read ebook file: '+b.ebookName); return; }
+  } else {
+    b.audioUrl=null; // TTS mode
+  }
+  if(b.ebookHandle){
+    try{
+      const ebookFile=await b.ebookHandle.getFile();
+      if(b.ebookType==='epub'){
+        const ab=await ebookFile.arrayBuffer();
+        const bytes=new Uint8Array(ab);
+        let bin=''; for(let i=0;i<bytes.byteLength;i++) bin+=String.fromCharCode(bytes[i]);
+        b.ebookData=btoa(bin);
+      } else {
+        b.ebookData=await ebookFile.text();
+      }
+    }catch(e){ alert('Could not read ebook file: '+b.ebookName); return; }
+  } else {
+    b.ebookData=null; // audio-only book
+  }
   b.transcriptType=null; b.transcriptData=null;
   if(b.transcriptHandle){
     try{
@@ -2620,15 +2694,23 @@ async function pwaCheckOnLaunch(){
   const savedName=await idbGet('rootName').catch(()=>null);
   if(!handle){ pwaShowFirstRun(); return; }
   try{
+    // First check if permission is already granted (happens on desktop Chrome
+    // after multiple trusted visits, or if session is still active)
     const perm=await handle.queryPermission({mode:'read'});
     if(perm==='granted'){
       pwaRootHandle=handle;
       await pwaScanAndRender();
-    } else {
-      document.getElementById('pwaRegrantSub').textContent=
-        'Tap below to re-open "'+(savedName||'your library')+'" and load your books.';
-      showScreen('pwaRegrant');
+      return;
     }
+    // Show regrant screen — one tap needed
+    const folderName = savedName || handle.name || 'your library';
+    document.getElementById('pwaRegrantSub').textContent=
+      'One tap to re-open "'+folderName+'". This is a browser security requirement.';
+    // Make the entire regrant card clickable for faster response
+    document.getElementById('pwaRegrant').onclick = (e) => {
+      if(!e.target.closest('.btn')) pwaRegrantAccess();
+    };
+    showScreen('pwaRegrant');
   }catch(e){ pwaShowFirstRun(); }
 }
 
@@ -2642,6 +2724,130 @@ function showScreen(id){
     if(s==='player') el.style.display=s===id?'flex':'none';
     else el.style.display=s===id?'flex':'none';
   });
+}
+
+// ══════════════════════════════════════════════════════
+// BOOK INFO MODAL
+// ══════════════════════════════════════════════════════
+function openBookInfoModal(){
+  const b = library[curBookIdx];
+  if(!b) return;
+
+  document.getElementById('bookInfoSub').textContent =
+    IS_PWA && CAN_FS ? 'Files scanned from your library folder.' : 'Files assigned to this book. Click a slot to change it.';
+
+  const slots = [
+    {
+      key: 'audio',
+      icon: '🎧',
+      label: 'Audio File',
+      name: b.audioName || (b.audioUrl ? 'Linked audio' : null),
+      badge: b.audioUrl ? 'loaded' : null,
+      inputId: 'biAudioInput',
+      canChange: !IS_PWA,
+    },
+    {
+      key: 'ebook',
+      icon: '📄',
+      label: 'Ebook',
+      name: b.ebookName || (b.ebookData ? 'Loaded' : null),
+      badge: b.ebookData ? 'loaded' : (b.ebookHandle ? 'linked' : null),
+      inputId: 'biEbookInput',
+      canChange: !IS_PWA,
+    },
+    {
+      key: 'transcript',
+      icon: '📝',
+      label: 'Transcript',
+      name: b.transcriptName || (b.transcriptType === 'whisper' ? 'Whisper JSON' : b.transcriptType === 'txt' ? 'Plain text' : null),
+      badge: b.transcriptType === 'whisper' ? 'whisper' : b.transcriptType === 'txt' ? 'txt' : null,
+      inputId: 'biTxInput',
+      canChange: true,
+    },
+  ];
+
+  const container = document.getElementById('bookInfoSlots');
+  container.innerHTML = '';
+  slots.forEach(slot => {
+    const hasFile = !!slot.name;
+    const div = document.createElement('div');
+    div.className = 'binfo-slot' + (hasFile ? '' : ' empty');
+    if(slot.canChange) div.onclick = () => document.getElementById(slot.inputId).click();
+    else div.style.cursor = 'default';
+
+    div.innerHTML = `
+      <span class="binfo-slot-icon">${slot.icon}</span>
+      <div class="binfo-slot-info">
+        <div class="binfo-slot-label">${xh(slot.label)}${slot.canChange ? '' : ' <span style="font-weight:400;text-transform:none;letter-spacing:0">(from folder)</span>'}</div>
+        <div class="binfo-slot-name${hasFile ? '' : ' empty'}">${hasFile ? xh(slot.name) : 'Not set — tap to add'}</div>
+      </div>
+      ${slot.badge ? `<span class="binfo-slot-badge">${xh(slot.badge)}</span>` : ''}
+      ${slot.canChange && hasFile ? '<span class="binfo-slot-action">Change ›</span>' : ''}
+      ${slot.canChange && !hasFile ? '<span class="binfo-slot-action">Add ›</span>' : ''}
+    `;
+    container.appendChild(div);
+  });
+
+  document.getElementById('bookInfoModal').style.display = 'flex';
+}
+
+function closeBookInfoModal(){
+  document.getElementById('bookInfoModal').style.display = 'none';
+}
+
+function biReassign(e, type){
+  const f = e.target.files[0];
+  e.target.value = '';
+  if(!f) return;
+  const ext = f.name.split('.').pop().toLowerCase();
+
+  if(type === 'audio'){
+    if(!AUDIO_EXTS.has(ext)){ alert('Not a recognised audio file.'); return; }
+    const b = library[curBookIdx];
+    if(b.audioUrl) URL.revokeObjectURL(b.audioUrl);
+    b.audioUrl = URL.createObjectURL(f);
+    b.audioName = f.name; b.audioSize = f.size; b.audioModified = f.lastModified;
+    // Reload the audio element
+    const audio = document.getElementById('audio');
+    const wasTime = audio.currentTime;
+    audio.src = b.audioUrl;
+    audio.load();
+    audio.addEventListener('loadedmetadata', function restore(){
+      audio.currentTime = wasTime;
+      audio.removeEventListener('loadedmetadata', restore);
+    });
+    if(!IS_PWA) saveLibrary();
+  } else if(type === 'ebook'){
+    if(!EBOOK_EXTS.has(ext)){ alert('Not a recognised ebook file.'); return; }
+    const b = library[curBookIdx];
+    const reader = new FileReader();
+    reader.onload = ev => {
+      b.ebookName = f.name; b.ebookType = ext;
+      b.ebookData = ext === 'epub' ? ev.target.result.split(',')[1] : ev.target.result;
+      if(!IS_PWA) saveLibrary();
+      // Reload ebook in place
+      loadEbook(b, ()=>{ curSent=0; curWord=0; updateHL(); updateProg(); });
+      openBookInfoModal(); // refresh the modal
+    };
+    ext === 'epub' ? reader.readAsDataURL(f) : reader.readAsText(f,'UTF-8');
+    return; // async — return early before refreshing modal
+  } else if(type === 'transcript'){
+    if(ext !== 'json' && ext !== 'txt'){ alert('Transcript must be JSON or TXT.'); return; }
+    const b = library[curBookIdx];
+    const reader = new FileReader();
+    reader.onload = ev => {
+      b.transcriptName = f.name;
+      b.transcriptType = ext === 'json' ? 'whisper' : 'txt';
+      b.transcriptData = ev.target.result;
+      if(!IS_PWA) saveLibrary();
+      loadTranscriptData(b);
+      updateTranscriptUI();
+      openBookInfoModal(); // refresh the modal
+    };
+    reader.readAsText(f,'UTF-8');
+    return;
+  }
+  openBookInfoModal(); // refresh the modal
 }
 
 // ══════════════════════════════════════════════════════

@@ -1,12 +1,14 @@
 // Folio Service Worker — offline caching
 // Cache version: bump this string to force a cache refresh on update
-const CACHE = 'folio-v1';
+const CACHE = 'folio-v2';
 
 // Everything Folio needs to run offline
 const PRECACHE = [
   './',
   './index.html',
   'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap',
+  // Pre-cache JSZip so EPUB parsing works offline
+  'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
 ];
 
 // Install: pre-cache the app shell
