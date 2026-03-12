@@ -2,6 +2,19 @@
 
 ---
 
+## v1.3 — 2026-03-12
+
+### Added
+- Reading progress bar is now a tap/click scrubber in TTS mode — tapping any point jumps to the corresponding sentence and restarts TTS if playing; bar expands to 12px in TTS mode to widen the hit target
+
+### Fixed
+- TOC chapter tap now scrolls to the correct position on first tap — sidebar closes before scroll fires, and scroll is deferred one rAF for layout to settle after the sidebar animates out
+- Tapping a TOC chapter while TTS is playing no longer skips a sentence — stale utterance is cancelled and a clean chain starts from the selected position
+- Tapping a TOC chapter while TTS is paused then pressing play now reads from the selected chapter, not the old paused position
+- Linking an audio file via Book Files (⋮ → Book Files) now switches the player out of TTS mode immediately — seek strip appears, TTS bar hides, play controls the audio file
+
+---
+
 ## v1.2 — 2026-03-12
 
 ### Fixed

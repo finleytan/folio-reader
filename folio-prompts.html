@@ -165,77 +165,7 @@ const PROMPTS = [
 
   // ── ACTIVE — in priority order ─────────────────────────
   {
-    num:'1', status:'active', type:'feat', model:'sonnet',
-    title:'Progress bar tap/scrub for TTS navigation',
-    desc:"Makes the thin reading progress bar tappable in TTS mode. Tapping at 40% of the bar jumps to 40% through the sentences and restarts TTS from that point. Audio mode is unchanged.",
-    prompt:
-`# Feature: Reading progress bar as TTS scrubber in index.html
-
-## Goal
-Make the thin reading progress bar (.read-progress-wrap / #readProg)
-tappable in TTS mode. Tapping to a position jumps to the corresponding
-sentence, restarting TTS from that point. In audio mode the bar stays
-purely decorative — no change to existing behaviour.
-
-## How it works
-A click or touch at x% of the bar's width maps to:
-  Math.round(pct * (sentences.length - 1))
-as the target sentence index. Jump to that sentence and restart TTS
-if playing.
-
-## 1. CSS — increase hit target in TTS mode
-  .read-progress-wrap {
-    height: 3px;
-    background: var(--border);
-    flex-shrink: 0;
-    transition: height .15s;
-  }
-  .read-progress-wrap.scrubbing {
-    height: 12px;
-    cursor: pointer;
-  }
-  .read-progress-wrap.scrubbing .read-progress-bar {
-    border-radius: 0 6px 6px 0;
-  }
-
-Toggle .scrubbing in configurePlayerForMode() — add:
-  document.querySelector('.read-progress-wrap')
-    .classList.toggle('scrubbing', ttsMode);
-
-## 2. JS — add scrub handler
-  function scrubToPosition(ev) {
-    if(!ttsMode || !sentences.length) return;
-    const wrap = ev.currentTarget;
-    const rect = wrap.getBoundingClientRect();
-    const clientX = ev.touches ? ev.touches[0].clientX : ev.clientX;
-    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    const target = Math.round(pct * (sentences.length - 1));
-    if(target === curSent) return;
-    curSent = target; curWord = 0;
-    updateHL(); updateProg(); saveBookProgressDebounced();
-    if(autoScroll) scrollToSent(curSent, true); // instant scroll
-    if(mediaState === 'playing') { ttsStop(); ttsPlay(); }
-  }
-
-## 3. Wire up once in init() after cacheDOM()
-  const progWrap = _readProg.parentElement;
-  progWrap.addEventListener('click', scrubToPosition);
-  progWrap.addEventListener('touchend', scrubToPosition);
-
-Do NOT attach inside loadEbook — attach once in init() so listeners
-survive book changes without stacking duplicates.
-
-## Constraints
-- scrubToPosition must no-op if !ttsMode
-- Use instant=true for scrollToSent so the reader doesn't smooth-scroll
-  across the whole book
-- Do not modify updateProg(), _readProg, or the progress bar width logic
-
-Run node --check index.html when done.`
-  },
-
-  {
-    num:'2', status:'active', type:'fix', model:'sonnet',
+    num:'1', status:'active', type:'fix', model:'sonnet',
     title:'Remove transcript pill from add-book modal + remove WPM UI',
     desc:"Two UI cleanups: (1) remove the redundant transcript file-pill from the add-book modal, (2) remove the WPM slider from the options panel. WPM logic stays — only the UI elements are removed.",
     prompt:
@@ -279,7 +209,7 @@ Run node --check index.html when done.`
   },
 
   {
-    num:'3', status:'active', type:'feat', model:'sonnet',
+    num:'2', status:'active', type:'feat', model:'sonnet',
     title:'Tap rate display to cycle speed presets',
     desc:"Tapping #rateBtnInline on the seek strip cycles through RATE_STEPS presets. Long-press (400ms) still opens the options panel. Adds a brief flash animation on cycle.",
     prompt:
@@ -339,7 +269,7 @@ Run node --check index.html when done.`
   },
 
   {
-    num:'4', status:'active', type:'feat', model:'sonnet',
+    num:'3', status:'active', type:'feat', model:'sonnet',
     title:'Add OpenDyslexic font option',
     desc:"Adds OpenDyslexic as a selectable body font in Display options. Loads from CDN on demand only — no impact on initial page load.",
     prompt:
@@ -440,6 +370,24 @@ differences. Won't help with genuine ebook/transcript divergence.`
   },
 
   // ── COMPLETED ─────────────────────────────────────────
+  {
+    num:'✓', status:'done', type:'fix', model:'sonnet',
+    title:'TOC navigation bugs fixed in TTS mode',
+    desc:"Fixed three TOC navigation bugs: sidebar now closes before scroll fires (fixing wrong position on mobile/long ebooks), ttsStop()+ttsPlay() replaces advanceSent() to prevent double-advance while playing, and ttsStop() clears the stale utterance when paused so the next play press starts from the correct sentence.",
+    prompt:''
+  },
+  {
+    num:'✓', status:'done', type:'fix', model:'sonnet',
+    title:'Linking audio via Book Files now switches out of TTS mode',
+    desc:"Fixed biReassign() audio branch — removed pre-load of _audio.src that caused self-revocation of the blob URL, and called configurePlayerForMode() directly to switch the player into audio mode immediately when audio is linked via Book Files.",
+    prompt:''
+  },
+  {
+    num:'✓', status:'done', type:'feat', model:'sonnet',
+    title:'Reading progress bar as TTS scrubber',
+    desc:"Added scrubToPosition() making the reading progress bar tappable in TTS mode — tap percentage maps to sentence index via Math.round(pct*(sentences.length-1)), bar expands to 12px with .scrubbing class in TTS mode, and TTS restarts from new position if playing.",
+    prompt:''
+  },
   {
     num:'✓', status:'done', type:'fix', model:'sonnet',
     title:'Seek bar updates ebook position while paused',

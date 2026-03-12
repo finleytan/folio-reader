@@ -251,7 +251,9 @@ body.theme-night{
 .ebook-area{flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative;}
 
 /* ── READING PROGRESS ── */
-.read-progress-wrap{height:3px;background:var(--border);flex-shrink:0;}
+.read-progress-wrap{height:3px;background:var(--border);flex-shrink:0;transition:height .15s;}
+.read-progress-wrap.scrubbing{height:12px;cursor:pointer;}
+.read-progress-wrap.scrubbing .read-progress-bar{border-radius:0 6px 6px 0;}
 .read-progress-bar{height:100%;background:var(--accent);width:0%;transition:width .4s ease;border-radius:0 2px 2px 0;}
 
 /* ── READER BODY ── */
@@ -1532,6 +1534,7 @@ function configurePlayerForMode(b, audioSrc, rate){
       _audio.removeEventListener('loadedmetadata', restore);
     });
   }
+  document.querySelector('.read-progress-wrap').classList.toggle('scrubbing', ttsMode);
   setRate(rate);
   setMediaState('stopped');
 }
@@ -1928,6 +1931,20 @@ function ttsStop(){
   stopScrollEngine(); releaseWakeLock(); updateMediaSessionState(false); updatePageTitle();
 }
 
+function scrubToPosition(ev){
+  if(!ttsMode || !sentences.length) return;
+  const wrap = ev.currentTarget;
+  const rect = wrap.getBoundingClientRect();
+  const clientX = ev.touches ? ev.touches[0].clientX : ev.clientX;
+  const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  const target = Math.round(pct * (sentences.length - 1));
+  if(target === curSent) return;
+  curSent = target; curWord = 0;
+  updateHL(); updateProg(); saveBookProgressDebounced();
+  if(autoScroll) scrollToSent(curSent, true);
+  if(mediaState === 'playing'){ ttsStop(); ttsPlay(); }
+}
+
 // ══════════════════════════════════════════════════════
 // HIGHLIGHTING & PROGRESS
 // ══════════════════════════════════════════════════════
@@ -2010,11 +2027,32 @@ function buildToc(){
     btn.addEventListener('click',()=>{
       curSent=entry.sentIdx; curWord=0;
       updateHL(); updateProg(); saveBookProgress();
-      scrollPaused = false;
-      scrollToSent(curSent);
-      if(ttsMode && mediaState==='playing'){ clearTimeout(scrollTimer); advanceSent(); }
-      // Close TOC on mobile after selection
+
+      // Close TOC FIRST so layout settles before scrolling.
+      // On mobile the sidebar closing shifts the scroll container —
+      // scrolling before close lands in the wrong place.
+      // On long ebooks, content-visibility:auto means unrendered
+      // paragraphs have no height yet — defer scroll one rAF so the
+      // browser can finish layout after the sidebar animates out.
       if(window.innerWidth<=700) toggleToc();
+
+      requestAnimationFrame(()=>{
+        scrollPaused = false;
+        scrollToSent(curSent, true); // instant=true bypasses safe-zone check
+
+        if(ttsMode){
+          if(mediaState==='playing'){
+            // Stop current utterance cleanly (resets generation counter),
+            // then restart from the new curSent position.
+            ttsStop(); ttsPlay();
+          } else if(ttsPaused){
+            // Cancel the stale utterance so the next play press starts
+            // fresh from the new position instead of resuming the old one.
+            ttsStop();
+          }
+          // mediaState === 'stopped': nothing to do, curSent is already set
+        }
+      });
     });
     list.appendChild(btn);
   });
@@ -3093,10 +3131,9 @@ function biReassign(e,type){
     if(!AUDIO_EXTS.has(ext)){ showToast('Not a recognised audio file','error'); return; }
     if(b.audioUrl) URL.revokeObjectURL(b.audioUrl);
     b.audioUrl=URL.createObjectURL(f); b.audioName=f.name;
-    const wasTime=_audio.currentTime;
-    _audio.src=b.audioUrl; _audio.load();
-    _audio.addEventListener('loadedmetadata',function r(){ _audio.currentTime=wasTime; _audio.removeEventListener('loadedmetadata',r); });
+    configurePlayerForMode(b, b.audioUrl, b.playbackRate||1);
     if(!IS_PWA) saveLibrary();
+    showToast('Audio linked','success');
   } else if(type==='ebook'){
     if(!EBOOK_EXTS.has(ext)){ showToast('Not a recognised ebook file','error'); return; }
     const reader=new FileReader();
@@ -3365,6 +3402,11 @@ async function init(){
   try{ loadDisplayPrefs(); }catch(e){}
   try{ setMediaState('stopped'); }catch(e){}
   try{ getTtsVoices(); }catch(e){}
+  try{
+    const progWrap = _readProg.parentElement;
+    progWrap.addEventListener('click', scrubToPosition);
+    progWrap.addEventListener('touchend', scrubToPosition);
+  }catch(e){}
   try{
     if(IS_PWA && CAN_FS){
       await pwaCheckOnLaunch();
