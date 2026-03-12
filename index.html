@@ -1536,7 +1536,7 @@ function openBook(i){
   $('pTitle').textContent=b.title;
   configurePlayerForMode(b, b.audioUrl||null, b.playbackRate||1);
   loadTranscriptData(b);
-  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); });
+  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); seekAudioToSentence(); });
   setupMediaSession();
   updatePageTitle();
 }
@@ -1562,6 +1562,13 @@ function goLib(){
 // ══════════════════════════════════════════════════════
 // MEDIA CONTROLS
 // ══════════════════════════════════════════════════════
+function seekAudioToSentence(){
+  if(ttsMode||curSent<=0||!sentenceTimings) return;
+  let t=sentenceTimings[curSent];
+  if(!t) for(let i=curSent-1;i>=0;i--){ if(sentenceTimings[i]){t=sentenceTimings[i];break;} }
+  if(t) _audio.currentTime=t.start;
+}
+
 function setMediaState(s){
   mediaState=s;
   document.getElementById('mBtnPlay').classList.toggle('m-active',s==='playing');
@@ -2652,6 +2659,7 @@ function saveLinkAudio(){
   b.audioName=laPending.name;
   ttsMode=false;
   _audio.src=b.audioUrl; _audio.playbackRate=b.playbackRate||1; _audio.load();
+  _audio.addEventListener('loadedmetadata',()=>seekAudioToSentence(),{once:true});
   $('seekStrip').style.display='';
   $('ttsBar').style.display='none';
   if(!IS_PWA) saveLibrary();
@@ -2909,7 +2917,7 @@ async function pwaOpenBook(i){
       else { b.ebookData=await ebookFile.text(); }
     }catch(e){ console.warn('Folio: ebook load failed',e); }
   }
-  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); });
+  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); seekAudioToSentence(); });
   setupMediaSession();
   updatePageTitle();
 }

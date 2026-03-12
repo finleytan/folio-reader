@@ -89,7 +89,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | **LIBRARY UI** | `renderLib()`, `renameBook()`, `deleteBook()`, `configurePlayerForMode()` |
 | **PLAYER CONFIG** | `configurePlayerForMode(b, audioSrc, rate)` — decides ttsMode, shows/hides seek strip vs TTS bar |
 | **OPEN BOOK / GO LIB** | `openBook(i)`, `goLib()` |
-| **MEDIA CONTROLS** | `setMediaState()`, `togglePlay()`, `mediaPlay/Pause/Stop()`, `skip()`, `setRate()`, `setVol()`, `toggleMute()`, seek handlers |
+| **MEDIA CONTROLS** | `setMediaState()`, `togglePlay()`, `mediaPlay/Pause/Stop()`, `skip()`, `setRate()`, `setVol()`, `toggleMute()`, `seekAudioToSentence()`, seek handlers |
 | **AUDIO EVENTS** | `_wordTick()` (rAF word highlight), `startWordTicker()`, `stopWordTicker()`, `wireAudioEvents()` (timeupdate/ended/play/pause) |
 | **SCROLL ENGINE** | `startScrollEngine()`, `stopScrollEngine()`, `advanceSent()`, `nudge(n)`, `resync()` |
 | **TTS** | `getTtsVoices()`, `setTtsVoice()`, `setTtsRate()`, `ttsPlay()`, `ttsPause()`, `ttsStop()` |
@@ -312,6 +312,7 @@ loadEbook(book, onDone)
   └── clears _activeSentEl/_activeWordEl → wipes #eContent → parses ebook format →
       builds DOM in chunks (DocumentFragment + yieldToMain) → populates sentences[] →
       buildToc() → buildSentenceTimings() (if transcript) → onDone()
+      (onDone in openBook/pwaOpenBook restores curSent then calls seekAudioToSentence())
 
 loadTranscriptData(b)
   └── setBannerState('loading') → parses JSON/TXT → setBannerState('ready') →
@@ -321,6 +322,11 @@ buildSentenceTimings()
   └── setBannerState('syncing') → greedy forward Jaccard match: ebook sentences →
       transcript word runs → populates sentenceTimings[] + wordTimings[] →
       setBannerState('ready')
+
+seekAudioToSentence()
+  └── if audio mode && curSent > 0 && sentenceTimings exists:
+      seek _audio.currentTime to sentenceTimings[curSent].start
+      (sparse fallback: scans backward for nearest matched sentence)
 ```
 
 ### Highlighting & Scroll
