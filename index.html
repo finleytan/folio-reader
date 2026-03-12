@@ -204,15 +204,13 @@ body.theme-night{
 /* ── SEEK STRIP ── */
 .seek-strip{background:var(--surface);border-bottom:1px solid var(--border);display:flex;flex-direction:column;padding:8px 14px 6px;flex-shrink:0;}
 .seek-row{display:flex;align-items:center;gap:6px;width:100%;}
-.seek-row+.seek-row{margin-top:4px;padding-top:4px;border-top:1px solid var(--border);}
 .seek-time{font-size:11px;color:var(--text3);font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0;min-width:34px;}
 .seek-time.right{text-align:right;}
 .seek-strip-bar{flex:1;height:6px;-webkit-appearance:none;appearance:none;background:var(--border);border-radius:3px;cursor:pointer;outline:none;transition:height .15s;}
 .seek-strip-bar:hover{height:8px;}
 .seek-strip-bar::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.4),0 0 0 2px rgba(91,141,239,.2);border:2px solid var(--surface);transition:transform .1s;}
 .seek-strip-bar::-webkit-slider-thumb:hover{transform:scale(1.15);}
-.rate-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;white-space:nowrap;flex-shrink:0;}
-.rate-presets{display:flex;align-items:center;gap:3px;flex-shrink:0;}
+.rate-presets{display:flex;align-items:center;gap:3px;flex-wrap:wrap;}
 .rate-preset-btn{padding:4px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;transition:background-color .15s,border-color .15s,color .15s;white-space:nowrap;min-height:30px;font-family:var(--font-ui);}
 .rate-preset-btn:hover{border-color:var(--accent);color:var(--accent);}
 .rate-preset-btn.active{background:var(--accent);border-color:var(--accent);color:white;}
@@ -280,43 +278,9 @@ body.theme-night{
 @keyframes word-flash{0%{background:var(--accent);color:white;box-shadow:0 0 8px rgba(91,141,239,.5);}100%{background:transparent;color:inherit;box-shadow:none;}}
 .word.flashing{animation:word-flash .35s ease;}
 
-/* ── BOTTOM BAR ── */
-.bottom-bar{background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;box-shadow:0 -2px 12px var(--shadow);}
-.bb-row{display:flex;align-items:center;gap:8px;padding:8px 14px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.bb-row::-webkit-scrollbar{display:none;}
-.bb-row+.bb-row{border-top:1px solid var(--border);}
-.bb-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;font-weight:500;flex-shrink:0;}
-.state-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px 5px 10px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--bg2);color:var(--text3);transition:background-color .3s,border-color .3s,color .3s;min-width:86px;justify-content:center;flex-shrink:0;}
-.state-badge.playing{background:rgba(20,60,30,.9);border-color:rgba(42,100,65,.8);color:#5dc888;box-shadow:0 0 12px rgba(93,200,136,.15);}
-.state-badge.paused{background:rgba(42,36,15,.9);border-color:rgba(90,74,15,.8);color:#c8a840;}
-.state-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
-.state-badge.playing .state-dot{animation:pulse 1.4s infinite;}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.8);}}
-.m-btn{padding:0 14px;height:var(--touch);border-radius:var(--radius-sm);background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-family:var(--font-ui);font-size:13px;font-weight:500;cursor:pointer;transition:background-color .15s,border-color .15s,color .15s;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;}
-.m-btn:hover{background:var(--surface2);color:var(--text);}
-.m-btn.m-active{background:var(--accent);border-color:var(--accent);color:white;}
-.nudge-btn{padding:0 11px;height:var(--touch);border-radius:var(--radius-sm);background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-family:var(--font-ui);font-size:13px;font-weight:500;cursor:pointer;transition:background-color .15s,border-color .15s,color .15s;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-.nudge-btn:hover{background:var(--surface2);color:var(--text);}
-.wpm-group{display:flex;align-items:center;gap:5px;flex-shrink:0;}
-.wpm-adj{width:var(--touch);height:var(--touch);border-radius:var(--radius-sm);background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-family:var(--font-ui);font-size:16px;font-weight:600;cursor:pointer;transition:background-color .15s,border-color .15s,color .15s;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.wpm-adj:hover{background:var(--surface2);color:var(--text);}
-.wpm-input{width:64px;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-family:var(--font-ui);font-size:14px;font-weight:600;text-align:center;outline:none;transition:border-color .2s;height:var(--touch);}
-.wpm-input:focus{border-color:var(--accent);}
-.spd-lbl{font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;}
-.as-wrap{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;}
-.as-lbl{font-size:12px;color:var(--text2);white-space:nowrap;}
-.sync-panel{background:var(--bg2);border-top:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.sync-panel::-webkit-scrollbar{display:none;}
-.sync-group{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.sync-anchor{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-size:12px;color:var(--text2);flex-shrink:0;}
-.sync-anchor.set{border-color:var(--accent);color:var(--accent);}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0;}
-.sync-anchor.set .sync-dot{background:var(--accent);}
-.sync-anchor-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--text3);}
-.sync-anchor-val{font-size:11px;}
-#syncPanel{overflow:hidden;max-height:0;transition:max-height .25s ease;}
-#syncPanel.open{max-height:80px;}
-#syncToggleBtn.active{color:var(--accent);border-color:var(--accent);}
+/* ── RATE BUTTON (seek strip) ── */
+.rate-btn-inline{padding:2px 8px;height:24px;border-radius:6px;border:1px solid var(--accent);background:rgba(91,141,239,.1);color:var(--accent);font-family:var(--font-ui);font-size:12px;font-weight:700;cursor:pointer;transition:background-color .15s,border-color .15s,color .15s;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;justify-content:center;min-width:36px;}
+.rate-btn-inline:hover{background:rgba(91,141,239,.2);}
 
 /* ── RELINK OVERLAY ── */
 .relink-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:flex-end;justify-content:center;z-index:2500;}
@@ -359,23 +323,15 @@ body.theme-night{
   .play-btn{width:40px;height:40px;font-size:15px;}
   .seek-strip{flex-direction:row;align-items:center;gap:10px;padding:8px 18px 10px;}
   .seek-row{display:contents;}
-  .seek-row+.seek-row{margin:0;padding:0;border:none;}
   .seek-strip-bar::-webkit-slider-thumb{width:16px;height:16px;}
   .opt-panel{top:68px;right:16px;}
   .toc-item{padding:7px 16px;font-size:13px;}
   .ebook-scroll{padding:52px 36px 60px;}
-  .bb-row{padding:9px 18px;gap:10px;overflow-x:visible;}
-  .sync-panel{padding:10px 18px;overflow-x:visible;}
   .book-card-actions{opacity:0;transition:opacity .2s;}
   .book-card:hover .book-card-actions{opacity:1;}
-  .m-btn{height:auto;padding:5px 13px;font-size:12px;}
-  .nudge-btn{height:auto;padding:5px 9px;font-size:11px;}
-  .wpm-adj{width:28px;height:28px;font-size:13px;}
-  .wpm-input{width:58px;height:auto;padding:4px 6px;font-size:13px;}
   .toggle{width:36px;height:20px;}
   .toggle::after{width:14px;height:14px;top:3px;}
   .toggle.on::after{left:19px;}
-  .state-badge{font-size:11px;padding:3px 10px 3px 8px;}
   .vol-wrap{display:flex;}
 }
 
@@ -388,31 +344,18 @@ body.theme-night{
   .play-btn{width:46px;height:46px;font-size:17px;}
   .back-btn{width:40px;height:40px;}
   .vol-wrap{display:none;}
-  .seek-strip{padding:6px 12px 8px;}
+  .seek-strip{padding:4px 12px;}
   .seek-time{font-size:11px;min-width:32px;}
   .seek-strip-bar::-webkit-slider-thumb{width:22px;height:22px;}
-  .seek-row+.seek-row{margin-top:4px;}
-  .rate-preset-btn{padding:5px 8px;font-size:11px;min-height:32px;flex:1;}
-  .rate-custom-input{width:44px;font-size:11px;padding:4px;min-height:32px;}
-  .rate-lbl{display:none;}
-  .bb-row{padding:8px 12px;gap:6px;}
-  .m-btn{height:42px;padding:0 12px;font-size:13px;}
-  .nudge-btn{height:42px;padding:0 10px;font-size:13px;}
-  .bottom-bar{padding-bottom:env(safe-area-inset-bottom,0px);}
   .opt-panel{position:fixed;top:auto !important;bottom:0;left:0;right:0;width:auto !important;border-radius:20px 20px 0 0;max-height:78vh;padding-bottom:env(safe-area-inset-bottom,0px);}
   .lib-grid{grid-template-columns:repeat(2,1fr);gap:12px;padding:0 14px 40px;}
   .lib-header{padding:28px 20px 20px;}
   .lib-logo{font-size:32px;}
   .lib-tagline{font-size:12px;}
-  .ebook-scroll{padding:16px 14px 100px;}
+  .ebook-scroll{padding:16px 14px 40px;}
   .toc-sidebar{width:82vw !important;}
   .modal{border-radius:20px 20px 0 0;max-height:90vh;}
   .modal-overlay{align-items:flex-end;}
-}
-@supports(padding-bottom:env(safe-area-inset-bottom)){
-  @media(max-width:639px){
-    .bottom-bar{padding-bottom:calc(env(safe-area-inset-bottom) + 2px);}
-  }
 }
 /* TOC mobile overlay */
 .toc-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:50;}
@@ -428,14 +371,14 @@ audio{display:none;}
 /* ── SMOOTH THEME TRANSITION ── */
 html,body,
 #library,#player,#pwaFirstRun,#pwaRegrant,
-.top-bar,.bottom-bar,.seek-strip,.opt-panel,
+.top-bar,.seek-strip,.opt-panel,
 .modal,.relink-sheet,.toc-sidebar,
 .book-card,.ebook-scroll,.ebook-content{
   transition:background-color .2s,border-color .2s,color .2s;
 }
 
 /* ── BUTTON PRESS FEEDBACK ── */
-.nudge-btn:active,.m-btn:active,.btn:active,.ic-btn:active,
+.btn:active,.ic-btn:active,
 .back-btn:active,.play-btn:active,.card-action-btn:active,
 .pill:active,.ipill:active,.op-tab:active{
   transform:scale(0.93);
@@ -620,6 +563,36 @@ html,body,
           <div class="op-ttl">Word Highlight</div>
           <div class="op-row"><span class="op-lbl">Show current word</span><button class="toggle on" id="wordHlToggle" onclick="toggleWordHl()"></button></div>
         </div>
+        <div class="op-sec">
+          <div class="op-ttl">Playback Rate</div>
+          <div class="op-row">
+            <div class="rate-presets">
+              <button class="rate-preset-btn" onclick="setRate(0.75)">0.75×</button>
+              <button class="rate-preset-btn active" onclick="setRate(1)">1×</button>
+              <button class="rate-preset-btn" onclick="setRate(1.25)">1.25×</button>
+              <button class="rate-preset-btn" onclick="setRate(1.5)">1.5×</button>
+              <button class="rate-preset-btn" onclick="setRate(2)">2×</button>
+              <input type="number" class="rate-custom-input" id="rateCustom" value="1" min="0.1" max="4" step="0.05"
+                title="Custom speed" onchange="setRate(this.value)" onkeydown="if(event.key==='Enter')setRate(this.value)">
+            </div>
+          </div>
+        </div>
+        <div class="op-sec">
+          <div class="op-ttl">Controls</div>
+          <div class="op-row"><span class="op-lbl">Auto-scroll</span><button class="toggle on" id="asToggle" onclick="toggleAS()"></button></div>
+          <div class="op-row" style="gap:8px">
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" id="resyncBtn" onclick="resync()">↺ Resync</button>
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="mediaStop()">⏹ Stop</button>
+          </div>
+          <div class="op-row" id="offsetRow" style="display:none">
+            <span class="op-lbl">Sync offset</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <button class="btn btn-ghost" style="font-size:12px;padding:4px 10px" onclick="adjustOffset(-0.5)">-0.5s</button>
+              <span id="offsetVal" style="font-size:13px;min-width:48px;text-align:center">0.0s</span>
+              <button class="btn btn-ghost" style="font-size:12px;padding:4px 10px" onclick="adjustOffset(+0.5)">+0.5s</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="op-tab-body" id="opTab-display" style="display:none">
         <div class="op-sec">
@@ -669,18 +642,7 @@ html,body,
         <span class="vol-icon" id="volIcon" onclick="toggleMute()">🔊</span>
         <input type="range" class="vol-slider" id="volBar" min="0" max="1" step="0.02" value="1" oninput="setVol(this.value)">
       </div>
-    </div>
-    <div class="seek-row">
-      <span class="rate-lbl">Speed</span>
-      <div class="rate-presets">
-        <button class="rate-preset-btn" onclick="setRate(0.75)">0.75×</button>
-        <button class="rate-preset-btn active" onclick="setRate(1)">1×</button>
-        <button class="rate-preset-btn" onclick="setRate(1.25)">1.25×</button>
-        <button class="rate-preset-btn" onclick="setRate(1.5)">1.5×</button>
-        <button class="rate-preset-btn" onclick="setRate(2)">2×</button>
-        <input type="number" class="rate-custom-input" id="rateCustom" value="1" min="0.1" max="4" step="0.05"
-          title="Custom speed" onchange="setRate(this.value)" onkeydown="if(event.key==='Enter')setRate(this.value)">
-      </div>
+      <button class="rate-btn-inline" id="rateBtnInline" onclick="toggleOpts();switchOptTab('playback',document.querySelector('.op-tab'))" title="Playback rate">1×</button>
     </div>
   </div>
 
@@ -731,52 +693,6 @@ html,body,
     </div>
   </div>
 
-  <!-- BOTTOM BAR -->
-  <div class="bottom-bar">
-    <div class="bb-row">
-      <button class="m-btn m-active" id="mBtnPlay" onclick="mediaPlay()">▶ Play</button>
-      <button class="m-btn" id="mBtnPause" onclick="mediaPause()">⏸ Pause</button>
-      <button class="m-btn" id="mBtnStop" onclick="mediaStop()">⏹ Stop</button>
-      <div class="vdiv"></div>
-      <span class="bb-lbl">Jump</span>
-      <div style="display:flex;gap:4px">
-        <button class="nudge-btn" onclick="nudge(-10)">−10</button>
-        <button class="nudge-btn" onclick="nudge(-5)">−5</button>
-        <button class="nudge-btn" onclick="nudge(-1)">−1</button>
-        <button class="nudge-btn" onclick="nudge(1)">+1</button>
-        <button class="nudge-btn" onclick="nudge(5)">+5</button>
-        <button class="nudge-btn" onclick="nudge(10)">+10</button>
-      </div>
-      <div class="vdiv"></div>
-      <div class="as-wrap">
-        <span class="as-lbl">Auto-scroll</span>
-        <button class="toggle on" id="asToggle" onclick="toggleAS()"></button>
-      </div>
-      <button class="m-btn" id="resyncBtn" onclick="resync()" style="display:none;border-color:var(--accent);color:var(--accent)">↺ Resync</button>
-      <button class="m-btn" id="syncToggleBtn" onclick="toggleSyncPanel()" style="margin-left:auto;color:var(--text3);font-size:11px" title="Advanced sync">⚙ Sync</button>
-    </div>
-    <div id="syncPanel">
-      <div class="sync-panel" id="syncPanelInner">
-        <span class="bb-lbl">Sync</span>
-        <div class="sync-group">
-          <div class="sync-anchor" id="audioAnchorEl">
-            <span class="sync-dot"></span>
-            <span><span class="sync-anchor-lbl">Audio start</span><br><span class="sync-anchor-val" id="audioAnchorVal">Not set</span></span>
-          </div>
-          <button class="m-btn" onclick="setAudioAnchor()">Set audio start</button>
-        </div>
-        <div class="sync-group">
-          <div class="sync-anchor" id="textAnchorEl">
-            <span class="sync-dot"></span>
-            <span><span class="sync-anchor-lbl">Text start</span><br><span class="sync-anchor-val" id="textAnchorVal">Not set</span></span>
-          </div>
-          <button class="m-btn" onclick="setTextAnchor()">Set text start</button>
-        </div>
-        <button class="nudge-btn" onclick="clearAnchors()">Clear</button>
-        <span class="spd-lbl" id="anchorStatus" style="margin-left:4px"></span>
-      </div>
-    </div>
-  </div>
 </div><!-- /player -->
 
 <!-- ════ ADD BOOK MODAL ════ -->
@@ -936,8 +852,9 @@ let curSent = 0; let curWord = 0;
 let autoScroll = true; let scrollPaused = false; let scrollTimer = null;
 let lastAdvanceTime = 0; let wpm = 150; let sentPauseMs = 500;
 let mediaState = 'stopped'; let tocOpen = false; let wordHlOn = true;
-let isSeeking = false; let audioZero = null; let textZero = null;
+let isSeeking = false;
 let sentenceTimings = [];
+let syncOffset = 0;
 let transcriptWords = null; let transcriptText = null;
 let ttsMode = false; let ttsSpeaking = false; let ttsUtterance = null;
 let ttsVoice = null; let ttsPaused = false;
@@ -1320,7 +1237,6 @@ function saveBookProgress(){
   b.audioTime=isFinite(_audio.currentTime)?_audio.currentTime:0;
   b.wpm=wpm; b.sentPauseMs=sentPauseMs;
   b.playbackRate=_audio.playbackRate||1;
-  b.audioZero=audioZero; b.textZero=textZero;
   b.totalSents=sentences.length||b.totalSents||1;
   saveLibrary();
 }
@@ -1333,7 +1249,7 @@ function flushPositionSync(){
       if(curBookIdx<0) return;
       const b=library[curBookIdx];
       // Synchronous write — mirrors savePwaProgress() but no IDB
-      const prog={curSent,curWord,audioTime:isFinite(_audio.currentTime)?_audio.currentTime:0,wpm,sentPauseMs,playbackRate:_audio.playbackRate||1,audioZero,textZero,totalSents:sentences.length||b.totalSents||1};
+      const prog={curSent,curWord,audioTime:isFinite(_audio.currentTime)?_audio.currentTime:0,wpm,sentPauseMs,playbackRate:_audio.playbackRate||1,totalSents:sentences.length||b.totalSents||1};
       Object.assign(b,prog);
       const all=getPwaProgress();
       all[b.id]=prog;
@@ -1345,7 +1261,6 @@ function flushPositionSync(){
       b.audioTime=isFinite(_audio.currentTime)?_audio.currentTime:0;
       b.wpm=wpm; b.sentPauseMs=sentPauseMs;
       b.playbackRate=_audio.playbackRate||1;
-      b.audioZero=audioZero; b.textZero=textZero;
       b.totalSents=sentences.length||b.totalSents||1;
       // Synchronous localStorage write only — strip blobs (they live in IDB now)
       try{
@@ -1531,8 +1446,7 @@ function openBook(i){
   const b=library[i];
   curBookIdx=i;
   wpm=b.wpm||wpm; sentPauseMs=b.sentPauseMs||sentPauseMs;
-  audioZero=b.audioZero||null; textZero=b.textZero||null;
-  updateAnchorUI();
+  syncOffset=b.syncOffset||0; updateOffsetUI();
   $('library').style.display='none';
   $('player').style.display='flex';
   $('pTitle').textContent=b.title;
@@ -1553,7 +1467,7 @@ function goLib(){
   document.getElementById('library').style.display='flex';
   document.getElementById('player').style.display='none';
   document.getElementById('optPanel').classList.remove('open');
-  curBookIdx=-1; transcriptWords=null; transcriptText=null; sentenceTimings=[]; wordTimings=[];
+  curBookIdx=-1; transcriptWords=null; transcriptText=null; sentenceTimings=[]; wordTimings=[]; syncOffset=0;
   _activeSentEl=null; _activeWordEl=null;
   releaseWakeLock();
   clearSleepTimer(); _sleepTimerIdx=0;
@@ -1568,14 +1482,11 @@ function seekAudioToSentence(){
   if(ttsMode||curSent<=0||!sentenceTimings) return;
   let t=sentenceTimings[curSent];
   if(!t) for(let i=curSent-1;i>=0;i--){ if(sentenceTimings[i]){t=sentenceTimings[i];break;} }
-  if(t) _audio.currentTime=t.start;
+  if(t) _audio.currentTime=t.start-syncOffset;
 }
 
 function setMediaState(s){
   mediaState=s;
-  document.getElementById('mBtnPlay').classList.toggle('m-active',s==='playing');
-  document.getElementById('mBtnPause').classList.toggle('m-active',s==='paused');
-  document.getElementById('mBtnStop').classList.toggle('m-active',s==='stopped');
 }
 function togglePlay(){
   if(ttsMode){ ttsSpeaking?ttsPause():ttsPlay(); return; }
@@ -1625,6 +1536,8 @@ function setRate(v){
   });
   const rc=$('rateCustom');
   if(rc) rc.value=v;
+  const ri=$('rateBtnInline');
+  if(ri) ri.textContent=v+'×';
   if(curBookIdx>=0){ library[curBookIdx].playbackRate=v; if(!IS_PWA) saveLibrary(); }
   saveDisplayPrefs();
 }
@@ -1656,14 +1569,12 @@ let _rafId = null;
 function _wordTick(){
   _rafId = null;
   if(mediaState !== 'playing') return;
-  const t   = _audio.currentTime;
+  const t   = _audio.currentTime + syncOffset;
   const wt  = wordTimings[curSent];
   if(wt && wt.starts && wt.count > 0){
     const starts = wt.starts;
-    let w = 0;
-    for(let i = 0; i < starts.length; i++){
-      if(t >= starts[i]) w = i; else break;
-    }
+    let lo=0, hi=starts.length-1, w=0;
+    while(lo<=hi){ const mid=(lo+hi)>>1; if(t>=starts[mid]){w=mid;lo=mid+1;}else hi=mid-1; }
     w = Math.min(w, wt.count - 1);
     if(w !== curWord){
       curWord = w;
@@ -1695,7 +1606,7 @@ function wireAudioEvents(){
       }
     }
     if(!sentenceTimings.length || mediaState!=='playing') return;
-    const t = this.currentTime;
+    const t = this.currentTime + syncOffset;
     let bestSent = 0;
     for(let i = 0; i < sentenceTimings.length; i++){
       if(sentenceTimings[i] && t >= sentenceTimings[i].start) bestSent = i;
@@ -1766,13 +1677,22 @@ function nudge(n){
 }
 function resync(){
   if(!sentenceTimings.length) return;
-  const t=_audio.currentTime;
+  const t=_audio.currentTime+syncOffset;
   let best=0;
   for(let i=0;i<sentenceTimings.length;i++){
     if(sentenceTimings[i]&&t>=sentenceTimings[i].start) best=i;
   }
   curSent=best; curWord=0; updateHL(); updateProg();
   document.getElementById('resyncBtn').style.display='none';
+}
+function adjustOffset(delta){
+  syncOffset=Math.round((syncOffset+delta)*10)/10;
+  updateOffsetUI();
+  if(curBookIdx>=0){ library[curBookIdx].syncOffset=syncOffset; if(!IS_PWA) saveLibrary(); }
+}
+function updateOffsetUI(){
+  const el=$('offsetVal');
+  if(el) el.textContent=(syncOffset>=0?'+':'')+syncOffset.toFixed(1)+'s';
 }
 
 // ══════════════════════════════════════════════════════
@@ -1850,45 +1770,6 @@ function ttsStop(){
   speechSynthesis.cancel(); ttsSpeaking=false; ttsPaused=false; ttsUtterance=null;
   setMediaState('stopped'); setPlayBtnIcon(false);
   stopScrollEngine(); releaseWakeLock(); updateMediaSessionState(false); updatePageTitle();
-}
-
-// ══════════════════════════════════════════════════════
-// SYNC ANCHORS
-// ══════════════════════════════════════════════════════
-function setAudioAnchor(){
-  audioZero=isFinite(_audio.currentTime)?_audio.currentTime:0;
-  updateAnchorUI(); saveBookProgress();
-}
-function setTextAnchor(){
-  textZero=curSent;
-  updateAnchorUI(); saveBookProgress();
-}
-function clearAnchors(){
-  audioZero=null; textZero=null;
-  updateAnchorUI(); saveBookProgress();
-}
-function updateAnchorUI(){
-  const aEl=document.getElementById('audioAnchorEl');
-  const tEl=document.getElementById('textAnchorEl');
-  const aVal=document.getElementById('audioAnchorVal');
-  const tVal=document.getElementById('textAnchorVal');
-  const stat=document.getElementById('anchorStatus');
-  aEl.classList.toggle('set',audioZero!==null);
-  tEl.classList.toggle('set',textZero!==null);
-  aVal.textContent=audioZero!==null?fmt(audioZero):'Not set';
-  tVal.textContent=textZero!==null?'Sentence '+(textZero+1):'Not set';
-  if(audioZero!==null&&textZero!==null){
-    stat.textContent='✓ Anchors set';
-    stat.style.color='var(--accent)';
-  } else {
-    stat.textContent='';
-  }
-}
-function toggleSyncPanel(){
-  const p=document.getElementById('syncPanel');
-  const btn=document.getElementById('syncToggleBtn');
-  p.classList.toggle('open');
-  btn.classList.toggle('active');
 }
 
 // ══════════════════════════════════════════════════════
@@ -2050,6 +1931,7 @@ document.addEventListener('click',(e)=>{
 async function loadTranscriptData(b){
   transcriptWords=null; transcriptText=null; sentenceTimings=[]; wordTimings=[];
   document.getElementById('resyncBtn').style.display='none';
+  document.getElementById('offsetRow').style.display='none';
   setBannerState('hidden');
   if(!b.transcriptType) return;
   setBannerState('loading','Loading transcript…');
@@ -2086,6 +1968,7 @@ async function loadTranscriptData(b){
     }
     if(sentences.length) await buildSentenceTimings();
     document.getElementById('resyncBtn').style.display='';
+    document.getElementById('offsetRow').style.display='';
   }catch(e){
     setBannerState('error','Error parsing transcript: '+e.message);
   }
@@ -2117,96 +2000,116 @@ async function buildSentenceTimings(){
     start: w.start, end: w.end, idx: i
   })).filter(w=>w.word.length>0);
 
-  // For each ebook sentence find the best-matching run in transcript
-  // using a greedy forward search with Jaccard on word sets
-  let searchFrom = 0; // keep search cursor moving forward for speed
-
-  sentences.forEach((s,si)=>{
-    // Tokenise sentence into clean words
-    const sWords = s.text.replace(/[^a-z0-9' ]/gi,' ').toLowerCase().split(/\s+/).filter(Boolean);
-    if(!sWords.length) return;
-
-    const sSet = new Set(sWords);
-    const windowLen = Math.max(sWords.length * 2, 10);
-
-    let bestScore = 0, bestStart = -1, bestEnd = -1;
-
-    // Search from cursor, but also allow looking back a little (for out-of-order edge cases)
-    const lo = Math.max(0, searchFrom - 5);
-    const hi = Math.min(tw.length - sWords.length, lo + windowLen * 4);
-
-    for(let wi = lo; wi <= hi; wi++){
-      // Build running window of transcript words
-      let run = [];
-      for(let wj = wi; wj < tw.length && run.length < sWords.length * 3; wj++){
+  // Helper: Jaccard-match an ebook sentence against a transcript window
+  function findMatch(sWords, sSet, lo, hi, earlyStop){
+    let bestScore=0, bestStart=-1, bestEnd=-1;
+    for(let wi=lo;wi<=hi;wi++){
+      let run=[];
+      for(let wj=wi;wj<tw.length&&run.length<sWords.length*3;wj++){
         run.push(tw[wj]);
-        // Score when run is around the right length
-        if(run.length >= Math.max(1, sWords.length - 2)){
-          const runSet = new Set(run.map(r=>r.word));
-          let inter = 0; sSet.forEach(w=>{ if(runSet.has(w)) inter++; });
-          const union = new Set([...sSet,...runSet]).size;
-          const score = union ? inter/union : 0;
-          if(score > bestScore){
-            bestScore = score;
-            bestStart = wi;
-            bestEnd = wj;
-          }
-          // Stop extending if we already have a great match
-          if(score > 0.85) break;
+        if(run.length>=Math.max(1,sWords.length-2)){
+          const runSet=new Set(run.map(r=>r.word));
+          let inter=0; sSet.forEach(w=>{ if(runSet.has(w)) inter++; });
+          const union=new Set([...sSet,...runSet]).size;
+          const score=union?inter/union:0;
+          if(score>bestScore){ bestScore=score; bestStart=wi; bestEnd=wj; }
+          if(score>earlyStop) break;
         }
       }
-      if(bestScore > 0.85) break;
+      if(bestScore>earlyStop) break;
     }
+    return {bestScore,bestStart,bestEnd};
+  }
 
-    if(bestStart >= 0 && bestScore > 0.35){
-      const matchedTw = tw.slice(bestStart, bestEnd + 1);
-      const tStart = matchedTw[0].start;
-      const tEnd   = matchedTw[matchedTw.length - 1].end;
-      sentenceTimings[si] = { start: tStart, end: tEnd };
-
-      // Build strictly-increasing per-ebook-word start times.
-      // Use transcript word start times directly — one per ebook word.
-      // If ebook has more words than transcript: interpolate the gaps.
-      // If ebook has fewer words: skip some transcript words evenly.
-      // Either way every ebook word gets a UNIQUE timestamp so no two
-      // words fire at the same time and there are no skips.
-      const ebCount = s.words.length;
-      const wStarts = new Array(ebCount);
-
-      if(ebCount === 1){
-        wStarts[0] = tStart;
-      } else if(matchedTw.length >= ebCount){
-        // More transcript words than ebook words — sample evenly
-        for(let wi = 0; wi < ebCount; wi++){
-          const twIdx = Math.round(wi * (matchedTw.length - 1) / (ebCount - 1));
-          wStarts[wi] = matchedTw[Math.min(twIdx, matchedTw.length - 1)].start;
-        }
-      } else {
-        // Fewer transcript words than ebook words — assign transcript words
-        // to evenly-spaced ebook positions, fill gaps by interpolation
-        // Step 1: place transcript word timestamps at their proportional ebook positions
-        const anchors = matchedTw.map((tw3, ti) => ({
-          ebIdx: Math.round(ti * (ebCount - 1) / (matchedTw.length - 1)),
-          t: tw3.start
-        }));
-        // Step 2: linear interpolation between anchors
-        for(let ai = 0; ai < anchors.length - 1; ai++){
-          const a0 = anchors[ai], a1 = anchors[ai + 1];
-          for(let wi = a0.ebIdx; wi <= a1.ebIdx; wi++){
-            const frac = a1.ebIdx > a0.ebIdx ? (wi - a0.ebIdx) / (a1.ebIdx - a0.ebIdx) : 0;
-            wStarts[wi] = a0.t + frac * (a1.t - a0.t);
-          }
-        }
-        wStarts[ebCount - 1] = anchors[anchors.length - 1].t;
+  // Helper: build per-word timing for a matched sentence
+  function assignWordTimings(si, s, matchedTw, tStart){
+    const ebCount=s.words.length;
+    const wStarts=new Array(ebCount);
+    if(ebCount===1){ wStarts[0]=tStart; }
+    else if(matchedTw.length>=ebCount){
+      for(let wi=0;wi<ebCount;wi++){
+        const twIdx=Math.round(wi*(matchedTw.length-1)/(ebCount-1));
+        wStarts[wi]=matchedTw[Math.min(twIdx,matchedTw.length-1)].start;
       }
-
-      // Guarantee strictly increasing (dedup any ties caused by rounding)
-      for(let wi = 1; wi < ebCount; wi++){
-        if(wStarts[wi] <= wStarts[wi - 1]) wStarts[wi] = wStarts[wi - 1] + 0.001;
+    } else {
+      const anchors=matchedTw.map((tw3,ti)=>({
+        ebIdx:Math.round(ti*(ebCount-1)/(matchedTw.length-1)), t:tw3.start
+      }));
+      for(let ai=0;ai<anchors.length-1;ai++){
+        const a0=anchors[ai],a1=anchors[ai+1];
+        for(let wi=a0.ebIdx;wi<=a1.ebIdx;wi++){
+          const frac=a1.ebIdx>a0.ebIdx?(wi-a0.ebIdx)/(a1.ebIdx-a0.ebIdx):0;
+          wStarts[wi]=a0.t+frac*(a1.t-a0.t);
+        }
       }
+      wStarts[ebCount-1]=anchors[anchors.length-1].t;
+    }
+    for(let wi=1;wi<ebCount;wi++){
+      if(wStarts[wi]<=wStarts[wi-1]) wStarts[wi]=wStarts[wi-1]+0.001;
+    }
+    wordTimings[si]={starts:wStarts,count:ebCount};
+  }
 
-      wordTimings[si] = { starts: wStarts, count: ebCount };
-      searchFrom = Math.max(searchFrom, bestStart + 1);
+  // Helper: accept a match for sentence si
+  function acceptMatch(si, bestStart, bestEnd){
+    const matchedTw=tw.slice(bestStart,bestEnd+1);
+    const tStart=matchedTw[0].start;
+    const tEnd=matchedTw[matchedTw.length-1].end;
+    sentenceTimings[si]={start:tStart,end:tEnd};
+    assignWordTimings(si,sentences[si],matchedTw,tStart);
+  }
+
+  // Tokenise all sentences once
+  const sentTokens=sentences.map(s=>{
+    const sWords=s.text.replace(/[^a-z0-9' ]/gi,' ').toLowerCase().split(/\s+/).filter(Boolean);
+    return {sWords,sSet:new Set(sWords)};
+  });
+
+  // ── Pass 1: Anchor pass — high-confidence matches only ──
+  let searchFrom=0;
+  const anchorTwIdx=[]; // anchorTwIdx[si] = bestStart index in tw (for anchors only)
+  sentences.forEach((s,si)=>{
+    const {sWords,sSet}=sentTokens[si];
+    if(!sWords.length) return;
+    const windowLen=Math.max(sWords.length*2,10);
+    const lo=Math.max(0,searchFrom-5);
+    const hi=Math.min(tw.length-sWords.length,lo+windowLen*8);
+    const {bestScore,bestStart,bestEnd}=findMatch(sWords,sSet,lo,hi,0.85);
+    if(bestStart>=0&&bestScore>=0.6){
+      acceptMatch(si,bestStart,bestEnd);
+      anchorTwIdx[si]=bestStart;
+      searchFrom=Math.max(searchFrom,bestStart+1);
+    }
+  });
+
+  // ── Pass 2: Fill pass — match remaining sentences between anchors ──
+  sentences.forEach((s,si)=>{
+    if(sentenceTimings[si]) return; // already matched
+    const {sWords,sSet}=sentTokens[si];
+    if(!sWords.length) return;
+    // Find nearest previous and next anchors
+    let prevTwEnd=0;
+    for(let j=si-1;j>=0;j--){
+      if(anchorTwIdx[j]!=null){
+        const prevMatch=tw.slice(anchorTwIdx[j]);
+        // Start after the previous anchor's matched region
+        const prevSentEnd=sentenceTimings[j];
+        for(let k=anchorTwIdx[j];k<tw.length;k++){
+          if(tw[k].start>=prevSentEnd.end){ prevTwEnd=k; break; }
+        }
+        break;
+      }
+    }
+    let nextTwStart=tw.length-1;
+    for(let j=si+1;j<sentences.length;j++){
+      if(anchorTwIdx[j]!=null){ nextTwStart=anchorTwIdx[j]; break; }
+    }
+    const lo=Math.max(0,prevTwEnd);
+    const hi=Math.min(tw.length-sWords.length,nextTwStart);
+    if(lo>hi) return;
+    const {bestScore,bestStart,bestEnd}=findMatch(sWords,sSet,lo,hi,0.85);
+    if(bestStart>=0&&bestScore>0.35){
+      acceptMatch(si,bestStart,bestEnd);
     }
   });
 
@@ -2221,14 +2124,23 @@ async function buildTimingsFromPlainText(){
   if(!txSents.length) return;
   const dur=isFinite(_audio.duration)?_audio.duration:0;
   if(!dur) return;
-  const timePerTxSent=dur/txSents.length;
+  // Proportional timing: weight each transcript sentence by word count
+  const txWordCounts=txSents.map(s=>s.split(/\s+/).filter(Boolean).length);
+  const totalWords=txWordCounts.reduce((a,b)=>a+b,0)||1;
+  const txTimings=[];
+  let cumTime=0;
+  txSents.forEach((ts,ti)=>{
+    const segDur=(txWordCounts[ti]/totalWords)*dur;
+    txTimings.push({start:cumTime,end:cumTime+segDur});
+    cumTime+=segDur;
+  });
   sentences.forEach((s,si)=>{
     let best=-1,bestScore=0;
     txSents.forEach((ts,ti)=>{
       const sc=similarity(s.text.toLowerCase(),ts.toLowerCase());
       if(sc>bestScore){bestScore=sc;best=ti;}
     });
-    if(best>=0&&bestScore>0.35) sentenceTimings[si]={start:best*timePerTxSent,end:(best+1)*timePerTxSent};
+    if(best>=0&&bestScore>0.35) sentenceTimings[si]=txTimings[best];
   });
   const matched = sentenceTimings.filter(Boolean).length;
   setBannerState('ready','Transcript synced · Ready to play',
@@ -2344,7 +2256,7 @@ function splitSentences(text){
   text=text.replace(/\s+/g,' ').trim();
   if(!text) return [];
   const parts=[];
-  const re=/[.!?]+["'»\u201d\u2019)}\]]?\s+|[.!?]+["'»\u201d\u2019)}\]]?$/g;
+  const re=/(?<!\b(?:Dr|Mr|Mrs|Ms|Prof|Rev|Sr|Jr|St|vs|etc|vol|ch|no))(?<!\b[A-Z])[.!?]+["'»\u201d\u2019)}\]]?\s+|[.!?]+["'»\u201d\u2019)}\]]?$/g;
   let last=0,m;
   while((m=re.exec(text))!==null){
     const end=m.index+m[0].length;
@@ -2550,7 +2462,7 @@ function addBook(){
       transcriptType:txType, transcriptData:txData,
       coverUrl:coverUrl||null, coverName:upData.cover?.name||null,
       curSent:0, curWord:0, audioTime:0, wpm:150, sentPauseMs:500, playbackRate:1,
-      audioZero:null, textZero:null, totalSents:1,
+      totalSents:1,
     });
     saveLibrary(); renderLib(); closeModal();
   };
@@ -2626,6 +2538,7 @@ function removeTranscript(){
   transcriptWords=null; transcriptText=null; sentenceTimings=[];
   setBannerState('hidden');
   document.getElementById('resyncBtn').style.display='none';
+  document.getElementById('offsetRow').style.display='none';
   if(!IS_PWA) saveLibrary();
   closeTxModal();
 }
@@ -2866,14 +2779,13 @@ async function pwaScanBookFolder(folderName,entry){
     coverHandle:coverFile?.handle||null, coverName:coverFile?.name||null,
     audioUrl:null, ebookData:null, transcriptType:null, transcriptData:null, coverUrl:null,
     curSent:0, curWord:0, audioTime:0, wpm:150, sentPauseMs:500, playbackRate:1,
-    audioZero:null, textZero:null,
   };
 }
 function getPwaProgress(){ try{ return JSON.parse(localStorage.getItem(PWA_PROG_KEY)||'{}'); }catch(e){ return {}; } }
 function savePwaProgress(){
   if(!IS_PWA||curBookIdx<0) return;
   const b=library[curBookIdx];
-  const prog={curSent,curWord,audioTime:isFinite(_audio.currentTime)?_audio.currentTime:0,wpm,sentPauseMs,playbackRate:_audio.playbackRate||1,audioZero,textZero,totalSents:sentences.length||b.totalSents||1};
+  const prog={curSent,curWord,audioTime:isFinite(_audio.currentTime)?_audio.currentTime:0,wpm,sentPauseMs,playbackRate:_audio.playbackRate||1,totalSents:sentences.length||b.totalSents||1};
   Object.assign(b,prog);
   const all=getPwaProgress();
   all[b.id]=prog;
@@ -2883,8 +2795,7 @@ async function pwaOpenBook(i){
   const b=library[i];
   curBookIdx=i;
   wpm=b.wpm||wpm; sentPauseMs=b.sentPauseMs||sentPauseMs;
-  audioZero=b.audioZero||null; textZero=b.textZero||null;
-  updateAnchorUI();
+  syncOffset=b.syncOffset||0; updateOffsetUI();
   showScreen('player');
   $('pTitle').textContent=b.title;
   const rate=b.playbackRate||1;

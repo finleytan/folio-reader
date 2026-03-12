@@ -2,7 +2,7 @@
 
 # Folio — Living Context Document
 
-Single-file HTML PWA (~3,004 lines). Audiobook/ebook reader with synced word-level highlighting.
+Single-file HTML PWA (~2,865 lines). Audiobook/ebook reader with synced word-level highlighting.
 Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default dark, light, night.
 
 ---
@@ -28,12 +28,11 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | Buttons | `.btn`, `.pill`, `.ipill`, `.toggle` |
 | Top bar | `.top-bar`, `.back-btn`, `.bk-info`, `.ic-btn`, `.play-btn` |
 | Options panel | `.opt-panel`, `.op-tab`, `.op-row`, `.op-slider` |
-| Seek strip | `.seek-strip`, `.seek-strip-bar`, `.rate-preset-btn`, `.vol-*` |
+| Seek strip | `.seek-strip`, `.seek-row`, `.seek-strip-bar`, `.seek-time`, `.rate-btn-inline`, `.vol-*` |
 | TTS bar | `.tts-bar` |
 | Transcript banner | `.tx-banner` (loading/syncing/ready/error), `.tx-spinner`, shimmer keyframes |
 | Reading progress | `.ebook-area`, `.read-progress-wrap`, `.read-progress-bar` |
 | Reader body | `.reader-body`, `.toc-sidebar`, `.toc-item`, `.ebook-scroll`, `.ebook-content`, `.sent`, `.word` |
-| Bottom bar | `.bottom-bar`, `.bb-row`, `.state-badge`, `.m-btn`, `.nudge-btn`, `.wpm-*`, `.sync-*` |
 | Relink overlay | `.relink-overlay`, `.relink-sheet` |
 | PWA screens | `.pwa-setup-card`, `.pwa-regrant-card` |
 | Media queries | `@media(min-width:640px)` desktop, `@media(max-width:639px)` mobile |
@@ -61,13 +60,12 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 |---|---|
 | `<audio id="audio">` | Hidden audio element |
 | `.top-bar` | Back button, title (`#pTitle`), progress text (`#pProg`), play button (`#playBtn`), option/TOC/transcript buttons |
-| `#optPanel` | Flyout options: 3 tabs (Playback, Display, Advanced) with sliders/toggles |
-| `#seekStrip` | Audio seek bar, time labels, rate presets, volume (hidden in TTS mode) |
+| `#optPanel` | Flyout options: 3 tabs (Playback, Display, Advanced) with sliders/toggles, rate presets, auto-scroll, resync, stop |
+| `#seekStrip` | Single-row: time label, seek bar, time label, rate button, volume (vol hidden on mobile; all hidden in TTS mode). ~30px tall on mobile (4px 12px padding) |
 | `#ttsBar` | TTS voice picker, rate slider (shown in TTS mode) |
 | `#txBanner` | Transcript status banner (loading/syncing/ready/error) |
 | `.read-progress-wrap` | Sentence-based reading progress bar (`#readProg`) |
 | `.reader-body` | TOC sidebar (`#tocSidebar` + `#tocList`) and ebook scroll area (`#eScroll` > `#eContent`) |
-| `.bottom-bar` | State badge, play/pause/stop/skip/nudge buttons, WPM controls, auto-scroll toggle, sync panel |
 
 ### JavaScript Sections
 
@@ -89,11 +87,10 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | **LIBRARY UI** | `renderLib()`, `renameBook()`, `deleteBook()`, `configurePlayerForMode()` |
 | **PLAYER CONFIG** | `configurePlayerForMode(b, audioSrc, rate)` — decides ttsMode, shows/hides seek strip vs TTS bar |
 | **OPEN BOOK / GO LIB** | `openBook(i)`, `goLib()` |
-| **MEDIA CONTROLS** | `setMediaState()`, `togglePlay()`, `mediaPlay/Pause/Stop()`, `skip()`, `setRate()`, `setVol()`, `toggleMute()`, `seekAudioToSentence()`, seek handlers |
+| **MEDIA CONTROLS** | `setMediaState()`, `togglePlay()`, `mediaPlay/Pause/Stop()`, `skip()`, `setRate()`, `setVol()`, `setVolBoth()`, `toggleMute()`, `seekAudioToSentence()`, seek handlers |
 | **AUDIO EVENTS** | `_wordTick()` (rAF word highlight), `startWordTicker()`, `stopWordTicker()`, `wireAudioEvents()` (timeupdate/ended/play/pause) |
 | **SCROLL ENGINE** | `startScrollEngine()`, `stopScrollEngine()`, `advanceSent()`, `nudge(n)`, `resync()` |
 | **TTS** | `getTtsVoices()`, `setTtsVoice()`, `setTtsRate()`, `ttsPlay()`, `ttsPause()`, `ttsStop()` |
-| **SYNC ANCHORS** | `setAudioAnchor()`, `setTextAnchor()`, `clearAnchors()`, `updateAnchorUI()`, `toggleSyncPanel()` |
 | **HIGHLIGHTING & PROGRESS** | `updateHL()`, `updateProg()`, `scrollToSent()`, `toggleAS()`, `toggleWordHl()` |
 | **TOC** | `toggleToc()`, `buildToc()`, `updateTocActive()` |
 | **OPTIONS PANEL** | `toggleOpts()`, `switchOptTab()`, `setTheme()`, `setFont()`, `setFS/LH/MW()`, `setAlign()`, WPM helpers, scroll-pause IIFE, click-outside handler |
@@ -185,8 +182,6 @@ Routed by `showScreen(id)` toggling `display:flex/none`.
 | `wordTimings` | `Array<{starts,count}\|undefined>` | Per-sentence word-level timestamps (sparse) |
 | `transcriptWords` | `Array<{word,start,end}>\|null` | Raw Whisper word entries |
 | `transcriptText` | `string\|null` | Plain-text transcript (no timestamps) |
-| `audioZero` | `number\|null` | Manual audio sync anchor (seconds) |
-| `textZero` | `number\|null` | Manual text sync anchor (sentence index) |
 
 ### UI state
 | Variable | Type | Description |
@@ -415,7 +410,6 @@ Blobs stripped via `_stripBlobs()` before every write.
   coverUrl, coverName,               // cover image data URL
   curSent, curWord, audioTime,       // saved progress
   wpm, sentPauseMs, playbackRate,    // per-book playback settings
-  audioZero, textZero,               // manual sync anchors
   totalSents,                        // for progress display on library card
   // PWA-only additional fields:
   audioHandle, ebookHandle, transcriptHandle, coverHandle  // File System Access handles
