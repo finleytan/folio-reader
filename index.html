@@ -1173,7 +1173,7 @@ function idbOpen(){
       if(!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
       if(!db.objectStoreNames.contains(IDB_BLOB_STORE)) db.createObjectStore(IDB_BLOB_STORE);
     };
-    req.onsuccess=e=>{ _idb=e.target.result; res(_idb); };
+    req.onsuccess=e=>{ _idb=e.target.result; _idb.onclose=()=>{ _idb=null; }; res(_idb); };
     req.onerror=rej;
   });
 }

@@ -82,7 +82,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | **KEYBOARD SHORTCUTS** | `keydown` listener: Space, arrows, `[`/`]`, `f`, `m` |
 | **PWA INSTALL** | `installPWA()`, `dismissInstall()`, `beforeinstallprompt` handler |
 | **DOM CACHE & UTILS** | `$()`, `cacheDOM()` (caches `_audio`, `_playBtn`, `_eContent`, `_readProg`, `_tCur`, `_seekBar`, `_eScroll`, `_pProg`), `setPlayBtnIcon()`, `xh()`, `fmt()`, `uid()` |
-| **INDEXEDDB** | `idbOpen()` (caches connection in `_idb`), `idbSet(key,val)`, `idbGet(key)` |
+| **INDEXEDDB** | `idbOpen()` (caches connection in `_idb`; `_idb.onclose` resets to `null` for auto-reconnect), `idbSet(key,val)`, `idbGet(key)` |
 | **LIBRARY PERSISTENCE** | `saveLibrary()`, `loadLibrary()`, `saveBookProgress()`, `flushPositionSync()`, `_saveBlobs()`, `_saveBlobsFor(bookId)`, `_deleteBlobsFor(bookId)`, `_stripBlobs()` |
 | **DISPLAY PREFERENCES** | `saveDisplayPrefs()` (reads `_fontBody/_fontSize/_lineHeight/_maxWidth`; no `getComputedStyle`), `loadDisplayPrefs()` |
 | **LIBRARY UI** | `renderLib()`, `renameBook()`, `deleteBook()` (inline confirm, calls `_deleteBlobsFor`), `configurePlayerForMode()` |
@@ -219,7 +219,7 @@ Routed by `showScreen(id)` toggling `display:flex/none`.
 | `_sleepEndTime` | Epoch ms when sleep timer expires |
 | `_sleepTickId` | setInterval ID for badge countdown |
 | `_installPromptEvent` | Deferred `beforeinstallprompt` event |
-| `_idb` | Cached IndexedDB connection (`null` until first `idbOpen()`) |
+| `_idb` | Cached IndexedDB connection (`null` until first `idbOpen()`; reset to `null` by `onclose` handler if browser closes the connection) |
 | `_audio` | Cached `<audio>` element |
 | `_playBtn` | Cached play button element |
 | `_eContent` | Cached `#eContent` element |
