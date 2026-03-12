@@ -2,7 +2,7 @@
 
 # Folio — Living Context Document
 
-Single-file HTML PWA (~2,980 lines). Audiobook/ebook reader with synced word-level highlighting.
+Single-file HTML PWA (~3,004 lines). Audiobook/ebook reader with synced word-level highlighting.
 Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default dark, light, night.
 
 ---
@@ -141,7 +141,7 @@ Routed by `showScreen(id)` toggling `display:flex/none`.
 
 **Browser mode** (`!IS_PWA`): file data in `library[]`, persisted via localStorage (metadata) + IndexedDB (blobs: ebookData, transcriptData, coverUrl).
 
-**PWA mode** (`IS_PWA && CAN_FS`): files read from disk via File System Access handles stored in IDB. Library rebuilt by folder scan each launch. Only progress saved to localStorage via `savePwaProgress()`.
+**PWA mode** (`IS_PWA && CAN_FS`): files read from disk via File System Access handles stored in IDB. Library rebuilt by folder scan each launch. Progress saved to localStorage via `savePwaProgress()` and also written back to the in-memory `library[curBookIdx]` so reopening without a re-scan sees current values.
 
 ---
 
@@ -397,7 +397,7 @@ Blobs stripped via `_stripBlobs()` before every write.
 
 `saveLibrary()` = sync localStorage + fire-and-forget async IDB blobs.
 `loadLibrary()` = async: metadata from LS, then hydrate blobs from IDB. Auto-migrates old format.
-`flushPositionSync()` = sync-only emergency save on visibilitychange/pagehide (critical for iOS).
+`flushPositionSync()` = sync-only emergency save on visibilitychange/pagehide (critical for iOS). Both PWA and browser paths update `library[curBookIdx]` in-memory before writing to localStorage.
 
 **Display prefs** saved separately to `folio_display_prefs_v1` (theme, fonts, font-size, line-height, width, alignment, wpm, sentPauseMs, wordHlOn).
 
