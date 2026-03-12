@@ -4,9 +4,9 @@ Single-file HTML PWA (~3k lines): audiobook/ebook reader with synced highlightin
 File: index.html — <style>, static HTML (4 screens + 5 modals), <script>.
 
 ## File structure
-- CSS: lines 15–462
-- HTML: lines 465–851
-- JS: lines 852–3258
+- CSS: lines 16–464
+- HTML: lines 466–852
+- JS: lines 853–3288
 
 ## Two playback modes (set by configurePlayerForMode)
 - Audio mode: <audio> drives playback, _wordTick() at rAF for word highlights
@@ -19,7 +19,7 @@ curSent/curWord = reading position. mediaState = 'stopped'|'playing'|'paused'.
 ## Constraints
 - Do not refactor or restructure unless asked
 - Read each target function in full before editing
-- Run `node --check index.html` to verify syntax after changes
+- Run `node -e "const fs=require('fs'),html=fs.readFileSync('index.html','utf8'),m=html.match(/<script>([\s\S]*?)<\/script>/);try{new Function(m[1]);console.log('OK');}catch(e){console.error(e.message);}"` to verify syntax after changes
 - State updates must always include: setPlayBtnIcon, setMediaState,
   acquireWakeLock/releaseWakeLock, updatePageTitle
 

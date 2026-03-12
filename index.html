@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" as="script">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
@@ -272,7 +273,7 @@ body.theme-night{
 .ebook-h1{font-size:1.45em;margin:2em 0 .6em;}
 .ebook-h2{font-size:1.22em;margin:1.6em 0 .5em;}
 .ebook-h3{font-size:1.08em;margin:1.3em 0 .4em;}
-.ebook-para{margin-bottom:1em;}
+.ebook-para{margin-bottom:1em;content-visibility:auto;contain-intrinsic-size:auto 80px;}
 .sent{cursor:pointer;border-radius:4px;padding:2px 0;border-bottom:2px solid transparent;transition:background .18s,border-color .18s;display:inline;}
 .sent:hover{background:var(--surface2);}
 .sent.sent-active{background:var(--hl-bg);border-bottom-color:var(--hl-border);}
@@ -867,7 +868,7 @@ let isSeeking = false;
 let sentenceTimings = [];
 let syncOffset = 0;
 let transcriptWords = null; let transcriptText = null;
-let _timingWorker = null; let _timingWorkerBlobUrl = null; let _pendingTimingBookIdx = -1;
+let _timingWorker = null; let _timingWorkerBlobUrl = null; let _pendingTimingBookIdx = -1; let _timingWorkerTimeout = null; let _plainTextRetryListener = null;
 let ttsMode = false; let ttsSpeaking = false; let ttsUtterance = null;
 let ttsVoice = null; let ttsPaused = false;
 let txPending = null; let laPending = null;
@@ -1485,6 +1486,7 @@ function configurePlayerForMode(b, audioSrc, rate){
   $('seekStrip').style.display = ttsMode ? 'none' : '';
   $('ttsBar').style.display    = ttsMode ? 'flex' : 'none';
   if(!ttsMode && audioSrc){
+    if(_audio.src && _audio.src.startsWith('blob:')) URL.revokeObjectURL(_audio.src);
     _audio.src = audioSrc;
     _audio.playbackRate = rate;
     _audio.load();
@@ -1534,6 +1536,9 @@ function goLib(){
   document.getElementById('player').style.display='none';
   document.getElementById('optPanel').classList.remove('open');
   curBookIdx=-1; transcriptWords=null; transcriptText=null; sentenceTimings=[]; wordTimings=[]; syncOffset=0; _pendingTimingBookIdx=-1;
+  if(_plainTextRetryListener){ _audio.removeEventListener('loadedmetadata',_plainTextRetryListener); _plainTextRetryListener=null; }
+  if(_timingWorkerTimeout){ clearTimeout(_timingWorkerTimeout); _timingWorkerTimeout=null; }
+  sentences=[]; tocEntries=[];
   _activeSentEl=null; _activeWordEl=null;
   releaseWakeLock();
   clearSleepTimer(); _sleepTimerIdx=0;
@@ -2115,12 +2120,12 @@ function _timingWorkerFn(){
       var minRunLen=Math.max(1,sWords.length-2);
       var maxRunLen=sWords.length*3;
       for(var wi=lo;wi<=hi;wi++){
-        var runFreq=new Map();
+        var runFreq=Object.create(null);
         var runDistinct=0,inter=0;
         for(var wj=wi;wj<tw.length&&(wj-wi)<maxRunLen;wj++){
           var w=tw[wj].word;
-          var prev=runFreq.get(w)||0;
-          runFreq.set(w,prev+1);
+          var prev=runFreq[w]||0;
+          runFreq[w]=prev+1;
           if(prev===0){runDistinct++;if(sSet.has(w))inter++;}
           var runLen=wj-wi+1;
           if(runLen>=minRunLen){
@@ -2130,7 +2135,7 @@ function _timingWorkerFn(){
             if(score>earlyStop) break;
           }
         }
-        if(bestScore>earlyStop) break;
+        if(bestScore>0.7) break;
       }
       return {bestScore:bestScore,bestStart:bestStart,bestEnd:bestEnd};
     }
@@ -2177,9 +2182,8 @@ function _timingWorkerFn(){
     for(var si=0;si<n;si++){
       var tok=sentTokens[si];
       if(!tok.sWords.length) continue;
-      var windowLen=Math.max(tok.sWords.length*2,10);
       var lo=Math.max(0,searchFrom-5);
-      var hi=Math.min(tw.length-tok.sWords.length,lo+windowLen*8);
+      var hi=Math.min(tw.length-tok.sWords.length,lo+tok.sWords.length*20+200);
       var r=findMatch(tok.sWords,tok.sSet,lo,hi,0.85);
       if(r.bestStart>=0&&r.bestScore>=0.6){
         accept(si,r.bestStart,r.bestEnd);
@@ -2207,7 +2211,7 @@ function _timingWorkerFn(){
         if(anchorTwIdx[j2]!=null){nextTwStart=anchorTwIdx[j2];break;}
       }
       var lo2=Math.max(0,prevTwEnd);
-      var hi2=Math.min(tw.length-tok2.sWords.length,nextTwStart);
+      var hi2=Math.min(tw.length-tok2.sWords.length,nextTwStart,lo2+tok2.sWords.length*20+200);
       if(lo2>hi2) continue;
       var r2=findMatch(tok2.sWords,tok2.sSet,lo2,hi2,0.85);
       if(r2.bestStart>=0&&r2.bestScore>0.35){
@@ -2260,10 +2264,16 @@ function getTimingWorker(){
   _timingWorker=new Worker(_timingWorkerBlobUrl);
   _timingWorker.onmessage=function(e){
     var d=e.data;
-    if(d.bookIdx!==_pendingTimingBookIdx) return;
+    if(_timingWorkerTimeout){ clearTimeout(_timingWorkerTimeout); _timingWorkerTimeout=null; }
+    if(d.bookIdx!==_pendingTimingBookIdx){
+      console.warn('Timing worker: stale result for bookIdx',d.bookIdx,'(current:',_pendingTimingBookIdx,')');
+      showToast('Transcript result discarded (stale book)','error');
+      return;
+    }
     if(!sentences.length||sentences.length!==d.sentenceTimings.length) return;
     sentenceTimings=d.sentenceTimings;
     if(d.wordTimings) wordTimings=d.wordTimings;
+    transcriptWords=null; transcriptText=null;
     var matched=sentenceTimings.filter(Boolean).length;
     setBannerState('ready','Transcript synced · Ready to play',
       matched+' sentences matched ('+Math.round(matched/sentences.length*100)+'%)');
@@ -2295,6 +2305,14 @@ async function buildSentenceTimings(){
       transcriptWords:transcriptWords,
       bookIdx:bookIdx
     });
+    if(_timingWorkerTimeout) clearTimeout(_timingWorkerTimeout);
+    _timingWorkerTimeout=setTimeout(function(){
+      _timingWorkerTimeout=null;
+      console.warn('Timing worker timed out, falling back to sync');
+      if(_timingWorker){ _timingWorker.terminate(); _timingWorker=null; }
+      showToast('Transcript sync timed out — using fallback','error');
+      _buildSentenceTimingsSync();
+    },8000);
   }catch(e){
     await _buildSentenceTimingsSync();
   }
@@ -2306,8 +2324,17 @@ async function buildTimingsFromPlainText(){
   sentenceTimings=new Array(sentences.length);
   wordTimings=new Array(sentences.length);
   var dur=isFinite(_audio.duration)?_audio.duration:0;
-  if(!dur) return;
   var bookIdx=curBookIdx;
+  if(!dur){
+    setBannerState('syncing','Waiting for audio…','Duration not yet available');
+    _plainTextRetryListener=function(){
+      _audio.removeEventListener('loadedmetadata',_plainTextRetryListener);
+      _plainTextRetryListener=null;
+      if(curBookIdx===bookIdx) buildTimingsFromPlainText();
+    };
+    _audio.addEventListener('loadedmetadata',_plainTextRetryListener);
+    return;
+  }
   _pendingTimingBookIdx=bookIdx;
   try{
     var worker=getTimingWorker();
@@ -2331,6 +2358,7 @@ async function _buildSentenceTimingsSync(){
   wordTimings=new Array(sentences.length);
   if(!transcriptWords||!transcriptWords.length){
     if(transcriptText) await _buildTimingsFromPlainTextSync();
+    transcriptWords=null; transcriptText=null;
     return;
   }
   const tw=transcriptWords.map((w,i)=>({
@@ -2343,12 +2371,12 @@ async function _buildSentenceTimingsSync(){
     const minRunLen=Math.max(1,sWords.length-2);
     const maxRunLen=sWords.length*3;
     for(let wi=lo;wi<=hi;wi++){
-      const runFreq=new Map();
+      const runFreq=Object.create(null);
       let runDistinct=0,inter=0;
       for(let wj=wi;wj<tw.length&&(wj-wi)<maxRunLen;wj++){
         const w=tw[wj].word;
-        const prev=runFreq.get(w)||0;
-        runFreq.set(w,prev+1);
+        const prev=runFreq[w]||0;
+        runFreq[w]=prev+1;
         if(prev===0){runDistinct++;if(sSet.has(w))inter++;}
         const runLen=wj-wi+1;
         if(runLen>=minRunLen){
@@ -2358,7 +2386,7 @@ async function _buildSentenceTimingsSync(){
           if(score>earlyStop) break;
         }
       }
-      if(bestScore>earlyStop) break;
+      if(bestScore>0.7) break;
     }
     return {bestScore,bestStart,bestEnd};
   }
@@ -2400,15 +2428,14 @@ async function _buildSentenceTimingsSync(){
     const sWords=s.text.replace(/[^a-z0-9' ]/gi,' ').toLowerCase().split(/\s+/).filter(Boolean);
     return {sWords,sSet:new Set(sWords)};
   });
-  const YIELD_EVERY=80;
+  const YIELD_EVERY=30;
   let searchFrom=0;
   const anchorTwIdx=[];
   for(let si=0;si<sentences.length;si++){
     const {sWords,sSet}=sentTokens[si];
     if(!sWords.length) continue;
-    const windowLen=Math.max(sWords.length*2,10);
     const lo=Math.max(0,searchFrom-5);
-    const hi=Math.min(tw.length-sWords.length,lo+windowLen*8);
+    const hi=Math.min(tw.length-sWords.length,lo+sWords.length*20+200);
     const {bestScore,bestStart,bestEnd}=findMatch(sWords,sSet,lo,hi,0.85);
     if(bestStart>=0&&bestScore>=0.6){
       acceptMatch(si,bestStart,bestEnd);
@@ -2436,7 +2463,7 @@ async function _buildSentenceTimingsSync(){
       if(anchorTwIdx[j]!=null){nextTwStart=anchorTwIdx[j];break;}
     }
     const lo=Math.max(0,prevTwEnd);
-    const hi=Math.min(tw.length-sWords.length,nextTwStart);
+    const hi=Math.min(tw.length-sWords.length,nextTwStart,lo+sWords.length*20+200);
     if(lo>hi) continue;
     const {bestScore,bestStart,bestEnd}=findMatch(sWords,sSet,lo,hi,0.85);
     if(bestStart>=0&&bestScore>0.35){
@@ -2447,6 +2474,7 @@ async function _buildSentenceTimingsSync(){
   const matched=sentenceTimings.filter(Boolean).length;
   setBannerState('ready','Transcript synced · Ready to play',
     matched+' sentences matched ('+Math.round(matched/sentences.length*100)+'%)');
+  transcriptWords=null;
 }
 async function _buildTimingsFromPlainTextSync(){
   setBannerState('syncing','Syncing transcript…','Estimating timing from plain text');

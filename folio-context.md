@@ -11,7 +11,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 
 | Zone | Contents |
 |---|---|
-| `<head>` | Meta, manifest, font preconnect/preload |
+| `<head>` | Meta, manifest, font preconnect/preload, JSZip preload (`<link rel="preload" as="script">`) |
 | `<style>` | All CSS |
 | `<body>` | Static HTML (4 screens + 5 modals) |
 | `<script>` | All JS |
@@ -32,7 +32,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | TTS bar | `.tts-bar` |
 | Transcript banner | `.tx-banner` (loading/syncing/ready/error), `.tx-spinner`, shimmer keyframes |
 | Reading progress | `.ebook-area`, `.read-progress-wrap`, `.read-progress-bar` |
-| Reader body | `.reader-body`, `.toc-sidebar`, `.toc-item`, `.ebook-scroll`, `.ebook-content`, `.sent`, `.word`, `.sent-resume-pulse` + `@keyframes sent-pulse` |
+| Reader body | `.reader-body`, `.toc-sidebar`, `.toc-item`, `.ebook-scroll`, `.ebook-content`, `.sent`, `.word`, `.sent-resume-pulse` + `@keyframes sent-pulse`; `.ebook-para` has `content-visibility:auto; contain-intrinsic-size:auto 80px` |
 | Relink overlay | `.relink-overlay`, `.relink-sheet` |
 | PWA screens | `.pwa-setup-card`, `.pwa-regrant-card` |
 | Media queries | `@media(min-width:640px)` desktop, `@media(max-width:639px)` mobile |
@@ -86,8 +86,8 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | **LIBRARY PERSISTENCE** | `saveLibrary()`, `loadLibrary()`, `saveBookProgress()`, `flushPositionSync()`, `_saveBlobs()`, `_saveBlobsFor(bookId)`, `_deleteBlobsFor(bookId)`, `_stripBlobs()` |
 | **DISPLAY PREFERENCES** | `saveDisplayPrefs()` (reads `_fontBody/_fontSize/_lineHeight/_maxWidth`; no `getComputedStyle`), `loadDisplayPrefs()` |
 | **LIBRARY UI** | `renderLib()`, `renameBook()`, `deleteBook()` (inline confirm, calls `_deleteBlobsFor`), `configurePlayerForMode()` |
-| **PLAYER CONFIG** | `configurePlayerForMode(b, audioSrc, rate)` — decides ttsMode, shows/hides seek strip vs TTS bar |
-| **OPEN BOOK / GO LIB** | `openBook(i)` (calls `pulseResumeSent()`), `goLib()` (resets `wordTimings=[]`) |
+| **PLAYER CONFIG** | `configurePlayerForMode(b, audioSrc, rate)` — decides ttsMode, shows/hides seek strip vs TTS bar; revokes previous `blob:` URL on `_audio.src` before assigning new src |
+| **OPEN BOOK / GO LIB** | `openBook(i)` (calls `pulseResumeSent()`), `goLib()` (resets `transcriptWords`, `transcriptText`, `sentenceTimings`, `wordTimings`, `sentences`, `tocEntries`, `syncOffset`, `_pendingTimingBookIdx`; also cancels `_plainTextRetryListener` and `_timingWorkerTimeout`) |
 | **MEDIA CONTROLS** | `setMediaState()`, `togglePlay()`, `mediaPlay/Pause/Stop()`, `skip()`, `setRate()` (calls `updateSpeedBadge()`), `setVol()`, `setVolBoth()`, `toggleMute()`, `seekAudioToSentence()` (uses `syncOffset`), `onSeekInput()`, `onSeekChange()` |
 | **AUDIO EVENTS** | `_wordTick()` (rAF word highlight, uses `syncOffset`), `startWordTicker()`, `stopWordTicker()`, `wireAudioEvents()` (timeupdate throttled ~4fps + binary search for sentence, ended/play/pause; uses `syncOffset`) |
 | **SCROLL ENGINE** | `startScrollEngine()`, `stopScrollEngine()`, `advanceSent()`, `nudge(n)`, `resync()` (uses `syncOffset`) |
@@ -96,7 +96,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | **HIGHLIGHTING & PROGRESS** | `updateHL()`, `updateProg()`, `scrollToSent()` (uses cached `_eScroll`), `toggleAS()`, `toggleWordHl()`, `pulseResumeSent()`, `updateSpeedBadge()` |
 | **TOC** | `toggleToc()`, `buildToc()` (populates `_tocItems[]`), `updateTocActive()` (uses cached `_tocItems`/`_prevTocActive` to skip redundant DOM work) |
 | **OPTIONS PANEL** | `toggleOpts()`, `switchOptTab()`, `setTheme()`, `updateThemeColor()`, `setFont()`, `setFS/LH/MW()`, `setAlign()`, `setDefaultWpmFromSlider()`, `setDefaultWpmFromInput()`, `updateWpmLabel()`, `setSentPause()`, scroll-pause IIFE (rAF-throttled), click-outside handler |
-| **TRANSCRIPT** | `loadTranscriptData()` (handles segment-level Whisper JSON without word_timestamps), `setBannerState()`, `_timingWorkerFn()` (serialised into Blob Worker), `getTimingWorker()`, `buildSentenceTimings()` (worker dispatch), `buildTimingsFromPlainText()` (worker dispatch), `_buildSentenceTimingsSync()` (fallback), `_buildTimingsFromPlainTextSync()` (fallback), `similarity()`, `updateTranscriptUI()` |
+| **TRANSCRIPT** | `loadTranscriptData()` (handles segment-level Whisper JSON without word_timestamps), `setBannerState()`, `_timingWorkerFn()` (serialised into Blob Worker), `getTimingWorker()`, `buildSentenceTimings()` (worker dispatch), `buildTimingsFromPlainText()` (worker dispatch), `_buildSentenceTimingsSync()` (fallback), `_buildTimingsFromPlainTextSync()` (fallback), `similarity()`, `updateTranscriptUI()`; after timing is built, `transcriptWords` and `transcriptText` are nulled (both worker onmessage path and sync fallback) |
 | **EBOOK LOADING** | `yieldToMain()` (prefers `scheduler.postTask` with `'background'` priority, falls back to `setTimeout`), `loadEbook(book, onDone)` (chunked DOM build with progress banner via `setBannerState`, delegated click handler via module-level `_contentClickHandler`) |
 | **SENTENCE SPLITTER** | `splitSentences(text)` |
 | **EBOOK PARSERS** | `parseTxt()`, `parseMd()`, `parseHtml()`, `extractFromDom()`, `parseEpub()`, `loadScript()`, `arrayBufferToBase64()` |
@@ -238,6 +238,8 @@ Routed by `showScreen(id)` toggling `display:flex/none`.
 | `_timingWorker` | Cached inline Web Worker for transcript timing (lazy, reused) |
 | `_timingWorkerBlobUrl` | Blob URL backing `_timingWorker` |
 | `_pendingTimingBookIdx` | Book index for the in-flight worker job; stale-result guard. Reset to -1 in `goLib()` |
+| `_timingWorkerTimeout` | setTimeout ID for 8-second worker watchdog in `buildSentenceTimings`; cleared on worker response or `goLib()` |
+| `_plainTextRetryListener` | One-shot `loadedmetadata` listener registered by `buildTimingsFromPlainText` when `_audio.duration` is 0; cleared on retry or `goLib()` |
 | `_contentClickHandler` | Module-level delegated click handler for `_eContent`; cleaned up via `removeEventListener` on each `loadEbook` call |
 | `_tocItems` | Cached array of TOC `<button>` elements; populated by `buildToc()` |
 | `_prevTocActive` | Index of previously active TOC entry; used by `updateTocActive()` to skip redundant DOM work |
@@ -336,13 +338,22 @@ loadTranscriptData(b)
 buildSentenceTimings()
   └── setBannerState('syncing') → posts {sentTexts, sentWordCounts, transcriptWords, bookIdx}
       to inline Blob Worker via getTimingWorker().
-      Worker runs greedy forward Jaccard match off main thread.
-      onmessage handler: stale-guard (bookIdx === _pendingTimingBookIdx),
+      After postMessage, starts an 8-second watchdog (_timingWorkerTimeout): if the worker
+      doesn't respond in time, terminates it, shows toast, falls back to _buildSentenceTimingsSync().
+      Worker runs two-pass greedy Jaccard match off main thread:
+        Pass 1 (anchor): greedy forward search, window = sWords.length*20+200
+        Pass 2 (fill): searches between anchors, same window formula
+        findMatch() outer wi-loop breaks early when bestScore>0.7 (confident match found);
+        inner wj-loop breaks at earlyStop=0.85. Object.create(null) for GC efficiency.
+      onmessage handler: clears _timingWorkerTimeout, stale-guard (bookIdx===_pendingTimingBookIdx —
+      mismatch shows toast + console.warn instead of silent discard),
       length-guard (sentences still match), then applies sentenceTimings[] +
-      wordTimings[] → setBannerState('ready').
-      try/catch falls back to _buildSentenceTimingsSync() (file:// or worker error).
-      buildTimingsFromPlainText() similarly dispatches plain-text timing to the
-      same worker with type='buildTimingsFromPlainText'
+      wordTimings[] → nulls transcriptWords + transcriptText → setBannerState('ready').
+      try/catch falls back to _buildSentenceTimingsSync() (file:// or worker error);
+      sync fallback uses same window formula (sWords.length*20+200), YIELD_EVERY=30.
+      buildTimingsFromPlainText() dispatches plain-text timing to the same worker with
+      type='buildTimingsFromPlainText'; if _audio.duration is 0 at call time, registers a
+      one-shot loadedmetadata listener (_plainTextRetryListener) and retries automatically.
 
 seekAudioToSentence()
   └── if audio mode && curSent > 0 && sentenceTimings exists:
@@ -503,7 +514,7 @@ Blobs stripped via `_stripBlobs()` before every write.
 
 ## Fragile Areas
 
-1. **Stale DOM refs**: `sentences[]` holds live DOM refs — any `#eContent` innerHTML wipe without clearing `sentences`, `_activeSentEl`, `_activeWordEl` causes stale-ref bugs.
+1. **Stale DOM refs**: `sentences[]` holds live DOM refs — any `#eContent` innerHTML wipe without clearing `sentences`, `_activeSentEl`, `_activeWordEl` causes stale-ref bugs. `goLib()` now clears `sentences=[]` and `tocEntries=[]`.
 2. **Fire-and-forget blobs**: `saveLibrary()` blob write is async fire-and-forget; closing tab before IDB flush = data loss for new books.
 3. **Yield-to-main**: Transcript state machine needs `await yieldToMain()` — missing `await` = banner states don't paint.
 4. **Sync window cap**: `buildSentenceTimings` search window is capped — long audio intros not in ebook can desync cursor.
