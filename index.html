@@ -1333,8 +1333,10 @@ function flushPositionSync(){
       if(curBookIdx<0) return;
       const b=library[curBookIdx];
       // Synchronous write — mirrors savePwaProgress() but no IDB
+      const prog={curSent,curWord,audioTime:isFinite(_audio.currentTime)?_audio.currentTime:0,wpm,sentPauseMs,playbackRate:_audio.playbackRate||1,audioZero,textZero,totalSents:sentences.length||b.totalSents||1};
+      Object.assign(b,prog);
       const all=getPwaProgress();
-      all[b.id]={curSent,curWord,audioTime:isFinite(_audio.currentTime)?_audio.currentTime:0,wpm,sentPauseMs,playbackRate:_audio.playbackRate||1,audioZero,textZero,totalSents:sentences.length||b.totalSents||1};
+      all[b.id]=prog;
       localStorage.setItem(PWA_PROG_KEY,JSON.stringify(all));
     } else {
       if(curBookIdx<0) return;
@@ -2871,8 +2873,10 @@ function getPwaProgress(){ try{ return JSON.parse(localStorage.getItem(PWA_PROG_
 function savePwaProgress(){
   if(!IS_PWA||curBookIdx<0) return;
   const b=library[curBookIdx];
+  const prog={curSent,curWord,audioTime:isFinite(_audio.currentTime)?_audio.currentTime:0,wpm,sentPauseMs,playbackRate:_audio.playbackRate||1,audioZero,textZero,totalSents:sentences.length||b.totalSents||1};
+  Object.assign(b,prog);
   const all=getPwaProgress();
-  all[b.id]={curSent,curWord,audioTime:isFinite(_audio.currentTime)?_audio.currentTime:0,wpm,sentPauseMs,playbackRate:_audio.playbackRate||1,audioZero,textZero,totalSents:sentences.length||b.totalSents||1};
+  all[b.id]=prog;
   localStorage.setItem(PWA_PROG_KEY,JSON.stringify(all));
 }
 async function pwaOpenBook(i){

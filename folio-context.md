@@ -352,7 +352,12 @@ _wordTick()  (audio mode only)
 
 ```
 saveBookProgress()
-  └── updates library[curBookIdx] fields → saveLibrary()
+  └── PWA: savePwaProgress()
+      Browser: updates library[curBookIdx] fields → saveLibrary()
+
+savePwaProgress()
+  └── builds prog object → Object.assign(library[curBookIdx], prog) →
+      writes to localStorage[PWA_PROG_KEY] keyed by book.id
 
 saveLibrary()
   └── _stripBlobs() all books → JSON.stringify → localStorage.setItem(LS_KEY) →
@@ -366,8 +371,8 @@ loadLibrary()
 
 flushPositionSync()
   └── sync-only emergency save on visibilitychange/pagehide (critical for iOS)
-      PWA: savePwaProgress() + direct localStorage write
-      Browser: synchronous localStorage only (no IDB)
+      PWA: Object.assign(library[curBookIdx], prog) + direct localStorage write
+      Browser: updates library[curBookIdx] + synchronous localStorage only (no IDB)
 ```
 
 ### Modal Functions
