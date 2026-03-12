@@ -6,6 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Folio</title>
+<meta name="theme-color" id="themeColorMeta" content="#111318">
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -179,6 +180,8 @@ body.theme-night{
 .ic-btn.active{color:var(--accent);}
 .play-btn{width:var(--touch);height:var(--touch);border-radius:50%;background:var(--accent);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background-color .15s,border-color .15s,color .15s;flex-shrink:0;box-shadow:0 2px 12px rgba(91,141,239,.3);}
 .play-btn:hover{filter:brightness(1.12);box-shadow:0 4px 20px rgba(91,141,239,.45);transform:scale(1.05);}
+.speed-badge{display:none;font-size:10px;font-weight:700;color:var(--accent);background:rgba(91,141,239,.12);border-radius:4px;padding:1px 5px;margin-left:-4px;align-self:center;pointer-events:none;font-family:var(--font-ui);}
+.speed-badge.show{display:inline-block;}
 
 /* ── OPTIONS PANEL ── */
 .opt-panel{
@@ -264,7 +267,7 @@ body.theme-night{
 .toc-num{font-size:10px;color:var(--text3);margin-right:6px;font-variant-numeric:tabular-nums;}
 .toc-empty{padding:20px 16px;font-size:13px;color:var(--text3);font-style:italic;}
 .ebook-scroll{flex:1;overflow-y:auto;padding:32px 20px 60px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
-.ebook-content{max-width:var(--max-width);margin:0 auto;font-family:var(--font-body);font-size:var(--font-size);line-height:var(--line-height);color:var(--text2);contain:content;}
+.ebook-content{max-width:var(--max-width);margin:0 auto;font-family:var(--font-body);font-size:var(--font-size);line-height:var(--line-height);color:var(--text2);contain:layout paint;}
 .ebook-h{font-family:var(--font-body);font-weight:600;color:var(--text);line-height:1.3;}
 .ebook-h1{font-size:1.45em;margin:2em 0 .6em;}
 .ebook-h2{font-size:1.22em;margin:1.6em 0 .5em;}
@@ -273,6 +276,8 @@ body.theme-night{
 .sent{cursor:pointer;border-radius:4px;padding:2px 0;border-bottom:2px solid transparent;transition:background .18s,border-color .18s;display:inline;}
 .sent:hover{background:var(--surface2);}
 .sent.sent-active{background:var(--hl-bg);border-bottom-color:var(--hl-border);}
+@keyframes sent-pulse{0%{box-shadow:0 0 0 0 rgba(91,141,239,.5);}70%{box-shadow:0 0 0 8px rgba(91,141,239,0);}100%{box-shadow:none;}}
+.sent.sent-resume-pulse{animation:sent-pulse .8s ease-out;}
 .word{border-radius:2px;transition:background .1s,color .1s;cursor:pointer;padding:0 1px;}
 .word.word-active{background:var(--word-hl);color:white;border-radius:3px;}
 @keyframes word-flash{0%{background:var(--accent);color:white;box-shadow:0 0 8px rgba(91,141,239,.5);}100%{background:transparent;color:inherit;box-shadow:none;}}
@@ -450,10 +455,15 @@ html,body,
   .book-cover-badge{background:rgba(0,0,0,.35);backdrop-filter:blur(4px);}
   .card-action-btn{background:rgba(0,0,0,.55);backdrop-filter:blur(4px);}
 }
+/* ── REDUCED MOTION ── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;}
+  .ebook-scroll{scroll-behavior:auto;}
+}
 </style>
 </head>
 <body>
-<div id="toastContainer"></div>
+<div id="toastContainer" aria-live="polite"></div>
 <div id="installBanner">
   <div style="font-size:22px;flex-shrink:0">📚</div>
   <div class="install-banner-text">
@@ -511,25 +521,25 @@ html,body,
 
 <!-- ════ PLAYER ════ -->
 <div id="player">
-  <audio id="audio"></audio>
+  <audio id="audio" preload="metadata"></audio>
 
   <!-- TOP BAR -->
   <div class="top-bar">
-    <button class="back-btn" onclick="goLib()">←</button>
+    <button class="back-btn" onclick="goLib()" aria-label="Back to library">←</button>
     <div class="bk-info">
       <div class="bk-title" id="pTitle">—</div>
       <div class="bk-prog" id="pProg">—</div>
     </div>
     <div class="top-bar-right">
-      <button class="ic-btn" onclick="skip(-15)" title="−15s">⏮</button>
-      <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
-      <button class="ic-btn" onclick="skip(15)" title="+15s">⏭</button>
+      <button class="ic-btn" onclick="skip(-15)" title="−15s" aria-label="Skip back 15 seconds">⏮</button>
+      <button class="play-btn" id="playBtn" onclick="togglePlay()" aria-label="Play">▶</button><span class="speed-badge" id="speedBadge"></span>
+      <button class="ic-btn" onclick="skip(15)" title="+15s" aria-label="Skip forward 15 seconds">⏭</button>
       <div class="vdiv"></div>
-      <button class="ic-btn" onclick="toggleToc()" title="Contents">☰</button>
-      <button class="ic-btn" id="transcriptBtn" onclick="openTranscriptModal()" title="Transcript">📝</button>
-      <button class="ic-btn" id="bookInfoBtn" onclick="openBookInfoModal()" title="Book files">ℹ</button>
-      <button class="ic-btn" id="optBtn" onclick="toggleOpts()">⚙</button>
-      <button class="ic-btn" id="sleepTimerBtn" onclick="cycleSleepTimer()" title="Sleep timer">🌙<span id="sleepTimerBadge"></span></button>
+      <button class="ic-btn" onclick="toggleToc()" title="Contents" aria-label="Table of contents">☰</button>
+      <button class="ic-btn" id="transcriptBtn" onclick="openTranscriptModal()" title="Transcript" aria-label="Transcript">📝</button>
+      <button class="ic-btn" id="bookInfoBtn" onclick="openBookInfoModal()" title="Book files" aria-label="Book files">ℹ</button>
+      <button class="ic-btn" id="optBtn" onclick="toggleOpts()" aria-label="Settings">⚙</button>
+      <button class="ic-btn" id="sleepTimerBtn" onclick="cycleSleepTimer()" title="Sleep timer" aria-label="Sleep timer">🌙<span id="sleepTimerBadge"></span></button>
     </div>
 
     <!-- OPTIONS PANEL -->
@@ -697,7 +707,7 @@ html,body,
 </div><!-- /player -->
 
 <!-- ════ ADD BOOK MODAL ════ -->
-<div class="modal-overlay" id="modal" style="display:none" onclick="closeOvl(event)">
+<div class="modal-overlay" id="modal" style="display:none" onclick="closeOvl(event)" role="dialog" aria-modal="true" aria-label="Add new book">
   <div class="modal">
     <div class="modal-title">Add New Book</div>
     <div class="modal-body">
@@ -756,7 +766,7 @@ html,body,
 </div>
 
 <!-- ════ TRANSCRIPT MODAL ════ -->
-<div class="modal-overlay" id="txModal" style="display:none" onclick="closeTxOvl(event)">
+<div class="modal-overlay" id="txModal" style="display:none" onclick="closeTxOvl(event)" role="dialog" aria-modal="true" aria-label="Transcript">
   <div class="modal">
     <div class="modal-title">Transcript</div>
     <p class="modal-sub" id="txModalSub">Add or replace the transcript for this book.</p>
@@ -781,7 +791,7 @@ html,body,
 </div>
 
 <!-- ════ LINK AUDIO MODAL ════ -->
-<div class="modal-overlay" id="linkAudioModal" style="display:none" onclick="if(event.target===this)closeLinkAudioModal()">
+<div class="modal-overlay" id="linkAudioModal" style="display:none" onclick="if(event.target===this)closeLinkAudioModal()" role="dialog" aria-modal="true" aria-label="Link audiobook">
   <div class="modal">
     <div class="modal-title">Link Audiobook</div>
     <p class="modal-sub">Add an audiobook file to this book. Folio will switch from TTS to the audio file.</p>
@@ -805,7 +815,7 @@ html,body,
 </div>
 
 <!-- ════ BOOK INFO MODAL ════ -->
-<div class="modal-overlay" id="bookInfoModal" style="display:none" onclick="if(event.target===this)closeBookInfoModal()">
+<div class="modal-overlay" id="bookInfoModal" style="display:none" onclick="if(event.target===this)closeBookInfoModal()" role="dialog" aria-modal="true" aria-label="Book files">
   <div class="modal">
     <div class="modal-title">Book Files</div>
     <p class="modal-sub" id="bookInfoSub">Files assigned to this book. Click a slot to change it.</p>
@@ -1004,6 +1014,42 @@ function _updateSleepBadge(){
 }
 
 // ══════════════════════════════════════════════════════
+// MODAL KEYBOARD NAV (Escape to close, focus trap)
+// ══════════════════════════════════════════════════════
+let _prevFocus=null;
+const _modalIds=['modal','txModal','linkAudioModal','bookInfoModal'];
+const _modalClosers={modal:closeModal,txModal:closeTxModal,linkAudioModal:closeLinkAudioModal,bookInfoModal:closeBookInfoModal};
+function _openModalEl(id){
+  _prevFocus=document.activeElement;
+  const el=document.getElementById(id);
+  if(!el) return;
+  // Focus first focusable element inside
+  setTimeout(()=>{const f=el.querySelector('button,input,[tabindex]'); if(f) f.focus();},50);
+}
+function _closeModalRestore(){
+  if(_prevFocus){try{_prevFocus.focus();}catch(e){} _prevFocus=null;}
+}
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape'&&e.key!=='Tab') return;
+  const openModal=_modalIds.find(id=>{const el=document.getElementById(id);return el&&el.style.display!=='none';});
+  if(!openModal) return;
+  if(e.key==='Escape'){
+    e.preventDefault();
+    const closer=_modalClosers[openModal];
+    if(closer) closer();
+    _closeModalRestore();
+    return;
+  }
+  // Focus trap on Tab
+  const container=document.getElementById(openModal);
+  const focusable=container.querySelectorAll('button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])');
+  if(!focusable.length) return;
+  const first=focusable[0], last=focusable[focusable.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+});
+
+// ══════════════════════════════════════════════════════
 // KEYBOARD SHORTCUTS
 // ══════════════════════════════════════════════════════
 document.addEventListener('keydown', function(e){
@@ -1012,6 +1058,8 @@ document.addEventListener('keydown', function(e){
   if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT') return;
   // Don't fire if player isn't visible
   if(document.getElementById('player')?.style.display==='none') return;
+  // Don't fire if a modal is open
+  if(_modalIds.some(id=>{const el=document.getElementById(id);return el&&el.style.display!=='none';})) return;
 
   switch(e.key){
     case ' ':
@@ -1099,7 +1147,7 @@ function cacheDOM(){
 // PLAY BUTTON HELPER
 // ══════════════════════════════════════════════════════
 function setPlayBtnIcon(playing){
-  if(_playBtn) _playBtn.textContent = playing ? '⏸' : '▶';
+  if(_playBtn){ _playBtn.textContent = playing ? '⏸' : '▶'; _playBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play'); }
 }
 
 
@@ -1149,13 +1197,14 @@ function _stripBlobs(b){
   BLOB_FIELDS.forEach(f=>{ o[f]=null; });
   return o;
 }
+let _pendingBlobSave=null;
 function saveLibrary(){
   try{
     const toSave=library.map(b=>_stripBlobs(b));
     localStorage.setItem(LS_KEY,JSON.stringify(toSave));
   }catch(e){console.warn('Folio: meta save failed',e);}
-  // Fire-and-forget IDB blob writes
-  _saveBlobs().catch(e=>console.warn('Folio: blob save failed',e));
+  // Track pending IDB blob write so we can await it on tab close
+  _pendingBlobSave=_saveBlobs().catch(e=>console.warn('Folio: blob save failed',e)).finally(()=>{_pendingBlobSave=null;});
 }
 async function _saveBlobs(){
   const db=await idbOpen();
@@ -1274,7 +1323,11 @@ function flushPositionSync(){
 
 // visibilitychange fires reliably on iOS when the user backgrounds or closes the app
 document.addEventListener('visibilitychange',function(){
-  if(document.visibilityState==='hidden') flushPositionSync();
+  if(document.visibilityState==='hidden'){
+    flushPositionSync();
+    // Await any pending IDB blob write to prevent data loss on close
+    if(_pendingBlobSave) _pendingBlobSave.catch(()=>{});
+  }
 });
 // pagehide is an additional fallback (fires on some Android browsers on navigate-away)
 window.addEventListener('pagehide',function(){ flushPositionSync(); },{passive:true});
@@ -1317,6 +1370,7 @@ function loadDisplayPrefs(){
     if(p.wordHl!==undefined){ wordHlOn=p.wordHl; document.getElementById('wordHlToggle')?.classList.toggle('on',wordHlOn); }
     if(p.wpm){ wpm=p.wpm; document.getElementById('defWpmSlider').value=wpm; document.getElementById('defWpmInput').value=wpm; updateWpmLabel(); }
     if(p.sentPauseMs!==undefined){ sentPauseMs=p.sentPauseMs; document.getElementById('sentPauseLbl').textContent=sentPauseMs+'ms'; }
+    updateThemeColor();
   }catch(e){}
 }
 
@@ -1453,9 +1507,16 @@ function openBook(i){
   $('pTitle').textContent=b.title;
   configurePlayerForMode(b, b.audioUrl||null, b.playbackRate||1);
   loadTranscriptData(b);
-  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); seekAudioToSentence(); });
+  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); seekAudioToSentence(); pulseResumeSent(); });
   setupMediaSession();
   updatePageTitle();
+}
+
+function pulseResumeSent(){
+  if(curSent<=0||!sentences[curSent]) return;
+  const el=sentences[curSent].el;
+  el.classList.add('sent-resume-pulse');
+  el.addEventListener('animationend',()=>el.classList.remove('sent-resume-pulse'),{once:true});
 }
 
 function goLib(){
@@ -1539,8 +1600,15 @@ function setRate(v){
   if(rc) rc.value=v;
   const ri=$('rateBtnInline');
   if(ri) ri.textContent=v+'×';
+  updateSpeedBadge(v);
   if(curBookIdx>=0){ library[curBookIdx].playbackRate=v; if(!IS_PWA) saveLibrary(); }
   saveDisplayPrefs();
+}
+function updateSpeedBadge(v){
+  const badge=$('speedBadge');
+  if(!badge) return;
+  if(Math.abs(v-1)<0.001){badge.classList.remove('show');badge.textContent='';}
+  else{badge.textContent=v+'x';badge.classList.add('show');}
 }
 function setVol(v){
   _audio.volume=v;
@@ -1874,7 +1942,12 @@ function setTheme(t,btn){
   document.body.className=t?'theme-'+t:'';
   document.querySelectorAll('[id^=themePill]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  updateThemeColor();
   saveDisplayPrefs();
+}
+function updateThemeColor(){
+  const m=document.getElementById('themeColorMeta');
+  if(m) m.setAttribute('content',getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
 }
 function setFont(f,key,btn){
   _fontBody=f;
@@ -2182,6 +2255,21 @@ async function loadEbook(book,onDone){
     else                                        items=parseTxt(String(book.ebookData||''));
   }catch(err){ items=[{type:'text',text:'Error loading ebook: '+err.message}]; }
   content.innerHTML='';
+  // Delegated click handler — one listener instead of one per word/sentence
+  content.onclick=function(ev){
+    const wordEl=ev.target.closest('.word');
+    const sentEl=ev.target.closest('.sent');
+    if(!sentEl) return;
+    const sIdx=parseInt(sentEl.dataset.s,10);
+    if(isNaN(sIdx)) return;
+    if(wordEl){
+      wordEl.classList.add('flashing');
+      wordEl.addEventListener('animationend',()=>wordEl.classList.remove('flashing'),{once:true});
+      const wIdx=parseInt(wordEl.dataset.w,10);
+      if(!isNaN(wIdx)){curSent=sIdx;curWord=wIdx;updateHL();updateProg();saveBookProgress();return;}
+    }
+    curSent=sIdx;curWord=0;updateHL();updateProg();saveBookProgress();
+  };
   // Use a DocumentFragment to batch all DOM insertions into one reflow
   const frag=document.createDocumentFragment();
   // Chunk size: smaller on slower devices (heuristic: < 6 logical CPUs → mobile)
@@ -2206,30 +2294,21 @@ async function loadEbook(book,onDone){
           const sentSpan=document.createElement('span');
           sentSpan.className='sent';
           const wordEls=[];
+          let wIdx=0;
           s.split(/(\s+)/).forEach(tok=>{
             if(/^\s+$/.test(tok)){ sentSpan.appendChild(document.createTextNode(tok)); }
             else if(tok){
               const ws=document.createElement('span');
               ws.className='word'; ws.textContent=tok;
-              ws.addEventListener('click',ev=>{
-                ev.stopPropagation();
-                ws.classList.add('flashing');
-                ws.addEventListener('animationend',()=>ws.classList.remove('flashing'),{once:true});
-              },{passive:true});
+              ws.dataset.w=wIdx++;
               wordEls.push({el:ws,text:tok});
               sentSpan.appendChild(ws);
             }
           });
           sentSpan.appendChild(document.createTextNode(' '));
           const sIdx=sentences.length;
+          sentSpan.dataset.s=sIdx;
           sentences.push({el:sentSpan,words:wordEls,text:s});
-          sentSpan.addEventListener('click',ev=>{
-            if(ev.target.classList.contains('word')){
-              const wIdx=wordEls.findIndex(w=>w.el===ev.target);
-              if(wIdx>=0){curSent=sIdx;curWord=wIdx;updateHL();updateProg();saveBookProgress();return;}
-            }
-            curSent=sIdx;curWord=0;updateHL();updateProg();saveBookProgress();
-          },{passive:true});
           para.appendChild(sentSpan);
         });
         if(para.children.length) frag.appendChild(para);
@@ -2362,8 +2441,8 @@ function arrayBufferToBase64(buf){
 // ADD BOOK MODAL
 // ══════════════════════════════════════════════════════
 const upData={audio:null,ebook:null,transcript:null,cover:null};
-function openModal(){ upData.audio=null; upData.ebook=null; upData.transcript=null; upData.cover=null; folderFiles=[]; resetModal(); document.getElementById('modal').style.display='flex'; }
-function closeModal(){ document.getElementById('modal').style.display='none'; }
+function openModal(){ upData.audio=null; upData.ebook=null; upData.transcript=null; upData.cover=null; folderFiles=[]; resetModal(); document.getElementById('modal').style.display='flex'; _openModalEl('modal'); }
+function closeModal(){ document.getElementById('modal').style.display='none'; _closeModalRestore(); }
 function closeOvl(e){ if(e.target.id==='modal') closeModal(); }
 function resetModal(){
   ['audioName','ebookName','transcriptName','coverName'].forEach(id=>{ const el=document.getElementById(id); el.textContent='No file selected'; el.className='fp-name empty'; });
@@ -2505,8 +2584,9 @@ function openTranscriptModal(){
   const b=curBookIdx>=0?library[curBookIdx]:null;
   document.getElementById('txRemoveBtn').style.display=b?.transcriptType?'':'none';
   document.getElementById('txModal').style.display='flex';
+  _openModalEl('txModal');
 }
-function closeTxModal(){ document.getElementById('txModal').style.display='none'; }
+function closeTxModal(){ document.getElementById('txModal').style.display='none'; _closeModalRestore(); }
 function closeTxOvl(e){ if(e.target.id==='txModal') closeTxModal(); }
 function txDzOver(e){ e.preventDefault(); document.getElementById('txDropzone').classList.add('drag-over'); }
 function txDzLeave(){ document.getElementById('txDropzone').classList.remove('drag-over'); }
@@ -2553,8 +2633,9 @@ function openLinkAudioModal(){
   document.getElementById('linkAudioName').className='fp-name empty';
   document.getElementById('linkAudioSaveBtn').disabled=true;
   document.getElementById('linkAudioModal').style.display='flex';
+  _openModalEl('linkAudioModal');
 }
-function closeLinkAudioModal(){ document.getElementById('linkAudioModal').style.display='none'; }
+function closeLinkAudioModal(){ document.getElementById('linkAudioModal').style.display='none'; _closeModalRestore(); }
 function laDzOver(e){ e.preventDefault(); document.getElementById('linkAudioDz').classList.add('drag-over'); }
 function laDzLeave(){ document.getElementById('linkAudioDz').classList.remove('drag-over'); }
 function laDzDrop(e){ e.preventDefault(); laDzLeave(); const f=e.dataTransfer.files[0]; if(f) laFileLoad(f); }
@@ -2615,8 +2696,9 @@ function openBookInfoModal(){
     container.appendChild(div);
   });
   document.getElementById('bookInfoModal').style.display='flex';
+  _openModalEl('bookInfoModal');
 }
-function closeBookInfoModal(){ document.getElementById('bookInfoModal').style.display='none'; }
+function closeBookInfoModal(){ document.getElementById('bookInfoModal').style.display='none'; _closeModalRestore(); }
 function biReassign(e,type){
   const f=e.target.files[0]; e.target.value=''; if(!f) return;
   const ext=f.name.split('.').pop().toLowerCase();
@@ -2833,7 +2915,7 @@ async function pwaOpenBook(i){
       else { b.ebookData=await ebookFile.text(); }
     }catch(e){ console.warn('Folio: ebook load failed',e); }
   }
-  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); seekAudioToSentence(); });
+  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); seekAudioToSentence(); pulseResumeSent(); });
   setupMediaSession();
   updatePageTitle();
 }
