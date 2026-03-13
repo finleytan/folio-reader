@@ -525,6 +525,7 @@ html,body,
   <div class="lib-header">
     <div class="lib-logo">Folio</div>
     <div class="lib-tagline">Audiobook &amp; Ebook Reader</div>
+    <div id="libVersion" style="font-size:10px;color:var(--text3);margin-top:6px;letter-spacing:.04em"></div>
     <div id="pwaFolderBadge" style="display:none;margin-top:8px;font-size:11px;color:var(--text3);cursor:pointer" onclick="pwaPickFolder()">📁 <span id="pwaFolderName"></span> · <span style="color:var(--accent)">Change</span></div>
   </div>
   <div class="lib-grid" id="libGrid"></div>
@@ -652,6 +653,7 @@ html,body,
         <div class="op-sec" style="color:var(--text3);font-size:12px;line-height:1.7">
           <div class="op-ttl">About</div>
           <div>Folio — Audiobook &amp; Ebook Reader</div>
+          <div id="aboutVersion" style="opacity:.5;margin-top:2px"></div>
           <div style="margin-top:4px;opacity:.6">Settings are saved automatically.</div>
         </div>
       </div>
@@ -872,6 +874,9 @@ html,body,
 
 <script>
 'use strict';
+
+// ── App version ───────────────────────────────────
+const APP_VERSION = '1.0.0';
 
 // ══════════════════════════════════════════════════════
 // STATE
@@ -3454,6 +3459,10 @@ if('serviceWorker' in navigator){
 // ══════════════════════════════════════════════════════
 async function init(){
   try{ cacheDOM(); }catch(e){}
+  const vEl = document.getElementById('libVersion');
+  if(vEl) vEl.textContent = 'v' + APP_VERSION;
+  const avEl = document.getElementById('aboutVersion');
+  if(avEl) avEl.textContent = 'Version ' + APP_VERSION;
   try{ _cacheScrollMetrics(); window.addEventListener('resize',_cacheScrollMetrics,{passive:true}); }catch(e){}
   try{ wireAudioEvents(); }catch(e){}
   try{ loadDisplayPrefs(); }catch(e){}

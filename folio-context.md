@@ -2,7 +2,7 @@
 
 # Folio — Living Context Document
 
-Single-file HTML PWA (~3,484 lines). Audiobook/ebook reader with synced word-level highlighting.
+Single-file HTML PWA (~3,493 lines). Audiobook/ebook reader with synced word-level highlighting.
 Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default dark, light, night.
 
 ---
@@ -16,7 +16,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | `<body>` | Static HTML (4 screens + 5 modals) |
 | `<script>` | All JS |
 
-**Approximate line ranges (index.html):** CSS `16–474` · HTML `476–872` · JS `873–3484`
+**Approximate line ranges (index.html):** CSS `16–474` · HTML `476–874` · JS `875–3493`
 
 ### CSS Sections
 
@@ -49,7 +49,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | `#installBanner` | PWA install prompt banner |
 | `#pwaFirstRun` | First-run screen: folder picker setup |
 | `#pwaRegrant` | Re-grant permissions screen |
-| `#library` | Library screen: header + `#libGrid` card grid |
+| `#library` | Library screen: header (logo, tagline, `#libVersion`) + `#libGrid` card grid |
 | `#player` | **Main player screen** (see breakdown below) |
 | `#modal` | Add Book modal (dropzone, file pills, folder assign) |
 | `#txModal` | Transcript modal (add/replace transcript) |
@@ -63,7 +63,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 |---|---|
 | `<audio id="audio">` | Hidden audio element |
 | `.top-bar` | Back button, title (`#pTitle`), progress text (`#pProg`), play button (`#playBtn`), speed badge (`#speedBadge`), option/TOC/transcript buttons |
-| `#optPanel` | Flyout options: 3 tabs (Playback, Display, Advanced) with sliders/toggles, rate presets, auto-scroll, resync, stop, sync offset (`#offsetRow`). Settings with ⓘ icons show inline `.op-desc` help text on tap via `toggleOpInfo()` |
+| `#optPanel` | Flyout options: 3 tabs (Playback, Display, Advanced) with sliders/toggles, rate presets, auto-scroll, resync, stop, sync offset (`#offsetRow`). About section includes `#aboutVersion`. Settings with ⓘ icons show inline `.op-desc` help text on tap via `toggleOpInfo()` |
 | `#seekStrip` | Single-row: time label, seek bar, time label, `.speed-strip` (−/rate/+ buttons), volume (vol hidden on mobile; all hidden in TTS mode). ~30px tall on mobile (4px 12px padding) |
 | `#ttsBar` | TTS voice picker, rate slider (shown in TTS mode) |
 | `#txBanner` | Transcript status banner (loading/syncing/ready/error) |
@@ -74,7 +74,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 
 | Section | Key functions |
 |---|---|
-| **STATE** | All global variable declarations and constants (incl. `_fontBody/_fontSize/_lineHeight/_maxWidth`) |
+| **STATE** | `APP_VERSION` constant, all global variable declarations and constants (incl. `_fontBody/_fontSize/_lineHeight/_maxWidth`) |
 | **TOAST** | `showToast(msg, type, duration)`, `showSyncHintOnce()` (one-time Whisper sync hint; guarded by `SYNC_HINT_KEY` localStorage flag + `ttsMode` check) |
 | **WAKE LOCK** | `acquireWakeLock()`, `releaseWakeLock()`, visibilitychange re-acquire + audio/TTS recovery, PWA `freeze`/`resume` listeners (IS_PWA-guarded) |
 | **MEDIA SESSION** | `setupMediaSession()`, `updateMediaSessionState(playing)` |
@@ -112,7 +112,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | **SCREEN ROUTER** | `showScreen(id)`, `pwaShowFirstRun()`, `pwaCheckOnLaunch()` |
 | **SWIPE GESTURES** | Touchstart/move/end IIFE on `#eScroll` |
 | **SERVICE WORKER** | `navigator.serviceWorker.register()` |
-| **INIT** | `init()` — calls cacheDOM, wireAudioEvents, loadDisplayPrefs, setMediaState, getTtsVoices; wires `click`+`touchend` on `_readProg.parentElement` → `scrubToPosition` (once, not per book-load); routing |
+| **INIT** | `init()` — calls cacheDOM, populates `#libVersion` and `#aboutVersion` from `APP_VERSION`, wireAudioEvents, loadDisplayPrefs, setMediaState, getTtsVoices; wires `click`+`touchend` on `_readProg.parentElement` → `scrubToPosition` (once, not per book-load); routing |
 
 ---
 
@@ -257,6 +257,7 @@ Routed by `showScreen(id)` toggling `display:flex/none`.
 ### Constants
 | Name | Value/Purpose |
 |---|---|
+| `APP_VERSION` | `'1.0.0'` — app version string; displayed in `#libVersion` and `#aboutVersion` at init |
 | `IS_PWA` | `true` if running as installed PWA (checks `standalone`, `fullscreen`, and `minimal-ui` display modes + `navigator.standalone`) |
 | `CAN_FS` | `true` if File System Access API available |
 | `AUDIO_EXTS` | Set of recognized audio extensions |

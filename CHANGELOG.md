@@ -2,6 +2,13 @@
 
 ---
 
+## v1.9 — 2026-03-13
+
+### Added
+- App version number displayed on library screen below tagline (`v1.0.0`) and in Options > Advanced > About (`Version 1.0.0`), driven by a single `APP_VERSION` constant
+
+---
+
 ## v1.8 — 2026-03-13
 
 ### Fixed
