@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node --check index.html)"
+      "Bash(node --check index.html)",
+      "Bash(npx playwright:*)"
     ]
   }
 }
