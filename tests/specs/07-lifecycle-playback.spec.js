@@ -115,6 +115,24 @@ async function injectAudioFixtureBook(page, opts = {}) {
   return book.id;
 }
 
+// Stub speechSynthesis so TTS utterances don't immediately error in headless Chromium
+async function stubSpeechSynthesis(page) {
+  await page.evaluate(() => {
+    const stub = {
+      _utt: null,
+      _paused: false,
+      speak(utt) { stub._utt = utt; stub._paused = false; },
+      pause() { stub._paused = true; if (stub._utt && stub._utt.onpause) stub._utt.onpause(); },
+      resume() { stub._paused = false; },
+      cancel() { stub._utt = null; stub._paused = false; },
+      getVoices() { return []; },
+      addEventListener() {},
+      removeEventListener() {},
+    };
+    Object.defineProperty(window, 'speechSynthesis', { value: stub, writable: true, configurable: true });
+  });
+}
+
 // ── Fix #1 & #3: Page Lifecycle (freeze / resume / visibilitychange) ──
 
 test.describe('Fix #1 & #3 — Page Lifecycle', () => {
@@ -125,6 +143,7 @@ test.describe('Fix #1 & #3 — Page Lifecycle', () => {
     await page.waitForSelector('#library', { state: 'visible' });
     await injectFixtureBook(page, { sentenceCount: 10, title: 'Lifecycle Test' });
     await openBook(page, 0);
+    await stubSpeechSynthesis(page);
     await injectStateReader(page);
   });
 
@@ -192,6 +211,7 @@ test.describe('Fix #2 — State quad consistency (TTS)', () => {
     await page.waitForSelector('#library', { state: 'visible' });
     await injectFixtureBook(page, { sentenceCount: 15, title: 'Quad Test' });
     await openBook(page, 0);
+    await stubSpeechSynthesis(page);
     await injectStateReader(page);
   });
 

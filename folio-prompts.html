@@ -209,6 +209,7 @@ html,body { background:var(--bg); color:var(--text); font-family:var(--font); mi
 
 /* Custom-card marker */
 .tag-custom { background:rgba(232,90,173,.1); color:#e85aad; border:1px solid rgba(232,90,173,.2); }
+.tag-date   { background:rgba(139,148,158,.1); color:var(--text2); border:1px solid rgba(139,148,158,.2); }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -286,6 +287,10 @@ html,body { background:var(--bg); color:var(--text); font-family:var(--font); mi
             <option value="high">High</option>
           </select>
         </div>
+      </div>
+      <div class="field" id="f-done-wrap" style="display:none">
+        <label>Completed date</label>
+        <input type="date" id="f-done">
       </div>
       <div class="field">
         <label>Prompt text</label>
@@ -424,6 +429,13 @@ const PROMPTS = [
   title:"No manual library rescan button",
   desc:"There is no way to manually trigger a rescan of book folders in PWA mode. If files are added or changed outside the app the user must remove and re-add the book to pick up changes — should have a visible rescan/refresh action on the library screen.",
   prompt:"# Feature: Manual library rescan button in PWA mode in index.html\n\n## Context\nRead folio-context.md: PWA FILE SYSTEM section. pwaScanAndRender() does\nthe full scan. The library screen HTML has a .lib-header div. IS_PWA and\nCAN_FS are constants. pwaRootHandle is the currently active folder handle.\n\n## Task\nAdd a visible \"Rescan\" button to the library header in PWA mode.\n\n### HTML\nFind the .lib-header div in the library screen. Inside it, add a rescan\nbutton that is only visible in PWA mode. Since we can\\'t use server-side\nrendering, hide it by default and show it with JS after init:\n  <button id=\"pwaRescanBtn\" class=\"ic-btn\" style=\"display:none\"\n    title=\"Rescan library\" onclick=\"pwaRescan()\">🔄</button>\n\nPlace it alongside the existing lib-header icon buttons.\n\n### JS\nAdd:\n  function pwaRescan() {\n    if(!IS_PWA || !pwaRootHandle) return;\n    showToast(\\'Scanning library…\\', \\'\\', 1500);\n    pwaScanAndRender();\n  }\n\nIn init(), after routing is resolved and if IS_PWA && CAN_FS:\n  const rescanBtn = document.getElementById(\\'pwaRescanBtn\\');\n  if(rescanBtn && IS_PWA && CAN_FS) rescanBtn.style.display = \\'\\';\n\n### Behaviour rules\n- Button is only ever visible in PWA mode (IS_PWA && CAN_FS).\n- Browser mode: button remains display:none permanently.\n- If pwaRootHandle is null (first-run, no folder yet): pwaRescan() is a\n  no-op (the guard handles this).\n- pwaScanAndRender() already shows the scanning indicator — no extra UI needed.\n- Do not change pwaScanAndRender() itself.\n\n## Verification\n- PWA mode, library screen: rescan button visible in header.\n- Tap rescan: library re-scans and re-renders from disk.\n- Browser mode: button not visible.\n- Run syntax check."
+  },
+
+  {
+  num:"22", status:"active", type:"fix", model:"sonnet", effort:"low",
+  title:"Seek bar does not jump ebook to correct position immediately",
+  desc:"Dragging the seek bar during playback takes 20-30s before ebook scrolls to the matching sentence. onSeekChange skips the sentence lookup when playing, and timeupdate is suppressed by scrollPaused from the drag gesture.",
+  prompt:"# Fix: Seek bar does not jump ebook to correct position immediately in index.html\n\n## Context\nRead onSeekInput(), onSeekChange(), the timeupdate handler inside wireAudioEvents(),\nscrollToSent(), and the scroll-pause IIFE on #eScroll before editing.\n\n## Root cause — two independent blockers\n\n### Blocker 1: onSeekChange skips sentence lookup during playback\nonSeekChange(v) sets _audio.currentTime correctly, but the binary search\nthat maps audio time → curSent is guarded by:\n  if(mediaState !== 'playing' && sentenceTimings.length)\nSo during active playback the sentence position is never updated by the\nseek handler. The code relies entirely on the next timeupdate to catch up.\n\n### Blocker 2: scrollPaused blocks scrollToSent for 2 seconds\nDragging the seek bar fires scroll events on #eScroll (the ebook viewport).\nThe scroll-pause IIFE sets scrollPaused = true and starts a 2-second\ncooldown timer. When timeupdate eventually fires and calls\nscrollToSent(curSent), the function returns early at:\n  if(!instant && scrollPaused) return;\nThe ebook stays frozen until the 2s cooldown expires.\n\nCombined: the seek bar changes the audio position, but the ebook does not\nfollow for several seconds — or longer if the user drags repeatedly.\n\n## Fix\n\n### 1. Run the binary search in onSeekChange regardless of playback state\nRemove the mediaState guard so the sentence lookup always runs after a seek:\n\n  function onSeekChange(v){\n    if(isFinite(_audio.duration)) _audio.currentTime = _audio.duration * v / 100;\n    isSeeking = false;\n    if(sentenceTimings.length){\n      const t = _audio.currentTime + syncOffset;\n      let lo = 0, hi = sentenceTimings.length - 1, best = curSent;\n      while(lo <= hi){\n        const mid = (lo + hi) >>> 1;\n        if(sentenceTimings[mid] && t >= sentenceTimings[mid].start){ best = mid; lo = mid + 1; }\n        else { hi = mid - 1; }\n      }\n      if(best !== curSent){\n        curSent = best; curWord = 0;\n        updateHL(); updateProg();\n        scrollToSent(curSent, true);   // instant=true — bypasses scrollPaused\n        saveBookProgressDebounced();\n      }\n    }\n  }\n\nKey changes:\n- Removed `mediaState !== 'playing'` from the guard.\n- Changed scrollToSent(curSent) to scrollToSent(curSent, true) so the\n  instant flag bypasses both the scrollPaused check and the safe-zone check.\n  This ensures the ebook jumps immediately to the seeked position.\n\n### 2. Clear scrollPaused on seek completion\nAt the top of onSeekChange, reset the scroll-pause state so subsequent\ntimeupdate-driven scrolls are not blocked:\n\n  scrollPaused = false;\n  if(_scrollPauseTimer){ clearTimeout(_scrollPauseTimer); _scrollPauseTimer = null; }\n\nThis cancels any pending cooldown from the drag gesture.\n\n## Constraints\n- Do not change onSeekInput() — it correctly sets isSeeking = true during drag.\n- Do not change the timeupdate binary search — it still drives continuous\n  tracking during normal playback.\n- Do not change scrollToSent() itself.\n- Do not change the scroll-pause IIFE — it still protects against manual\n  scroll during normal playback.\n- _wordTick (rAF loop) handles word-level highlights independently and\n  does not need changes — it reads curSent which is now set correctly.\n\n## Verification\n- Audio playing: drag seek bar to a different position. Ebook immediately\n  scrolls to the matching sentence (no 2-30s delay).\n- Audio paused: drag seek bar. Ebook still updates immediately (existing\n  behaviour preserved).\n- Normal playback without seeking: auto-scroll still works, scroll-pause\n  cooldown still works for manual scroll.\n- Rapid repeated seeks: each one immediately updates ebook position.\n- Run syntax check."
   },
 
   {
@@ -692,147 +704,147 @@ const PROMPTS = [
 
   // ── Completed ─────────────────────────────────────
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"PWA: playback hangs on random sentences mid-book",
   desc:"Separated _scrollPauseTimer from scrollTimer so the scroll-pause IIFE no longer kills the advanceSent chain. Added curSent bounds guard and rAF re-registration to _wordTick to prevent stalls on out-of-bounds or undefined entries.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"No freeze/resume page lifecycle handling — TTS breaks on Android Chrome",
   desc:"Added TTS branches to the freeze/resume listeners (shared _wasPlayingBeforeFreeze flag). Freeze calls ttsPause(), resume calls ttsPlay() after 200ms. Expanded visibilitychange to detect dead speechSynthesis engine and restart from curSent.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"PWA: pause and resume breaks playback state",
   desc:"Fixed mediaPlay() .catch() to call full state quad with paused state on play rejection. Added releaseWakeLock() to wireAudioEvents pause handler so browser-initiated pauses release the wake lock.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"PWA: audio stops when leaving and returning to app",
   desc:"Added freeze/resume Page Lifecycle listeners (IS_PWA-guarded) that cleanly pause audio before freeze and resume after 150ms delay. Expanded visibilitychange handler to recover silently-paused audio via _audio.play().catch().",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"TOC navigation bugs fixed in TTS mode",
   desc:"Fixed three TOC navigation bugs: sidebar now closes before scroll fires (fixing wrong position on mobile/long ebooks), ttsStop()+ttsPlay() replaces advanceSent() to prevent double-advance while playing, and ttsStop() clears the stale utterance when paused so the next play press starts from the correct sentence.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"Linking audio via Book Files now switches out of TTS mode",
   desc:"Fixed biReassign() audio branch — removed pre-load of _audio.src that caused self-revocation of the blob URL, and called configurePlayerForMode() directly to switch the player into audio mode immediately when audio is linked via Book Files.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"feat", model:"sonnet",
+  num:"✓", status:"done", type:"feat", model:"sonnet", done:"",
   title:"Reading progress bar as TTS scrubber",
   desc:"Added scrubToPosition() making the reading progress bar tappable in TTS mode — tap percentage maps to sentence index via Math.round(pct*(sentences.length-1)), bar expands to 12px with .scrubbing class in TTS mode, and TTS restarts from new position if playing.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"Seek bar updates ebook position while paused",
   desc:"Added binary search in onSeekChange() to immediately update the sentence highlight and scroll position when the seek bar is dragged while paused or stopped.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"EPUB paragraph fragmentation fix",
   desc:"Rewrote extractFromDom() to collect text at block element boundaries, fixing paragraph fragmentation from inline elements in EPUB/HTML. Also fixed empty TOC for EPUBs where headings are nested inside div containers.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"TTS auto-scroll stops working after navigation",
   desc:"Added _programmaticScroll flag to prevent programmatic scroll events from triggering the 2s auto-scroll cooldown; TOC click now restarts advanceSent() when TTS is playing.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"TTS play/pause unresponsive after pausing",
   desc:"Removed ttsSpeaking=false from stopScrollEngine() to fix TTS play/pause state corruption caused by the scroll engine timer firing during active playback.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"Two speed controls visible in TTS mode + TTS rate not synced",
   desc:"Hidden speed-strip in TTS mode by adding explicit hide in configurePlayerForMode(). Unified rate state by routing setTtsRate() through setRate() and syncing #ttsRateLbl / #ttsRateSlider from setRate().",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"TTS sentence highlight off by one after click",
   desc:"Added re-anchor guard inside utt.onboundary: if _activeSentEl has drifted from the current sentence element, it is corrected before the word highlight updates.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"TTS sentence skip on click",
   desc:"Added _ttsGeneration counter. onend/onerror closures capture gen at speak() time and bail out if gen !== _ttsGeneration, preventing stale cancel callbacks from advancing curSent.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"TTS play button unresponsive after returning to app",
   desc:"Expanded the visibilitychange wake-lock handler to detect a dead SpeechSynthesis engine on return from background and reset ttsSpeaking/mediaState to stopped so play works on the first press.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"TTS → audiobook position lost on mode switch",
   desc:"Guarded audioTime writes in saveBookProgress() and flushPositionSync() with !ttsMode. Added sentenceTimings fallback seek in configurePlayerForMode()'s loadedmetadata handler when audioTime is 0.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"TTS click navigation",
   desc:"Clicking a sentence in TTS mode now stops the current utterance and restarts speech from the tapped sentence. Both word-click and sentence-click paths updated.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"fix", model:"sonnet",
+  num:"✓", status:"done", type:"fix", model:"sonnet", done:"",
   title:"Instant scroll to resume position on book open",
   desc:"Book open now scrolls instantly to the saved sentence position. scrollToSent() gained an instant=true parameter; pulseResumeSent(true) is passed from both openBook and pwaOpenBook.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"feat", model:"sonnet",
+  num:"✓", status:"done", type:"feat", model:"sonnet", done:"",
   title:"Inline speed controls on seek strip",
   desc:"− / rate / + buttons sit directly on the seek strip. Mobile users can change speed without opening the options panel. RATE_STEPS array and changeSpeed() function added.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"feat", model:"sonnet",
+  num:"✓", status:"done", type:"feat", model:"sonnet", done:"",
   title:"Progress percentage in top bar",
   desc:"Top bar now shows \"Chapter 3 · 15%\" instead of the raw sentence count. Chapter label is derived from tocEntries[] and truncated to 28 chars.",
   prompt:""
   },
 
   {
-  num:"✓", status:"done", type:"feat", model:"sonnet",
+  num:"✓", status:"done", type:"feat", model:"sonnet", done:"",
   title:"Sync offset hint toast",
   desc:"One-time toast appears after the first Whisper transcript sync pointing users to Options > Sync offset. Guarded by folio_sync_hint_v1 localStorage flag.",
   prompt:""
@@ -892,7 +904,8 @@ function appendSection(label, items, container) {
     const effortLabels = { low:'Low', med:'Med', high:'High' };
     const effortTag = p.effort ? `<span class="tag tag-effort-${p.effort}">${effortLabels[p.effort]} effort</span>` : '';
     const hasPrompt  = p.prompt && p.prompt.trim().length > 0;
-    const extraTag  = isDone     ? '<span class="tag tag-done">Done</span>'
+    const doneDate  = isDone && p.done ? `<span class="tag tag-date">${escHtml(p.done)}</span>` : '';
+    const extraTag  = isDone     ? '<span class="tag tag-done">Done</span>' + doneDate
                     : isDeferred ? '<span class="tag tag-defer">Deferred</span>'
                     : isBacklog  ? (hasPrompt ? '' : '<span class="tag tag-backlog">Needs prompt</span>')
                     : '';
@@ -972,6 +985,15 @@ function copyText(btn) {
 }
 
 // ── Add-prompt modal ───────────────────────────────────────
+function _toggleDoneField() {
+  const isDone = document.getElementById('f-status').value === 'done';
+  document.getElementById('f-done-wrap').style.display = isDone ? '' : 'none';
+  if(isDone && !document.getElementById('f-done').value) {
+    document.getElementById('f-done').value = new Date().toISOString().slice(0,10);
+  }
+}
+document.getElementById('f-status').addEventListener('change', _toggleDoneField);
+
 function openAddModal() {
   document.getElementById('f-title').value  = '';
   document.getElementById('f-desc').value   = '';
@@ -979,6 +1001,8 @@ function openAddModal() {
   document.getElementById('f-status').value = 'active';
   document.getElementById('f-type').value   = 'feat';
   document.getElementById('f-effort').value = 'low';
+  document.getElementById('f-done').value   = '';
+  _toggleDoneField();
   document.getElementById('addModal').classList.add('open');
   setTimeout(()=>document.getElementById('f-title').focus(), 50);
 }
@@ -992,12 +1016,14 @@ function saveNewPrompt() {
   if(!title){ document.getElementById('f-title').focus(); return; }
   const custom = loadCustom();
   const maxNum = allPrompts().reduce((m,p)=>Math.max(m, parseInt(p.num)||0), 0);
+  const status = document.getElementById('f-status').value;
   custom.push({
     num:    String(maxNum + 1),
-    status: document.getElementById('f-status').value,
+    status,
     type:   document.getElementById('f-type').value,
     model:  'sonnet',
     effort: document.getElementById('f-effort').value,
+    done:   status === 'done' ? document.getElementById('f-done').value : '',
     title,
     desc:   document.getElementById('f-desc').value.trim(),
     prompt: document.getElementById('f-prompt').value,
