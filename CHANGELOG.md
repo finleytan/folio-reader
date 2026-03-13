@@ -2,6 +2,30 @@
 
 ---
 
+## v1.5 — 2026-03-12
+
+### Added
+- **Tests tab** in the debug panel: 47-assertion automated suite covering all four existing tabs; results stream into the panel as each test completes
+- `?debug&test` URL flag — panel opens automatically on the Tests tab and runs the full suite 300ms after load
+- `tests/console-test.js` — standalone DevTools console runner (paste-and-run, same 47 assertions)
+- `tests/debug-panel.spec.js` + `tests/playwright.config.js` — Playwright test suite with dialog handling and headless CI support
+
+### Fixed
+- Audio (fake) fixture mode now correctly sets `ttsMode=false` and shows the seek strip — previous 800ms timeout raced against `loadEbook`'s async chunked DOM build; replaced with a 50ms poll that waits for `sentences.length > 0`
+
+---
+
+## v1.4 — 2026-03-12
+
+### Added
+- Developer debug panel activated by `?debug` in the URL — completely absent from DOM and CSS when the flag is not present
+- **Fixture tab**: injects a synthetic book (10/25/50/100 sentences, TTS or fake-audio mode) directly into the library without dragging files; fake audio mode seeds `sentenceTimings` with 2s/sentence spacing 800ms after open
+- **Stepper tab**: jump to sentence, ±1/±10 step buttons, audio-time range slider (maps 0–100% to a 200s fake duration), TTS play/pause/stop controls (shown only when `ttsMode === true`), sync offset ±0.1/±0.5 buttons, and per-word highlight tester
+- **State tab**: live monospace two-column readout of all key globals, auto-refreshing at 500ms while active; anomaly highlighting (amber) for empty `sentenceTimings` with an open book, `curSent ≥ sentences.length`, and playing-but-audio-paused state
+- **Persist tab**: dump/clear/force-save `folio_library_v2`; dump `folio_pwa_progress_v1`; simulate `pagehide` event; list/clear IndexedDB blob store; dump/reset `folio_display_prefs_v1`
+
+---
+
 ## v1.3 — 2026-03-12
 
 ### Added
