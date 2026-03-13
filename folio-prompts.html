@@ -92,6 +92,10 @@ html,body { background:var(--bg); color:var(--text); font-family:var(--font); mi
 .tag-done   { background:rgba(63,185,80,.1);   color:var(--green); border:1px solid rgba(63,185,80,.25); }
 .tag-defer  { background:rgba(72,79,88,.2); color:#8b949e; border:1px solid #30363d; }
 .tag-backlog{ background:rgba(210,153,34,.1); color:var(--yellow); border:1px solid rgba(210,153,34,.25); }
+.tag-perf   { background:rgba(165,120,255,.12); color:#a578ff; border:1px solid rgba(165,120,255,.2); }
+.tag-effort-low  { background:rgba(57,210,192,.1);  color:#39d2c0; border:1px solid rgba(57,210,192,.2); }
+.tag-effort-med  { background:rgba(240,136,62,.1);  color:var(--orange); border:1px solid rgba(240,136,62,.2); }
+.tag-effort-high { background:rgba(232,90,173,.1);  color:#e85aad; border:1px solid rgba(232,90,173,.2); }
 
 .card-chevron { font-size:12px; color:var(--text3); transition:transform .2s; flex-shrink:0; }
 .prompt-card.open .card-chevron { transform:rotate(180deg); }
@@ -150,6 +154,7 @@ html,body { background:var(--bg); color:var(--text); font-family:var(--font); mi
     <button class="filter-btn"          onclick="filter('backlog',this)">Backlog</button>
     <button class="filter-btn"          onclick="filter('fix',this)">Fixes</button>
     <button class="filter-btn"          onclick="filter('feat',this)">Features</button>
+    <button class="filter-btn"          onclick="filter('perf',this)">Perf</button>
   </div>
 
   <div id="cards"></div>
@@ -163,9 +168,8 @@ html,body { background:var(--bg); color:var(--text); font-family:var(--font); mi
 // ╚══════════════════════════════════════════════════════════╝
 const PROMPTS = [
 
-  // ── ACTIVE — in priority order ─────────────────────────
   {
-    num:'1', status:'active', type:'fix', model:'sonnet',
+    num:'1', status:'active', type:'fix', model:'sonnet', effort:'low',
     title:'Remove transcript pill from add-book modal + remove WPM UI',
     desc:"Two UI cleanups: (1) remove the redundant transcript file-pill from the add-book modal, (2) remove the WPM slider from the options panel. WPM logic stays — only the UI elements are removed.",
     prompt:
@@ -209,7 +213,55 @@ Run node --check index.html when done.`
   },
 
   {
-    num:'2', status:'active', type:'feat', model:'sonnet',
+    num:'2', status:'active', type:'feat', model:'sonnet', effort:'low',
+    title:'Add OpenDyslexic font option',
+    desc:"Adds OpenDyslexic as a selectable body font in Display options. Loads from CDN on demand only — no impact on initial page load.",
+    prompt:
+`# Feature: Add OpenDyslexic font option in index.html
+
+## Goal
+Add OpenDyslexic as a selectable body font alongside Lora, Georgia,
+Sans, Mono. Load from CDN only when selected.
+
+## 1. Add font pill to HTML
+In the Font pills section (Display tab, op-sec containing fontPill-lora),
+add after the Mono pill:
+
+  <button class="pill" id="fontPill-dyslexic"
+    onclick="setFont('OpenDyslexic,sans-serif','dyslexic',this)">
+    Dyslexic
+  </button>
+
+## 2. Load font on demand in setFont()
+Find setFont(f, key, btn) and add CDN injection when key is 'dyslexic',
+before the existing logic:
+
+  if(key === 'dyslexic' && !document.getElementById('font-opendyslexic')){
+    const link = document.createElement('link');
+    link.id = 'font-opendyslexic';
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.cdnfonts.com/css/open-dyslexic';
+    document.head.appendChild(link);
+  }
+
+Only add these lines at the top of setFont() — do not change anything
+else in that function.
+
+## 3. No changes needed to saveDisplayPrefs() or loadDisplayPrefs()
+fontKey is already saved generically from the active fontPill id.
+'dyslexic' will round-trip correctly. loadDisplayPrefs() restores via
+setFont() which will re-inject the CDN link if needed.
+
+## Notes
+- CDN: https://fonts.cdnfonts.com/css/open-dyslexic (free, no key)
+- Guard with getElementById to avoid duplicate link injection
+- Demand-load only — do not preload
+
+Run node --check index.html when done.`
+  },
+
+  {
+    num:'3', status:'active', type:'feat', model:'sonnet', effort:'med',
     title:'Tap rate display to cycle speed presets',
     desc:"Tapping #rateBtnInline on the seek strip cycles through RATE_STEPS presets. Long-press (400ms) still opens the options panel. Adds a brief flash animation on cycle.",
     prompt:
@@ -268,57 +320,9 @@ Add to stylesheet:
 Run node --check index.html when done.`
   },
 
-  {
-    num:'3', status:'active', type:'feat', model:'sonnet',
-    title:'Add OpenDyslexic font option',
-    desc:"Adds OpenDyslexic as a selectable body font in Display options. Loads from CDN on demand only — no impact on initial page load.",
-    prompt:
-`# Feature: Add OpenDyslexic font option in index.html
-
-## Goal
-Add OpenDyslexic as a selectable body font alongside Lora, Georgia,
-Sans, Mono. Load from CDN only when selected.
-
-## 1. Add font pill to HTML
-In the Font pills section (Display tab, op-sec containing fontPill-lora),
-add after the Mono pill:
-
-  <button class="pill" id="fontPill-dyslexic"
-    onclick="setFont('OpenDyslexic,sans-serif','dyslexic',this)">
-    Dyslexic
-  </button>
-
-## 2. Load font on demand in setFont()
-Find setFont(f, key, btn) and add CDN injection when key is 'dyslexic',
-before the existing logic:
-
-  if(key === 'dyslexic' && !document.getElementById('font-opendyslexic')){
-    const link = document.createElement('link');
-    link.id = 'font-opendyslexic';
-    link.rel = 'stylesheet';
-    link.href = 'https://fonts.cdnfonts.com/css/open-dyslexic';
-    document.head.appendChild(link);
-  }
-
-Only add these lines at the top of setFont() — do not change anything
-else in that function.
-
-## 3. No changes needed to saveDisplayPrefs() or loadDisplayPrefs()
-fontKey is already saved generically from the active fontPill id.
-'dyslexic' will round-trip correctly. loadDisplayPrefs() restores via
-setFont() which will re-inject the CDN link if needed.
-
-## Notes
-- CDN: https://fonts.cdnfonts.com/css/open-dyslexic (free, no key)
-- Guard with getElementById to avoid duplicate link injection
-- Demand-load only — do not preload
-
-Run node --check index.html when done.`
-  },
-
   // ── DEFERRED ──────────────────────────────────────────
   {
-    num:'D', status:'deferred', type:'fix', model:'sonnet',
+    num:'D', status:'deferred', type:'fix', model:'sonnet', effort:'high',
     title:'DEFERRED: Confidence-aware sync correction',
     desc:"Stores Jaccard confidence scores during matching and re-matches low-confidence sentences at playback time using a ±5 sentence window. Deferred — do not build until explicitly requested.",
     prompt:
@@ -473,71 +477,274 @@ differences. Won't help with genuine ebook/transcript divergence.`
     prompt:''
   },
 
-  // ── BACKLOG — in priority order ────────────────────────
   {
-    num:'B-1', status:'backlog', type:'fix', model:'sonnet',
-    title:'Audiobook + ebook with no transcript — undefined UX',
-    desc:"No defined behaviour for when an audiobook and ebook are loaded but no transcript is present. Should show a banner explaining the state and surface the transcript upload action. High risk of confusing new users.",
-    prompt:''
-  },
-  {
-    num:'B-2', status:'backlog', type:'fix', model:'sonnet',
+    num:'4', status:'backlog', type:'fix', model:'sonnet', effort:'low',
     title:'TOC double-click required to navigate',
     desc:"TOC sometimes requires two clicks to reach the correct position. Likely a race between toggleToc() closing the sidebar and scrollToSent() firing on mobile. Needs investigation before prompt can be written.",
     prompt:''
   },
   {
-    num:'B-3', status:'backlog', type:'fix', model:'sonnet',
+    num:'5', status:'backlog', type:'fix', model:'sonnet', effort:'low',
     title:'UI element drift (icons shift between books)',
     desc:"Icons like the options button shift position slightly depending on the book. Likely a flexbox/layout issue caused by variable content in the player bar. Needs investigation.",
     prompt:''
   },
   {
-    num:'B-4', status:'backlog', type:'fix', model:'sonnet',
-    title:'Can\'t assign file types individually (folder-only)',
-    desc:"File type assignment only works when uploading an entire folder. Individual file picker path does not exist. Needs a new file assignment flow in the book info panel.",
+    num:'6', status:'backlog', type:'feat', model:'sonnet', effort:'low',
+    title:'High-contrast themes',
+    desc:"Add high-contrast and white-on-black themes to the theme picker. Currently only Parchment, Dark, and Night exist.",
     prompt:''
   },
   {
-    num:'B-5', status:'backlog', type:'fix', model:'sonnet',
-    title:'No auto-link audiobook on mobile',
-    desc:"Should auto-link an audiobook if one is present in the selected folder on mobile. No matching logic exists yet.",
-    prompt:''
-  },
-  {
-    num:'B-6', status:'backlog', type:'fix', model:'sonnet',
-    title:'Ebook formatting polish',
-    desc:"General ebook formatting still needs work beyond the paragraph fragmentation fix. Specific issues to be identified during testing.",
-    prompt:''
-  },
-  {
-    num:'B-7', status:'backlog', type:'feat', model:'sonnet',
-    title:'Faster audiobook relinking (remember filepath)',
-    desc:"Relinking an audiobook requires re-uploading. Should remember the filename/path so relinking is quicker — especially for PWA mode where file handles are available.",
-    prompt:''
-  },
-  {
-    num:'B-8', status:'backlog', type:'fix', model:'sonnet',
+    num:'7', status:'backlog', type:'fix', model:'sonnet', effort:'low',
     title:'No way to cancel folder selection on mobile',
     desc:"Once folder selection begins on mobile there is no cancel step. Needs a confirmation or cancel affordance before committing the folder.",
     prompt:''
   },
   {
-    num:'B-9', status:'backlog', type:'feat', model:'sonnet',
+    num:'8', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'Shift+Arrow skip silent no-op in TTS mode',
+    desc:"Keyboard shortcuts Shift+\u2190 and Shift+\u2192 call skip(\u00b115) which immediately returns in TTS mode with no feedback \u2014 user gets no response and no indication of why, making the shortcut feel broken.",
+    prompt:''
+  },
+  {
+    num:'9', status:'backlog', type:'feat', model:'sonnet', effort:'low',
+    title:'No currently-playing indicator on library cards',
+    desc:"Returning to the library while audio is playing shows no visual connection between the active book card and the ongoing playback \u2014 users have no way to identify which book is playing at a glance.",
+    prompt:''
+  },
+  {
+    num:'10', status:'backlog', type:'feat', model:'sonnet', effort:'low',
+    title:'Chapter skip buttons \u2014 jump to next/previous chapter',
+    desc:"Navigation jumps either one sentence (nudge) or opens the full TOC sidebar \u2014 there is no quick way to skip to the next or previous chapter without tapping through the TOC.",
+    prompt:''
+  },
+  {
+    num:'11', status:'backlog', type:'perf', model:'sonnet', effort:'low',
+    title:'arrayBufferToBase64 blocks main thread on large EPUBs',
+    desc:"The base64 encoder uses a character-by-character loop with string concatenation that blocks the main thread for large EPUB files \u2014 should use btoa with a typed array slice approach or move off the main thread.",
+    prompt:''
+  },
+  {
+    num:'12', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'lastAdvanceTime is declared but never used \u2014 dead state variable',
+    desc:"lastAdvanceTime is initialised in the global state block and documented in folio-context.md as \u2018unused legacy?\u2019 but is never read or written anywhere \u2014 should be removed to reduce state surface and confusion.",
+    prompt:''
+  },
+  {
+    num:'13', status:'backlog', type:'perf', model:'sonnet', effort:'low',
+    title:'content-visibility intrinsic size hint may cause layout shifts',
+    desc:"ebook-para uses contain-intrinsic-size: auto 80px but paragraphs vary widely in height \u2014 incorrect cached estimates cause layout shifts as the user scrolls through books with short or long paragraphs.",
+    prompt:''
+  },
+  {
+    num:'14', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'Book rename uses window.prompt() \u2014 inconsistent and blocked in some PWA contexts',
+    desc:"renameBook() calls window.prompt() which is blocked in some installed PWA environments and looks out of place alongside the rest of the custom modal UI \u2014 should be replaced with an inline edit field on the card.",
+    prompt:''
+  },
+  {
+    num:'15', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'syncOffset not saved in PWA mode \u2014 lost on every session',
+    desc:"adjustOffset() writes library[curBookIdx].syncOffset but skips saving when IS_PWA is true, and savePwaProgress() does not include syncOffset in its prog object. Any sync offset dialled in during a PWA session is silently lost on the next launch \u2014 data loss for transcript users.",
+    prompt:''
+  },
+  {
+    num:'16', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'parseMd leaves partial markdown symbols on edge-case formatting',
+    desc:"parseMd strips inline markdown with /[*_`~]+/g but leaves partial symbols on tokens like word* or _word where the asterisk or underscore is adjacent to a non-space character. Produces garbage text fragments for heavily formatted Markdown ebooks.",
+    prompt:''
+  },
+  {
+    num:'17', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'No visual feedback when sync offset is adjusted during playback',
+    desc:"adjustOffset() updates the #offsetVal label inside the options panel but shows nothing in the main reading view. Users tuning the offset by feel while listening cannot easily see the current value without opening options.",
+    prompt:''
+  },
+  {
+    num:'18', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'TOC sidebar does not scroll to the active chapter on open',
+    desc:"buildToc() rebuilds the list from scratch on every open, always starting scrolled to the top. In a long book the active chapter is highlighted but off-screen, forcing manual scrolling to find the current position.",
+    prompt:''
+  },
+  {
+    num:'19', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'Horizontal swipe gesture in reader conflicts with text selection on touch laptops',
+    desc:"The swipe handler fires nudge() for any horizontal touchend drag over 50px on the ebook scroll area. On a touch laptop or tablet, attempting to select text by dragging horizontally accidentally triggers sentence navigation instead.",
+    prompt:''
+  },
+  {
+    num:'20', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'loadScript has no CDN fallback for JSZip \u2014 EPUB silently fails offline',
+    desc:"loadScript() resolves on both onload and onerror so parseEpub continues with JSZip undefined when the CDN is unreachable, showing only a terse error message with no retry, no fallback URL, and no explanation that the device may be offline.",
+    prompt:''
+  },
+  {
+    num:'21', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'rateBtnInline opens options panel using fragile querySelector for tab selection',
+    desc:"The inline speed button calls switchOptTab('playback', document.querySelector('.op-tab')) which relies on the first .op-tab in the DOM being the Playback tab. If tab order ever changes it will silently open the wrong tab.",
+    prompt:''
+  },
+  {
+    num:'22', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'folio_install_dismissed flag never expires \u2014 install prompt permanently hidden after one dismissal',
+    desc:"Once the install banner is dismissed the folio_install_dismissed flag is set with no version key or expiry. Users who dismiss it accidentally can never get the install prompt back without manually clearing localStorage, and the flag persists across major app updates.",
+    prompt:''
+  },
+  {
+    num:'23', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'Stale totalSents from old progress poisons progress % on re-added books',
+    desc:"When a book is removed and re-added, the old progress record in folio_pwa_progress_v1 may still contain a stale totalSents value. If the new ebook has a different sentence count the progress percentage calculation uses the wrong denominator, showing incorrect or >100% progress.",
+    prompt:''
+  },
+  {
+    num:'24', status:'backlog', type:'fix', model:'sonnet', effort:'low',
+    title:'configurePlayerForMode called before all handles resolved \u2014 wrong mode if both fail',
+    desc:"configurePlayerForMode() is called as soon as the first file handle resolves, but if both audio and ebook handles fail the function may lock the player into the wrong mode with no recovery path. The resolution order is not guaranteed and there is no final reconciliation step.",
+    prompt:''
+  },
+  {
+    num:'25', status:'backlog', type:'perf', model:'sonnet', effort:'low',
+    title:'pwaScanBookFolder has no early exit once all slots are filled',
+    desc:"pwaScanBookFolder() iterates every file in the folder even after audio, ebook, transcript, and cover slots are all populated. For folders with many non-book files this wastes time on unnecessary getFile() calls.",
+    prompt:''
+  },
+  {
+    num:'26', status:'backlog', type:'perf', model:'sonnet', effort:'low',
+    title:'Ebook data string held in memory after DOM is built (PWA only)',
+    desc:"In PWA mode the raw ebook text string read from the file handle is kept in the library entry after loadEbook() has finished building the DOM. The string can be several MB for large books and is never needed again after rendering \u2014 it should be nulled out to reduce memory pressure.",
+    prompt:''
+  },
+  {
+    num:'27', status:'backlog', type:'fix', model:'sonnet', effort:'med',
+    title:'Audiobook + ebook with no transcript \u2014 undefined UX',
+    desc:"No defined behaviour for when an audiobook and ebook are loaded but no transcript is present. Should show a banner explaining the state and surface the transcript upload action. High risk of confusing new users.",
+    prompt:''
+  },
+  {
+    num:'28', status:'backlog', type:'fix', model:'sonnet', effort:'med',
+    title:'Ebook formatting polish',
+    desc:"General ebook formatting still needs work beyond the paragraph fragmentation fix. Specific issues to be identified during testing.",
+    prompt:''
+  },
+  {
+    num:'29', status:'backlog', type:'fix', model:'sonnet', effort:'med',
+    title:'No auto-link audiobook on mobile',
+    desc:"Should auto-link an audiobook if one is present in the selected folder on mobile. No matching logic exists yet.",
+    prompt:''
+  },
+  {
+    num:'30', status:'backlog', type:'feat', model:'sonnet', effort:'med',
+    title:'Faster audiobook relinking (remember filepath)',
+    desc:"Relinking an audiobook requires re-uploading. Should remember the filename/path so relinking is quicker \u2014 especially for PWA mode where file handles are available.",
+    prompt:''
+  },
+  {
+    num:'31', status:'backlog', type:'feat', model:'sonnet', effort:'med',
     title:'Settings accessible from library screen',
     desc:"Options menu is only accessible from inside the reader. Should be reachable from the library view without opening a book.",
     prompt:''
   },
   {
-    num:'B-10', status:'backlog', type:'feat', model:'sonnet',
-    title:'Manage files from library screen',
-    desc:"No way to edit or remove book files from the library view — user must open the book first. Should support edit/remove from the library card or a long-press menu.",
+    num:'32', status:'backlog', type:'fix', model:'sonnet', effort:'med',
+    title:'Text alignment resets on book reopen',
+    desc:"Text alignment set in Display options is lost when closing and reopening a book \u2014 loadEbook() wipes #eContent innerHTML which discards the inline style, and setAlign() is not called again after the ebook finishes loading.",
     prompt:''
   },
   {
-    num:'B-11', status:'backlog', type:'feat', model:'sonnet',
-    title:'High-contrast themes',
-    desc:"Add high-contrast and white-on-black themes to the theme picker. Currently only Parchment, Dark, and Night exist.",
+    num:'33', status:'backlog', type:'fix', model:'sonnet', effort:'med',
+    title:'loadEbook has no cancellation \u2014 race on rapid book switching',
+    desc:"Opening a book then immediately opening a different one can leave two concurrent chunked DOM builds writing to #eContent \u2014 the old book\u2019s async chunks can land after the new book has started rendering, corrupting the reader.",
+    prompt:''
+  },
+  {
+    num:'34', status:'backlog', type:'feat', model:'sonnet', effort:'med',
+    title:'Empty library onboarding \u2014 no guidance for new users',
+    desc:"A first-time user sees a blank grid and a + card with no explanation of what Folio does, what files it accepts, or how to get started \u2014 critical to fix before Play Store submission.",
+    prompt:''
+  },
+  {
+    num:'35', status:'backlog', type:'feat', model:'sonnet', effort:'med',
+    title:'Library sort order is fixed \u2014 no user control',
+    desc:"Books are sorted alphabetically in PWA mode and by insertion order in browser mode with no way to reorder \u2014 users with large libraries have no way to surface recently-read or prioritised books.",
+    prompt:''
+  },
+  {
+    num:'36', status:'backlog', type:'feat', model:'sonnet', effort:'med',
+    title:'Export / backup reading progress',
+    desc:"Reading positions are stored only in localStorage and IndexedDB \u2014 clearing browser data or moving to a new device permanently loses all progress with no recovery path.",
+    prompt:''
+  },
+  {
+    num:'37', status:'backlog', type:'fix', model:'sonnet', effort:'med',
+    title:'Sentence splitter breaks on common abbreviations and quoted dialogue',
+    desc:"splitSentences() treats i.e., e.g., Fig., p. (page), and No. as sentence boundaries, corrupting highlighting and transcript sync for non-fiction. Quoted dialogue is also split incorrectly: \"He said \\\"Stop!\\\" and ran away\" becomes two fragments because the regex fires on the closing quote.",
+    prompt:''
+  },
+  {
+    num:'38', status:'backlog', type:'feat', model:'sonnet', effort:'med',
+    title:'Sleep timer \u2014 no custom duration and no way to extend a running timer',
+    desc:"The sleep timer cycles through fixed 15/30/45/60 min presets only. There is no way to set an arbitrary duration or extend a timer that is already running without cycling all the way back around.",
+    prompt:''
+  },
+  {
+    num:'39', status:'backlog', type:'feat', model:'sonnet', effort:'med',
+    title:'Multi-select books in library for bulk delete',
+    desc:"There is no way to select multiple books at once in the library \u2014 deleting several books requires opening each one individually and removing it. Should support a selection mode (long-press or edit button) with a bulk delete action.",
+    prompt:''
+  },
+  {
+    num:'40', status:'backlog', type:'perf', model:'sonnet', effort:'med',
+    title:'Timing worker blob URL never revoked',
+    desc:"The timing worker is created via URL.createObjectURL() on a Blob but the blob URL is never revoked after the worker is started. Each book open leaks a blob URL that persists for the lifetime of the page.",
+    prompt:''
+  },
+  {
+    num:'41', status:'backlog', type:'perf', model:'sonnet', effort:'med',
+    title:'Cover + audio blob URLs leaked on PWA rescan',
+    desc:"When pwaScanBookFolder() rescans a book folder it creates new blob URLs for cover and audio files without revoking the previous ones. Repeated rescans accumulate orphaned blob URLs that hold file data in memory.",
+    prompt:''
+  },
+  {
+    num:'42', status:'backlog', type:'fix', model:'sonnet', effort:'med',
+    title:'Toast container obscured by Android gesture navigation bar',
+    desc:"The toast notification container sits at a fixed bottom position that overlaps with the Android gesture navigation bar on phones without a hardware nav bar. Toasts are partially or fully hidden behind the system UI.",
+    prompt:''
+  },
+  {
+    num:'43', status:'backlog', type:'fix', model:'sonnet', effort:'med',
+    title:'No freeze/resume page lifecycle handling \u2014 TTS breaks on Android Chrome',
+    desc:"Android Chrome can freeze background tabs via the Page Lifecycle API. There is no freeze/resume event handling, so speechSynthesis state becomes stale when the tab is frozen and resumed \u2014 TTS stops working and the play button becomes unresponsive until a full page reload.",
+    prompt:''
+  },
+  {
+    num:'44', status:'backlog', type:'fix', model:'sonnet', effort:'high',
+    title:'Can\'t assign file types individually (folder-only)',
+    desc:"File type assignment only works when uploading an entire folder. Individual file picker path does not exist. Needs a new file assignment flow in the book info panel.",
+    prompt:''
+  },
+  {
+    num:'45', status:'backlog', type:'feat', model:'sonnet', effort:'high',
+    title:'Manage files from library screen',
+    desc:"No way to edit or remove book files from the library view \u2014 user must open the book first. Should support edit/remove from the library card or a long-press menu.",
+    prompt:''
+  },
+  {
+    num:'46', status:'backlog', type:'feat', model:'sonnet', effort:'high',
+    title:'Search within book',
+    desc:"There is no way to find a word or phrase in the current ebook text \u2014 a significant gap for non-fiction and reference books where users need to locate specific passages.",
+    prompt:''
+  },
+  {
+    num:'47', status:'backlog', type:'feat', model:'sonnet', effort:'high',
+    title:'Per-book display settings',
+    desc:"Font, size, line height, and theme are global \u2014 users reading books in different languages or formats must manually adjust typography every time they switch books.",
+    prompt:''
+  },
+  {
+    num:'48', status:'backlog', type:'feat', model:'sonnet', effort:'high',
+    title:'No manual library rescan button',
+    desc:"There is no way to manually trigger a rescan of book folders in PWA mode. If files are added or changed outside the app the user must remove and re-add the book to pick up changes \u2014 should have a visible rescan/refresh action on the library screen.",
     prompt:''
   },
 
@@ -551,6 +758,7 @@ function matches(p, f) {
   if(f === 'backlog') return p.status === 'backlog';
   if(f === 'fix')     return p.type === 'fix';
   if(f === 'feat')    return p.type === 'feat';
+  if(f === 'perf')    return p.type === 'perf';
   return true;
 }
 
@@ -581,8 +789,10 @@ function appendSection(label, items, container) {
     const isBacklog  = p.status === 'backlog';
     const uid        = p.status + '_' + i;
 
-    const typTag   = p.type==='fix' ? '<span class="tag tag-fix">Fix</span>' : '<span class="tag tag-feat">Feature</span>';
+    const typTag   = p.type==='fix' ? '<span class="tag tag-fix">Fix</span>' : p.type==='perf' ? '<span class="tag tag-perf">Perf</span>' : '<span class="tag tag-feat">Feature</span>';
     const modelTag = '<span class="tag tag-sonnet">Sonnet</span>';
+    const effortLabels = { low:'Low', med:'Med', high:'High' };
+    const effortTag = p.effort ? `<span class="tag tag-effort-${p.effort}">${effortLabels[p.effort]} effort</span>` : '';
     const extraTag = isDone     ? '<span class="tag tag-done">Done</span>'
                    : isDeferred ? '<span class="tag tag-defer">Deferred</span>'
                    : isBacklog  ? '<span class="tag tag-backlog">Needs prompt</span>'
@@ -607,7 +817,7 @@ function appendSection(label, items, container) {
         <div class="card-num">${escHtml(p.num)}</div>
         <div class="card-meta">
           <div class="card-title">${p.title}</div>
-          <div class="card-tags">${typTag}${modelTag}${extraTag}</div>
+          <div class="card-tags">${typTag}${modelTag}${effortTag}${extraTag}</div>
         </div>
         <span class="card-chevron">&#9660;</span>
       </div>

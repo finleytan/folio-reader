@@ -182,6 +182,32 @@ Do not make any changes yet. Just confirm you're ready and summarise the archite
 `Read CLAUDE.md and folio-context.md. Confirm you understand the architecture and you're ready for tasks.`
   },
 
+  {
+    icon:'🗺️', stage:'start',
+    title:'Orient before touching anything',
+    subtitle:'Read context docs and map the area — no edits until confirmed',
+    detailed:
+`Before making any changes, orient yourself on the current state of the codebase.
+
+1. Read CLAUDE.md in full
+2. Read folio-context.md in full
+3. Read the relevant section(s) of index.html for the area I'm about to work in:
+   - Identify the exact functions involved
+   - Note their current line ranges
+   - Note any state variables they read or write
+   - Note any other functions that call them or that they call
+
+Then tell me:
+- Which functions you'll be working in, with current line ranges
+- Which global state variables are involved
+- Any fragile areas from folio-context.md that are nearby
+- Any risks or side effects I should know about before you start
+
+Do not edit anything until I confirm you have the right scope.`,
+    quick:
+`Read CLAUDE.md and folio-context.md before touching anything. Then tell me which functions and state variables are involved in this task, their current line ranges, and any nearby fragile areas. Don't edit anything until I confirm.`
+  },
+
   // ── BEFORE CODING ────────────────────────────────────
   {
     icon:'🗺️', stage:'before',
@@ -229,6 +255,40 @@ Pay particular attention to:
 Tell me the root cause and your proposed fix. Do not edit anything until I confirm.`,
     quick:
 `Diagnose this issue before making any changes. Trace the full code path involved. Tell me what you find and the root cause. Don't edit anything until I confirm.`
+  },
+
+  {
+    icon:'🔗', stage:'before',
+    title:'Map ripple effects before editing',
+    subtitle:'Find every caller and shared state before touching a function',
+    detailed:
+`Before editing any function, map its full ripple surface.
+
+For each function I'm about to change:
+
+1. CALLERS — find every function that calls it directly. List them with line numbers.
+
+2. SHARED STATE — list every global variable the function reads or writes.
+   For each variable, find every other function that also reads or writes it.
+
+3. EVENT LISTENERS — check whether the function is wired to any event listeners
+   (audio events, DOM events, IIFEs) that could be affected by a behaviour change.
+
+4. CALL CHAIN — trace one level deeper: do any of the callers have their own
+   callers that could be affected?
+
+5. RISK MATRIX — for each caller and shared-state neighbour, rate the regression
+   risk as LOW / MEDIUM / HIGH and explain why.
+
+Pay particular attention to:
+- Functions that share scrollTimer (scroll-pause IIFE and advanceSent/stopScrollEngine)
+- Functions that read mediaState, ttsMode, ttsSpeaking, ttsPaused
+- Functions that touch sentences[] or _activeSentEl/_activeWordEl
+- The state update quad: setPlayBtnIcon, setMediaState, acquireWakeLock/releaseWakeLock, updatePageTitle
+
+Do not edit anything until I confirm the ripple map looks complete.`,
+    quick:
+`Before editing, map the ripple effects. For each function I'm changing: list every caller (with line numbers), every shared global variable and what else touches it, and rate the regression risk for each neighbour as LOW/MEDIUM/HIGH. Don't edit until I confirm.`
   },
 
   // ── DURING CODING ─────────────────────────────────────
@@ -350,6 +410,59 @@ Keep it non-technical — assume the reader hasn't seen the code.
 Then suggest a one-sentence changelog entry.`,
     quick:
 `In simple terms explain what changes you made and what I should put for the commit summary/description.`
+  },
+
+  {
+    icon:'🧪', stage:'after',
+    title:'Write Playwright tests for this change',
+    subtitle:'Generate a spec file + Claude Code prompt to add it to the test suite',
+    detailed:
+`Write Playwright regression tests for the changes made in this session.
+
+## Context to read first
+1. Read tests/helpers/folio.js — understand the available helpers
+2. Read tests/specs/ — check the existing specs to avoid duplicating tests
+   and to match the numbering convention (next file = one higher than current max)
+3. Review the functions changed in this session and their ripple map
+
+## Spec file requirements
+- Filename: tests/specs/NN-featurename.spec.js
+  (suggest appropriate number and kebab-case name)
+- Import from ../helpers/folio.js:
+  clearStorage, gotoFolio, injectFixtureBook, openBook, getAppState, nudge
+- Every test uses test.beforeEach: gotoFolio → clearStorage → reload →
+  waitForSelector('#library') → injectFixtureBook → openBook (if reader needed)
+- Call app functions via: page.evaluate(() => window.functionName(args))
+- Read globals not in getAppState() via: page.evaluate(() => window.varName)
+- Assert DOM with Playwright locators: toBeVisible/toBeHidden/toContainText/toHaveCount
+- Catch JS errors where relevant:
+    const errors = []; page.on('pageerror', e => errors.push(e.message));
+    ... actions ... expect(errors).toHaveLength(0);
+- Cover: happy path, state correctness, DOM correctness, persistence
+  (reload + reopen), boundary conditions, error resilience, TTS/audio mode parity
+- Add a comment block at the top:
+    /** Tests for: [Feature]  Functions under test: [list]  Added: [date] */
+
+## For audio mode parity tests, seed fake timings after injectFixtureBook + openBook:
+  await page.evaluate(() => {
+    window.sentenceTimings = window.sentences.map((_,i) =>
+      ({ start: i*2, end: (i+1)*2-0.1 }));
+    window.updateHL();
+  });
+
+## Output two things
+
+OUTPUT 1 — the complete spec file, ready to save
+
+OUTPUT 2 — a Claude Code prompt that:
+- Creates the spec file at the exact path
+- Runs npm test from the tests/ directory after creating it
+- Does NOT touch index.html or any existing spec file
+- Fixes wrong selectors or variable names by re-reading index.html
+- Reports back: which passed, which failed, and whether any failure
+  indicates a bug in index.html rather than a wrong test`,
+    quick:
+`Write Playwright tests for the changes in this session. Read tests/helpers/folio.js and the existing tests/specs/ first. Output: (1) a complete spec file with happy path, state, DOM, persistence, and error-resilience tests; (2) a Claude Code prompt to create the file and run npm test. Don't touch index.html or existing specs.`
   },
 
   // ── RELEASE & SHIP ────────────────────────────────────
@@ -495,6 +608,58 @@ Prompt: [prompt text]
 
 Follow the exact {num, status, type, model, title, desc, prompt} structure.
 Renumber remaining active prompts so there are no gaps.`
+  },
+
+  {
+    icon:'📋', stage:'maintenance',
+    title:'Add a backlog item',
+    subtitle:'Insert a properly structured backlog entry into folio-prompts.html',
+    detailed:
+`Add a new backlog entry to folio-prompts.html.
+
+Place it in the Backlog section (// ── BACKLOG — in priority order) at the
+priority position I specify, or at the end of the backlog if no position given.
+After inserting, renumber all backlog entries sequentially (B-1, B-2, B-3…)
+so there are no gaps.
+
+The entry must follow this exact structure — note that backlog entries have
+no prompt template (left as empty string until promoted to active):
+
+  {
+    num:'B-N', status:'backlog', type:'fix'|'feat', model:'sonnet'|'opus',
+    title:'Short title shown on the card',
+    desc:"One sentence describing the problem or gap. Present tense. Focus on
+user impact, not implementation detail.",
+    prompt:''
+  },
+
+Guidelines for each field:
+- num: next B-N in sequence after renumbering
+- status: always 'backlog' for new backlog entries
+- type: 'fix' for bugs/broken behaviour, 'feat' for new functionality
+- model: 'sonnet' for targeted changes, 'opus' for complex restructuring —
+  use your best guess based on scope; can be updated when promoted to active
+- title: ≤60 chars, plain English, no punctuation at end
+- desc: one sentence, present tense, describes the problem a user experiences
+  or the capability that's missing — not the technical cause
+
+Do not modify any existing entries, the render logic, or any CSS.
+Do not promote the entry to active — leave status as 'backlog' and prompt as ''.
+
+Confirm when done by showing:
+- The inserted entry
+- The full updated backlog queue in order (num + title only)`,
+    quick:
+`Add a new backlog entry to folio-prompts.html.
+
+Title: [TITLE]
+Type: fix | feat
+Model: sonnet | opus
+Desc: [one sentence, present tense, user-facing problem or missing capability]
+Position: end of backlog | after B-[N]
+
+Use structure: {num:'B-N', status:'backlog', type, model, title, desc, prompt:''}.
+Renumber all backlog entries B-1, B-2… with no gaps after inserting.`
   },
 
 ];
