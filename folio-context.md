@@ -2,7 +2,7 @@
 
 # Folio — Living Context Document
 
-Single-file HTML PWA (~4,269 lines). Audiobook/ebook reader with synced word-level highlighting.
+Single-file HTML PWA (~3,429 lines). Audiobook/ebook reader with synced word-level highlighting.
 Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default dark, light, night.
 
 ---
@@ -16,8 +16,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | `<body>` | Static HTML (4 screens + 5 modals) |
 | `<script>` | All JS |
 
-**Approximate line ranges (index.html):** CSS `16–531` · HTML `534–930` · JS `931–4266`
-Debug panel CSS delimited `473–531`; debug panel JS delimited `3487–4266`.
+**Approximate line ranges (index.html):** CSS `16–472` · HTML `475–871` · JS `872–3425`
 
 ### CSS Sections
 
@@ -41,7 +40,6 @@ Debug panel CSS delimited `473–531`; debug panel JS delimited `3487–4266`.
 | PWA screens | `.pwa-setup-card`, `.pwa-regrant-card` |
 | Media queries | `@media(min-width:640px)` desktop, `@media(max-width:639px)` mobile |
 | Misc | Theme transitions, button feedback, toasts, inline delete confirm, sleep badge, install banner, backdrop-filter |
-| **Debug panel** | `#dbg-toggle`, `#dbg-panel`, `.dbg-*` classes — all inert unless `?debug` in URL; injected dynamically by `initDebugPanel()`; `.dbg-test-*` classes added for Tests tab result rows |
 
 ### HTML Structure
 
@@ -114,8 +112,7 @@ Debug panel CSS delimited `473–531`; debug panel JS delimited `3487–4266`.
 | **SCREEN ROUTER** | `showScreen(id)`, `pwaShowFirstRun()`, `pwaCheckOnLaunch()` |
 | **SWIPE GESTURES** | Touchstart/move/end IIFE on `#eScroll` |
 | **SERVICE WORKER** | `navigator.serviceWorker.register()` |
-| **INIT** | `init()` — calls cacheDOM, wireAudioEvents, loadDisplayPrefs, setMediaState, getTtsVoices; wires `click`+`touchend` on `_readProg.parentElement` → `scrubToPosition` (once, not per book-load); routing; final step calls `initDebugPanel()` if `location.search.includes('debug')` |
-| **DEBUG PANEL** | `initDebugPanel()` — guarded by `location.search.includes('debug')`; injects `#dbg-toggle` pill and `#dbg-panel` overlay dynamically; **five tabs**: **Fixture** (synthetic book injection, fake sentence timings; Audio fake mode uses 50ms poll waiting for `sentences.length>0` before setting `ttsMode=false` and showing seek strip — avoids race with async `loadEbook`), **Stepper** (jump/nudge, audio-time simulation, TTS controls, sync offset, word-highlight test; jump input is 0-based), **State** (live 500ms-refresh globals readout with anomaly highlighting), **Persist** (localStorage dump/clear/save, IDB blob listing/clearing, display prefs dump/reset), **Tests** (`renderTestsTab` + `runAllTests` — 47-assertion automated suite; all assertions stream into the panel as they complete); `?debug&test` auto-opens panel on Tests tab and runs suite 300ms after load; all button handlers wrapped in try/catch; no global state added (all panel state is closed over inside `initDebugPanel`) |
+| **INIT** | `init()` — calls cacheDOM, wireAudioEvents, loadDisplayPrefs, setMediaState, getTtsVoices; wires `click`+`touchend` on `_readProg.parentElement` → `scrubToPosition` (once, not per book-load); routing |
 
 ---
 
@@ -533,7 +530,6 @@ Blobs stripped via `_stripBlobs()` before every write.
 | click-outside handler for options panel | any document click |
 | swipe gesture detection on `#eScroll` | touch events → `nudge(±1)` |
 | modal keyboard trap (Escape to close, Tab focus trap) | keydown on open modals |
-| `runAllTests()` async IIFE (inside Tests tab) | fires on `▶ Run All Tests` click, or automatically 300ms after `initDebugPanel()` when `?test` is in URL; overrides `window.confirm` temporarily per test and restores it; streams `okRow()` results into `#dbg-test-results` |
 
 ---
 
@@ -548,5 +544,3 @@ Blobs stripped via `_stripBlobs()` before every write.
 7. **`scrollTimer` dual use**: `scrollTimer` is used both by the scroll-pause IIFE and by `advanceSent()` via `stopScrollEngine`. Clearing it in one context can affect the other.
 8. **`togglePlay` TTS check**: `togglePlay()` checks `ttsSpeaking` to decide play vs pause. `ttsSpeaking` is exclusively owned by `ttsPlay`/`ttsPause`/`ttsStop` — `stopScrollEngine` must not set it. If `ttsPaused` is true and `ttsSpeaking` is false, `togglePlay` correctly calls `ttsPlay()` which hits the resume path.
 9. **`extractFromDom` bare-div text**: `div` is not in BLOCK and is descended into (not consumed atomically). A `<div>` containing only raw text with no block children will have that text silently dropped, since the walker skips `nodeType===3` text nodes. Rare in real EPUBs/HTML, but possible in minimal hand-authored files.
-10. **Debug panel fixture in PWA mode**: `openBook()` calls `pwaOpenBook(i)` when `IS_PWA && CAN_FS`, which expects a real file handle. Fixture books have no handle, so injection silently fails in PWA mode. Debug panel is only reliable in browser (non-PWA) mode.
-11. **`runAllTests` mutates globals**: The Tests tab runner temporarily sets `curSent = sentences.length` (OOB) to trigger the anomaly highlight test, then restores it. If the runner is interrupted mid-test (e.g. navigation), `curSent` may remain OOB. Restoration is `curSent = Math.min(savedCS, sentences.length - 1)` followed by `updateHL()` + `updateProg()`.

@@ -1,0 +1,59 @@
+/* ── DEBUG PANEL START ── */
+#dbg-toggle{
+  position:fixed;bottom:20px;right:20px;z-index:99999;
+  height:36px;padding:0 14px;border-radius:18px;
+  background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.15);
+  color:#e8eaf0;font-family:var(--font-ui);font-size:12px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+  backdrop-filter:blur(6px);white-space:nowrap;
+}
+#dbg-panel{
+  position:fixed;bottom:64px;right:20px;z-index:99999;
+  width:340px;max-height:80vh;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+  display:flex;flex-direction:column;overflow:hidden;
+  font-family:var(--font-ui);font-size:13px;
+}
+#dbg-panel.dbg-hidden{display:none;}
+.dbg-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.dbg-title{font-size:13px;font-weight:700;color:var(--text);letter-spacing:.02em;}
+.dbg-close{background:transparent;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:2px 6px;border-radius:4px;line-height:1;}
+.dbg-close:hover{background:var(--surface2);color:var(--text);}
+.dbg-tabs{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;}
+.dbg-tab{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:var(--font-ui);font-size:11px;font-weight:500;cursor:pointer;transition:background-color .12s,border-color .12s,color .12s;}
+.dbg-tab:hover{border-color:var(--accent);color:var(--accent);}
+.dbg-tab.active{background:var(--accent);border-color:var(--accent);color:white;}
+.dbg-body{flex:1;overflow-y:auto;padding:12px 14px;}
+.dbg-section{margin-bottom:14px;}
+.dbg-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:700;margin-bottom:6px;}
+.dbg-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;}
+.dbg-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--font-ui);font-size:11px;font-weight:500;cursor:pointer;transition:background-color .12s,border-color .12s,color .12s;white-space:nowrap;}
+.dbg-btn:hover{border-color:var(--accent);color:var(--accent);}
+.dbg-btn.dbg-danger{border-color:rgba(220,80,80,.4);color:#e06050;}
+.dbg-btn.dbg-danger:hover{background:rgba(220,80,80,.15);border-color:#e06050;}
+.dbg-sel,.dbg-num{padding:4px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-family:var(--font-ui);font-size:12px;outline:none;}
+.dbg-sel:focus,.dbg-num:focus{border-color:var(--accent);}
+.dbg-state-table{width:100%;border-collapse:collapse;font-size:11px;font-family:'Courier New',monospace;}
+.dbg-state-table td{padding:2px 4px;vertical-align:top;line-height:1.5;}
+.dbg-state-table td:first-child{color:var(--text3);white-space:nowrap;width:48%;}
+.dbg-state-table td:last-child{color:var(--text);word-break:break-all;}
+.dbg-state-table td.dbg-anomaly{color:#d29922;}
+.dbg-sep{border:none;border-top:1px solid var(--border);margin:4px 0;}
+.dbg-out{font-size:11px;color:var(--text3);margin-top:6px;font-family:'Courier New',monospace;word-break:break-all;line-height:1.5;}
+.dbg-slider{width:100%;accent-color:var(--accent);cursor:pointer;flex:1;}
+.dbg-test-row{display:flex;align-items:baseline;gap:6px;padding:2px 0;font-size:11px;font-family:'Courier New',monospace;line-height:1.5;}
+.dbg-test-icon{flex-shrink:0;font-size:11px;}
+.dbg-test-name{color:var(--text2);flex:1;}
+.dbg-test-info{color:var(--text3);font-size:10px;white-space:nowrap;}
+.dbg-test-pass .dbg-test-icon{color:#3fb950;}
+.dbg-test-fail .dbg-test-icon{color:#f85149;}
+.dbg-test-fail .dbg-test-name{color:#f85149;}
+.dbg-test-summary{margin-top:10px;padding:6px 10px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;text-align:center;}
+.dbg-test-summary.pass{background:rgba(63,185,80,.15);color:#3fb950;}
+.dbg-test-summary.fail{background:rgba(248,81,73,.15);color:#f85149;}
+.dbg-test-running{color:var(--text3);font-size:11px;font-style:italic;padding:4px 0;}
+/* ── DEBUG PANEL END ── */

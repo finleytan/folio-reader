@@ -2,6 +2,15 @@
 
 ---
 
+## v1.6 — 2026-03-12
+
+### Removed
+- **Debug panel** removed from `index.html` to reduce file size (~840 lines of CSS + JS stripped)
+- Archived to `_archive/debug-panel/` with `debug-panel.css`, `debug-panel.js`, and a `README.md` explaining how to re-add all three pieces (CSS, JS, init hook)
+- `tests/console-test.js` and Playwright suite remain in place; debug panel test files are also preserved in the archive
+
+---
+
 ## v1.5 — 2026-03-12
 
 ### Added
