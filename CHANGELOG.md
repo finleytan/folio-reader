@@ -2,11 +2,22 @@
 
 ---
 
+## v1.12 — 2026-03-14
+
+### Performance
+- **Service worker switched from cache-first to stale-while-revalidate for app shell** — cached `index.html` was never refreshed (static `folio-v2` cache key), so code changes never reached installed PWAs; now serves from cache immediately and updates in the background for next launch
+
+### Fixed
+- **Double safe-area inset on PWA mobile** — `padding-top:env(safe-area-inset-top)` was applied to both `#player` and its child `.top-bar`, doubling the notch padding; removed from `#player`
+- Service worker cache bumped from `folio-v2` → `folio-v3` to flush stale entries
+
+---
+
 ## v1.11 — 2026-03-14
 
 ### Fixed
 - **Toast notifications hidden behind Android gesture nav bar** — `#toastContainer` now uses `env(safe-area-inset-bottom)` to clear the system UI
-- **PWA player top bar clipped under status bar** — added `is-pwa` body class with `env(safe-area-inset-top)` padding on `.top-bar` and `#player` in mobile query
+- **PWA player top bar clipped under status bar** — added `is-pwa` body class with `env(safe-area-inset-top)` padding on `.top-bar` in mobile query (not `#player` — applying to both doubled the inset)
 - **No visual feedback when adjusting sync offset** — `adjustOffset()` now shows a brief toast with the current offset value (e.g. "Sync offset: +1.5s")
 - **Top bar icons shift position between books** — `.speed-badge` pinned with `flex-shrink:0` and `min-width`; desktop `.bk-info` changed to `flex:1` so title absorbs variable space
 - **Book rename used `window.prompt()`** — replaced with an inline edit field on the library card; Enter saves, Escape cancels, blur saves if changed

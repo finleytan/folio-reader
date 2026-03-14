@@ -2,7 +2,7 @@
 
 # Folio — Living Context Document
 
-Single-file HTML PWA (~3,599 lines). Audiobook/ebook reader with synced word-level highlighting.
+Single-file HTML PWA (~3,598 lines). Audiobook/ebook reader with synced word-level highlighting.
 Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default dark, light, night.
 
 ---
@@ -16,7 +16,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | `<body>` | Static HTML (4 screens + 5 modals) |
 | `<script>` | All JS |
 
-**Approximate line ranges (index.html):** CSS `16–501` · HTML `503–885` · JS `886–3597`
+**Approximate line ranges (index.html):** CSS `16–500` · HTML `503–884` · JS `886–3596`
 
 ### CSS Sections
 
@@ -41,7 +41,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | Media queries | `@media(min-width:640px)` desktop, `@media(max-width:639px)` mobile; mobile query includes `env(safe-area-inset-bottom)` padding on `.seek-strip` and `.tts-bar` for notched devices |
 | Inline title edit | `.book-title-input` (inline rename input on library cards) |
 | Folder confirm sheet | `.folder-confirm-sheet`, `.folder-confirm-name`, `.folder-confirm-sub`, `.folder-confirm-row` (PWA folder picker confirmation) |
-| PWA safe-area | `body.is-pwa .top-bar`, `body.is-pwa #player` get `padding-top:env(safe-area-inset-top)` in mobile query |
+| PWA safe-area | `body.is-pwa .top-bar` gets `padding-top:env(safe-area-inset-top)` in mobile query (only `.top-bar`, not `#player` — applying to both doubled the inset since `.top-bar` is a child of `#player`) |
 | Misc | Theme transitions, button feedback, toasts (with `env(safe-area-inset-bottom)` clearance), inline delete confirm, sleep badge, install banner, backdrop-filter |
 
 ### HTML Structure
@@ -114,7 +114,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | **PWA FILE SYSTEM** | `_confirmFolder(name)` (returns Promise\<boolean\>; shows fixed bottom sheet with folder name + Use/Choose-another buttons), `pwaPickFolder()` (now awaits `_confirmFolder` before committing handle), `pwaRegrantAccess()`, `pwaScanAndRender()` (per-folder try/catch around `pwaScanBookFolder`), `pwaScanBookFolder()` (skips files with base name 'metadata'; only auto-assigns JSON as transcript if filename contains 'transcript' or 'whisper' — no fallback to first JSON), `getPwaProgress()`, `savePwaProgress()` (prog includes `syncOffset`), `pwaOpenBook()` (now awaits `loadTranscriptData` before reading ebook handle; shows saved progress % immediately on open; shows toasts on audio/ebook handle failure; transcript catch nulls `transcriptData`/`transcriptType`) |
 | **SCREEN ROUTER** | `showScreen(id)`, `pwaShowFirstRun()`, `pwaCheckOnLaunch()` |
 | **SWIPE GESTURES** | Touchstart/move/end IIFE on `#eScroll` |
-| **SERVICE WORKER** | `navigator.serviceWorker.register()` |
+| **SERVICE WORKER** | `navigator.serviceWorker.register()` — sw.js uses stale-while-revalidate for app shell (serves cached version immediately, updates in background), cache-first for fonts/CDN; cache key `folio-v3` |
 | **TEST BRIDGE** | `__testBridge(action, value)` — exposes `let`-scoped state (sentences, sentenceTimings, mediaState, curSent, curWord, autoScroll, isSeeking, syncOffset) for Playwright tests. Function declaration so it's on `window`. No-op in production. |
 | **INIT** | `init()` — calls cacheDOM, populates `#libVersion` and `#aboutVersion` from `APP_VERSION`, wireAudioEvents, loadDisplayPrefs, setMediaState, getTtsVoices; wires `click`+`touchend` on `_readProg.parentElement` → `scrubToPosition` (once, not per book-load); routing |
 
@@ -573,3 +573,5 @@ Blobs stripped via `_stripBlobs()` before every write.
 16. **`let`-scoped variables inaccessible from `page.evaluate`**: All state variables (`sentences`, `sentenceTimings`, `curSent`, `mediaState`, etc.) are declared with `let` inside the `<script>` block, so they are NOT on `window`. Playwright `page.evaluate()` runs in a separate scope and cannot access them. Tests must use `__testBridge(action, value)` (a `function` declaration, therefore on `window`) to get/set these variables. Do not use `window.sentences` or `window.sentenceTimings` in tests — it creates a new `window` property that the app code never reads.
 17. **`renameBook` inline edit lifecycle**: `renameBook()` replaces the `.book-title` div with an `<input>`. The blur handler calls `finish()` which calls `renderLib()`. The Enter handler must `removeEventListener('blur', finish)` first to prevent double-fire (Enter → finish → renderLib rebuilds card → input is removed from DOM → browser fires blur on removed input → second finish). Escape also removes the blur listener before calling `renderLib()`.
 18. **`_confirmFolder` must resolve before committing handle**: `pwaPickFolder()` awaits `_confirmFolder(handle.name)` between `showDirectoryPicker()` and `idbSet`. If the user clicks "Choose another", the function returns without setting `pwaRootHandle` or writing to IDB — the first-run screen remains visible.
+19. **SW cache key must be bumped on code changes**: `sw.js` uses a static cache key (`folio-v3`). The app shell strategy is stale-while-revalidate (serves from cache instantly, fetches update in background), so changes are picked up on the next launch — but only if the browser detects that `sw.js` itself has changed (byte-level comparison). If you change `index.html` without also changing `sw.js` (e.g. bumping the cache key), browsers that have already cached the SW may not re-fetch the app shell at all. Always bump the cache version string when shipping `index.html` changes.
+20. **PWA safe-area padding on `.top-bar` only**: `padding-top:env(safe-area-inset-top)` must be applied to `.top-bar` only, not to both `.top-bar` and `#player`. Since `.top-bar` is a child of `#player`, applying to both doubles the notch inset on mobile devices.

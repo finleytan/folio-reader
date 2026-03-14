@@ -1,6 +1,6 @@
 // Folio Service Worker — offline caching
 // Cache version: bump this string to force a cache refresh on update
-const CACHE = 'folio-v2';
+const CACHE = 'folio-v3';
 
 // Everything Folio needs to run offline
 const PRECACHE = [
@@ -32,26 +32,48 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Fetch: cache-first for app shell, network-first for everything else
+// Fetch strategy:
+//   App shell  → stale-while-revalidate (fast from cache, background update)
+//   Fonts/CDN  → cache-first (immutable resources)
 self.addEventListener('fetch', e => {
   // Only handle GET requests
   if (e.request.method !== 'GET') return;
 
   const url = new URL(e.request.url);
 
-  // For the app HTML itself: cache-first (works offline)
+  // Don't try to cache blob: or data: URLs
+  if (url.protocol === 'blob:' || url.protocol === 'data:') return;
+
   const isAppShell = url.pathname.endsWith('/') ||
     url.pathname.endsWith('/index.html') ||
     url.pathname.endsWith('/audiobook-reader.html');
 
-  // For Google Fonts: cache-first
+  // App shell: stale-while-revalidate
+  // Serve cached version immediately for fast load, then fetch updated
+  // version in background so the next launch gets new code
+  if (isAppShell) {
+    e.respondWith(
+      caches.open(CACHE).then(cache => {
+        return cache.match(e.request).then(cached => {
+          const fetchPromise = fetch(e.request).then(res => {
+            if (res && res.status === 200) {
+              cache.put(e.request, res.clone());
+            }
+            return res;
+          }).catch(() => cached); // offline fallback
+          return cached || fetchPromise;
+        });
+      })
+    );
+    return;
+  }
+
+  // Google Fonts + JSZip CDN: cache-first (immutable)
   const isFonts = url.hostname.includes('fonts.googleapis.com') ||
     url.hostname.includes('fonts.gstatic.com');
-
-  // For JSZip CDN (used for EPUB): cache-first once fetched
   const isCDN = url.hostname.includes('cdnjs.cloudflare.com');
 
-  if (isAppShell || isFonts || isCDN) {
+  if (isFonts || isCDN) {
     e.respondWith(
       caches.match(e.request).then(cached => {
         if (cached) return cached;
@@ -61,13 +83,11 @@ self.addEventListener('fetch', e => {
             caches.open(CACHE).then(c => c.put(e.request, clone));
           }
           return res;
-        }).catch(() => cached); // offline fallback to cache
+        }).catch(() => cached);
       })
     );
     return;
   }
 
   // Everything else (blob URLs for audio etc): pass through
-  // Don't try to cache blob: or data: URLs
-  if (url.protocol === 'blob:' || url.protocol === 'data:') return;
 });
