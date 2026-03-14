@@ -42,18 +42,22 @@ async function getInternalState(page) {
 // Seed dense fake timings: sentence i → start at i*2s, end at (i+1)*2-0.1
 async function seedFakeTimings(page) {
   await page.evaluate(() => {
-    window.sentenceTimings = window.sentences.map((_, i) =>
+    const sents = __testBridge('getSentences');
+    const timings = sents.map((_, i) =>
       ({ start: i * 2, end: (i + 1) * 2 - 0.1 }));
-    window.updateHL();
+    __testBridge('setSentenceTimings', timings);
+    updateHL();
   });
 }
 
 // Seed sparse timings: only even-indexed sentences have entries
 async function seedSparseTimings(page) {
   await page.evaluate(() => {
-    window.sentenceTimings = window.sentences.map((_, i) =>
+    const sents = __testBridge('getSentences');
+    const timings = sents.map((_, i) =>
       i % 2 === 0 ? { start: i * 2, end: (i + 1) * 2 - 0.1 } : undefined);
-    window.updateHL();
+    __testBridge('setSentenceTimings', timings);
+    updateHL();
   });
 }
 
@@ -182,7 +186,7 @@ test.describe('sparse sentenceTimings handling', () => {
   test('timeupdate finds last sparse entry near end of book', async ({ page }) => {
     await seedSparseTimings(page);
 
-    const sentCount = await page.evaluate(() => window.sentences.length);
+    const sentCount = await page.evaluate(() => __testBridge('getSentences').length);
     // Pick a time past the last even-indexed sentence
     const lastEvenIdx = (sentCount - 1) % 2 === 0 ? sentCount - 1 : sentCount - 2;
     const targetTime = lastEvenIdx * 2 + 0.5;
@@ -206,7 +210,7 @@ test.describe('sparse sentenceTimings handling', () => {
     // Simulate a seek bar change when paused — onSeekChange uses the same linear scan
     const result = await page.evaluate(() => {
       const audio = document.getElementById('audio');
-      Object.defineProperty(audio, 'duration', { get: () => 100, configurable: true, writable: true });
+      Object.defineProperty(audio, 'duration', { get: () => 100, configurable: true });
       Object.defineProperty(audio, 'currentTime', { get: () => 8.5, configurable: true, set: () => {} });
       window.__syncSetMediaState('paused');
 
@@ -225,7 +229,7 @@ test.describe('sparse sentenceTimings handling', () => {
 
     // Set all timings to undefined (no matches at all)
     await page.evaluate(() => {
-      window.sentenceTimings = new Array(window.sentences.length);
+      __testBridge('setSentenceTimings', new Array(__testBridge('getSentences').length));
       const audio = document.getElementById('audio');
       Object.defineProperty(audio, 'paused', { get: () => false, configurable: true });
       Object.defineProperty(audio, 'currentTime', { get: () => 5.0, configurable: true });
@@ -336,7 +340,7 @@ test.describe('empty sentenceTimings guard', () => {
     page.on('pageerror', e => errors.push(e.message));
 
     await page.evaluate(() => {
-      window.sentenceTimings = [];
+      __testBridge('setSentenceTimings', []);
       const audio = document.getElementById('audio');
       Object.defineProperty(audio, 'paused', { get: () => false, configurable: true });
       Object.defineProperty(audio, 'currentTime', { get: () => 5.0, configurable: true });

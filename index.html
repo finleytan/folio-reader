@@ -3497,6 +3497,23 @@ if('serviceWorker' in navigator){
 }
 
 // ══════════════════════════════════════════════════════
+// TEST BRIDGE — exposes let-scoped state for Playwright
+// ══════════════════════════════════════════════════════
+function __testBridge(action, value){
+  if(action==='getSentences') return sentences;
+  if(action==='setSentenceTimings'){ sentenceTimings=value; return; }
+  if(action==='getSentenceTimings') return sentenceTimings;
+  if(action==='setMediaState'){ mediaState=value; return; }
+  if(action==='getMediaState') return mediaState;
+  if(action==='setCurSent'){ curSent=value; return; }
+  if(action==='getCurSent') return curSent;
+  if(action==='getCurWord') return curWord;
+  if(action==='setAutoScroll'){ autoScroll=value; return; }
+  if(action==='setIsSeeking'){ isSeeking=value; return; }
+  if(action==='getSyncOffset') return syncOffset;
+}
+
+// ══════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════
 async function init(){

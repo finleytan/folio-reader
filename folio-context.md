@@ -2,7 +2,7 @@
 
 # Folio — Living Context Document
 
-Single-file HTML PWA (~3,535 lines). Audiobook/ebook reader with synced word-level highlighting.
+Single-file HTML PWA (~3,552 lines). Audiobook/ebook reader with synced word-level highlighting.
 Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default dark, light, night.
 
 ---
@@ -16,7 +16,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | `<body>` | Static HTML (4 screens + 5 modals) |
 | `<script>` | All JS |
 
-**Approximate line ranges (index.html):** CSS `16–475` · HTML `477–875` · JS `876–3533`
+**Approximate line ranges (index.html):** CSS `16–475` · HTML `477–875` · JS `876–3550`
 
 ### CSS Sections
 
@@ -112,6 +112,7 @@ Dark-theme mobile-first. Fonts: DM Sans (UI), Lora (body). Three themes: default
 | **SCREEN ROUTER** | `showScreen(id)`, `pwaShowFirstRun()`, `pwaCheckOnLaunch()` |
 | **SWIPE GESTURES** | Touchstart/move/end IIFE on `#eScroll` |
 | **SERVICE WORKER** | `navigator.serviceWorker.register()` |
+| **TEST BRIDGE** | `__testBridge(action, value)` — exposes `let`-scoped state (sentences, sentenceTimings, mediaState, curSent, curWord, autoScroll, isSeeking, syncOffset) for Playwright tests. Function declaration so it's on `window`. No-op in production. |
 | **INIT** | `init()` — calls cacheDOM, populates `#libVersion` and `#aboutVersion` from `APP_VERSION`, wireAudioEvents, loadDisplayPrefs, setMediaState, getTtsVoices; wires `click`+`touchend` on `_readProg.parentElement` → `scrubToPosition` (once, not per book-load); routing |
 
 ---
@@ -566,3 +567,4 @@ Blobs stripped via `_stripBlobs()` before every write.
 13. **Sparse `sentenceTimings` and search algorithms**: `sentenceTimings` is a sparse array (undefined holes for unmatched sentences). Binary search breaks on sparse arrays — a hole at the midpoint sends the search left, skipping all valid entries on the right. The `timeupdate` and `onSeekChange` handlers now use reverse linear scan. If you add new code that searches `sentenceTimings`, use linear scan or ensure the array is dense.
 14. **`curWord = -1` sentinel**: `timeupdate` and `setRate()` set `curWord = -1` on sentence transitions and rate changes to prevent a word-0 flash. `updateHL()` skips word highlight when `curWord < 0`. `_wordTick()` naturally handles the sentinel because its binary search always returns `w >= 0`, so `w !== curWord` is true and it recalculates. Do not change the `-1` to `0` — it reintroduces the flicker at sentence boundaries.
 15. **PWA JSON transcript auto-assignment**: `pwaScanBookFolder()` only auto-assigns JSON files whose filename contains 'transcript' or 'whisper'. No fallback to the first JSON file. `loadTranscriptData()` validates the JSON structure (must have `.segments` or `.words` array) before proceeding — rejects config/metadata JSON with an error banner.
+16. **`let`-scoped variables inaccessible from `page.evaluate`**: All state variables (`sentences`, `sentenceTimings`, `curSent`, `mediaState`, etc.) are declared with `let` inside the `<script>` block, so they are NOT on `window`. Playwright `page.evaluate()` runs in a separate scope and cannot access them. Tests must use `__testBridge(action, value)` (a `function` declaration, therefore on `window`) to get/set these variables. Do not use `window.sentences` or `window.sentenceTimings` in tests — it creates a new `window` property that the app code never reads.

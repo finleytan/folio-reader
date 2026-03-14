@@ -43,18 +43,22 @@ async function getInternalState(page) {
 // Seed dense timings: sentence i -> start i*2s, end (i+1)*2-0.1
 async function seedDenseTimings(page) {
   await page.evaluate(() => {
-    window.sentenceTimings = window.sentences.map((_, i) =>
+    const sents = __testBridge('getSentences');
+    const timings = sents.map((_, i) =>
       ({ start: i * 2, end: (i + 1) * 2 - 0.1 }));
-    window.updateHL();
+    __testBridge('setSentenceTimings', timings);
+    updateHL();
   });
 }
 
 // Seed sparse timings: only even-indexed sentences have entries
 async function seedSparseTimings(page) {
   await page.evaluate(() => {
-    window.sentenceTimings = window.sentences.map((_, i) =>
+    const sents = __testBridge('getSentences');
+    const timings = sents.map((_, i) =>
       i % 2 === 0 ? { start: i * 2, end: (i + 1) * 2 - 0.1 } : undefined);
-    window.updateHL();
+    __testBridge('setSentenceTimings', timings);
+    updateHL();
   });
 }
 
@@ -445,7 +449,7 @@ test.describe('error resilience', () => {
     page.on('pageerror', e => errors.push(e.message));
 
     await page.evaluate(() => {
-      window.sentenceTimings = [];
+      __testBridge('setSentenceTimings', []);
     });
     await mockAudio(page, { currentTime: 10.0, paused: true });
 
