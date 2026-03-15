@@ -2678,7 +2678,9 @@ function _timingWorkerFn(){
   }
   self.onmessage=function(e){
     var d=e.data;
-    if(d.type==='buildSentenceTimings'){
+    if(d.type==='ping'){
+      self.postMessage({type:'ping'});
+    } else if(d.type==='buildSentenceTimings'){
       var r=doSentenceTimings(d.sentTexts,d.sentWordCounts,d.transcriptWords);
       self.postMessage({type:'buildSentenceTimings',sentenceTimings:r.sentenceTimings,wordTimings:r.wordTimings,bookIdx:d.bookIdx});
     } else if(d.type==='buildTimingsFromPlainText'){
@@ -2690,11 +2692,18 @@ function _timingWorkerFn(){
 
 function getTimingWorker(){
   if(_timingWorker) return _timingWorker;
-  var code='('+_timingWorkerFn.toString()+')()';
-  _timingWorkerBlobUrl=URL.createObjectURL(new Blob([code],{type:'application/javascript'}));
-  _timingWorker=new Worker(_timingWorkerBlobUrl);
+  try{
+    var code='('+_timingWorkerFn.toString()+')()';
+    _timingWorkerBlobUrl=URL.createObjectURL(new Blob([code],{type:'application/javascript'}));
+    _timingWorker=new Worker(_timingWorkerBlobUrl);
+  }catch(e){
+    console.warn('Timing worker creation failed:',e);
+    _timingWorker=null;
+    return null;
+  }
   _timingWorker.onmessage=function(e){
     var d=e.data;
+    if(d.type==='ping'){ return; }
     if(_timingWorkerTimeout){ clearTimeout(_timingWorkerTimeout); _timingWorkerTimeout=null; }
     if(d.bookIdx!==_pendingTimingBookIdx){
       console.warn('Timing worker: stale result for bookIdx',d.bookIdx,'(current:',_pendingTimingBookIdx,')');
@@ -2712,12 +2721,16 @@ function getTimingWorker(){
   };
   _timingWorker.onerror=function(err){
     console.warn('Timing worker error, falling back to sync:',err);
+    if(_timingWorkerTimeout){ clearTimeout(_timingWorkerTimeout); _timingWorkerTimeout=null; }
+    _timingWorker=null;
     _buildSentenceTimingsSync();
   };
   return _timingWorker;
 }
 
 async function buildSentenceTimings(){
+  var bookIdx=curBookIdx;
+  _pendingTimingBookIdx=bookIdx;
   setBannerState('syncing','Syncing transcript…','Matching words to ebook sentences');
   await yieldToMain();
   sentenceTimings=new Array(sentences.length);
@@ -2726,10 +2739,9 @@ async function buildSentenceTimings(){
     if(transcriptText) await buildTimingsFromPlainText();
     return;
   }
-  var bookIdx=curBookIdx;
-  _pendingTimingBookIdx=bookIdx;
   try{
     var worker=getTimingWorker();
+    if(!worker){ await _buildSentenceTimingsSync(); return; }
     worker.postMessage({
       type:'buildSentenceTimings',
       sentTexts:sentences.map(function(s){return s.text;}),
@@ -2742,21 +2754,22 @@ async function buildSentenceTimings(){
       _timingWorkerTimeout=null;
       console.warn('Timing worker timed out, falling back to sync');
       if(_timingWorker){ _timingWorker.terminate(); _timingWorker=null; }
-      showToast('Transcript sync timed out — using fallback','error');
+      setBannerState('syncing','Syncing transcript…','Using fallback method');
       _buildSentenceTimingsSync();
-    },8000);
+    },20000);
   }catch(e){
     await _buildSentenceTimingsSync();
   }
 }
 
 async function buildTimingsFromPlainText(){
+  var bookIdx=curBookIdx;
+  _pendingTimingBookIdx=bookIdx;
   setBannerState('syncing','Syncing transcript…','Estimating timing from plain text');
   await yieldToMain();
   sentenceTimings=new Array(sentences.length);
   wordTimings=new Array(sentences.length);
   var dur=isFinite(_audio.duration)?_audio.duration:0;
-  var bookIdx=curBookIdx;
   if(!dur){
     setBannerState('syncing','Waiting for audio…','Duration not yet available');
     _plainTextRetryListener=function(){
@@ -2767,7 +2780,6 @@ async function buildTimingsFromPlainText(){
     _audio.addEventListener('loadedmetadata',_plainTextRetryListener);
     return;
   }
-  _pendingTimingBookIdx=bookIdx;
   try{
     var worker=getTimingWorker();
     worker.postMessage({
@@ -3412,6 +3424,9 @@ function saveLinkAudio(){
   _audio.addEventListener('loadedmetadata',()=>seekAudioToSentence(),{once:true});
   $('seekStrip').style.display='';
   $('ttsBar').style.display='none';
+  const _ss=document.querySelector('.speed-strip');
+  if(_ss) _ss.style.display='';
+  document.querySelector('.read-progress-wrap').classList.remove('scrubbing');
   if(!IS_PWA) saveLibrary();
   closeLinkAudioModal();
 }

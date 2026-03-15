@@ -2,6 +2,20 @@
 
 ---
 
+## v1.16 — 2026-03-14
+
+### Fixed
+- Transcript sync crashes on restricted origins (file://, strict CSP) — worker creation now fails gracefully with automatic sync fallback
+- Linking audio to a TTS-only book leaves speed strip hidden and progress bar in scrubbing mode — `saveLinkAudio()` now fully mirrors audio-mode setup
+- Worker timeout fires error toast instead of continuing gracefully — now shows syncing banner with fallback status
+- Worker `onerror` handler did not clear watchdog timeout, risking double fallback execution
+
+### Changed
+- Timing worker watchdog timeout increased from 8 seconds to 20 seconds for large books
+- `_pendingTimingBookIdx` set before first `await` in both `buildSentenceTimings` and `buildTimingsFromPlainText` to prevent stale-result acceptance during rapid book switches
+
+---
+
 ## v1.15 — 2026-03-14
 
 ### Added
