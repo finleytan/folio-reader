@@ -2,6 +2,35 @@
 
 ---
 
+## v1.17 — 2026-03-14
+
+### Added
+- SVG icon system for top bar — emoji icons replaced with inline SVGs via `.ic-svg` class with `.top-bar-divider` separator
+- TTS toggle button in top bar (mic icon) for ebook-only books — defaults off; auto-enables sentence highlighting when toggled on
+- Volume popover — tap speaker icon to open vertical slider above button, tap outside to close; visible in both audio and TTS modes
+- Speed pill button — single tap-to-cycle button replaces three-button ±/rate speed strip
+- Audio needs-relink indicator — amber dot on book files icon when audio blob URL is lost on refresh
+- Relink overlay auto-shown on book open when stale audio is detected
+
+### Changed
+- Top bar height increased to 60px on mobile; icon buttons increased to 44px
+- Play button enlarged to 56px on mobile with stronger accent glow
+- Bottom bar layout changed to five-slot: vol · skip · play · skip · speed
+- Bottom bar hidden for ebook-only books until TTS is toggled on
+- Audiobook mode defaults highlighting to Sentence + Word
+- TTS voice selector moved from bottom TTS bar to options panel Playback tab
+- Volume, playback rate, and stop controls removed from options panel (accessible from bottom bar)
+- Reading progress bar removed from below top bar
+- App version bumped to 1.17.0
+
+### Fixed
+- Sleep timer badge shifting adjacent buttons — badge now absolutely positioned with `pointer-events:none`
+- `closeRelink()` resetting `curBookIdx` prevented Book Info modal from opening after dismissing relink overlay
+- `ttsPlay()` crash on null `ttsRateSlider` reference after TTS bar removal — now reads rate from `rateCustom`
+- `cycleSpeed()` failing in TTS mode — reads current rate from `rateCustom` instead of `_audio.playbackRate`
+
+---
+
 ## v1.16 — 2026-03-14
 
 ### Fixed

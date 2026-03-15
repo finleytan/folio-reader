@@ -22,6 +22,7 @@
   --font-ui:'DM Sans',sans-serif; --font-body:'Lora',Georgia,serif;
   --font-size:18px; --line-height:1.88; --max-width:680px;
   --radius:14px; --radius-sm:8px; --touch:44px;
+  --amber-bg:#2a2200; --amber-border:#4a3a00; --amber-text:#c8a84a; --amber-muted:#a08840;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-ui);overflow:hidden;}
@@ -31,21 +32,25 @@ body.theme-light{
   --bg:#f5f0e8; --bg2:#ede8df; --surface:#fff8f0; --surface2:#ede4d8;
   --border:#d8cfc0; --text:#2a2520; --text2:#5a5048; --text3:#a09080;
   --shadow:rgba(0,0,0,.1); --hl-bg:rgba(91,141,239,.1); --word-hl:#3a6fd8;
+  --amber-bg:#fdf3d0; --amber-border:#d4a840; --amber-text:#7a5800; --amber-muted:#9a7020;
 }
 body.theme-night{
   --bg:#07080a; --bg2:#0d0f12; --surface:#111318; --surface2:#161820;
   --border:#1e2230; --text:#c0c8d8; --text2:#707888; --text3:#383d50;
   --accent:#4a7ad0;
+  --amber-bg:#1e1800; --amber-border:#3a2e00; --amber-text:#c8a84a; --amber-muted:#a08840;
 }
 body.theme-hc{
   --bg:#000000; --bg2:#0a0a0a; --surface:#0a0a0a; --surface2:#111111;
   --border:#ffffff; --text:#ffffff; --text2:#cccccc; --text3:#888888;
   --accent:#ffff00; --hl-bg:#333300; --hl-border:#ffff00; --word-hl:#ffff00;
+  --amber-bg:#000000; --amber-border:#ffffff; --amber-text:#ffff00; --amber-muted:#ffff00;
 }
 body.theme-hclight{
   --bg:#ffffff; --bg2:#f8f8f8; --surface:#f8f8f8; --surface2:#eeeeee;
   --border:#000000; --text:#000000; --text2:#333333; --text3:#666666;
   --accent:#0000cc; --hl-bg:#cce5ff; --hl-border:#0000cc; --word-hl:#0000cc;
+  --amber-bg:#fffff0; --amber-border:#000000; --amber-text:#000000; --amber-muted:#333333;
 }
 
 /* ── SCREENS ── */
@@ -189,6 +194,8 @@ body.theme-hclight{
 .ic-btn{width:var(--touch);height:var(--touch);border-radius:var(--radius-sm);background:transparent;border:none;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background-color .15s,border-color .15s,color .15s;flex-shrink:0;}
 .ic-btn:hover{background:var(--surface2);color:var(--text);}
 .ic-btn.active{color:var(--accent);}
+.ic-svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;flex-shrink:0;}
+.top-bar-divider{width:1px;height:22px;background:var(--border);flex-shrink:0;margin:0 2px;}
 .play-btn{width:var(--touch);height:var(--touch);border-radius:50%;background:var(--accent);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background-color .15s,border-color .15s,color .15s;flex-shrink:0;box-shadow:0 2px 12px rgba(91,141,239,.3);}
 .play-btn:hover{filter:brightness(1.12);box-shadow:0 4px 20px rgba(91,141,239,.45);transform:scale(1.05);}
 .speed-badge{display:none;font-size:10px;font-weight:700;color:var(--accent);background:rgba(91,141,239,.12);border-radius:4px;padding:1px 5px;margin-left:-4px;align-self:center;pointer-events:none;font-family:var(--font-ui);flex-shrink:0;min-width:30px;text-align:center;}
@@ -219,7 +226,9 @@ body.theme-hclight{
 .rate-sel{background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--font-ui);font-size:12px;padding:5px 8px;border-radius:var(--radius-sm);cursor:pointer;outline:none;}
 
 /* ── SEEK STRIP ── */
-.seek-strip{background:var(--surface);border-bottom:1px solid var(--border);display:flex;flex-direction:column;padding:8px 14px 6px;flex-shrink:0;}
+.bottom-controls{background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;box-shadow:0 -2px 12px var(--shadow);}
+.ctrl-row{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:6px 14px 8px;}
+.seek-strip{display:flex;flex-direction:column;padding:8px 14px 0;flex-shrink:0;}
 .seek-row{display:flex;align-items:center;gap:6px;width:100%;}
 .seek-time{font-size:11px;color:var(--text3);font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0;min-width:34px;}
 .seek-time.right{text-align:right;}
@@ -233,12 +242,16 @@ body.theme-hclight{
 .rate-preset-btn.active{background:var(--accent);border-color:var(--accent);color:white;}
 .rate-custom-input{width:50px;padding:4px 6px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);font-family:var(--font-ui);font-size:11px;font-weight:600;text-align:center;outline:none;min-height:30px;}
 .rate-custom-input:focus{border-color:var(--accent);}
-.vol-wrap{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.vol-icon{font-size:14px;cursor:pointer;user-select:none;flex-shrink:0;}
-.vol-slider{width:70px;accent-color:var(--accent);cursor:pointer;}
+.vol-wrap{position:relative;flex-shrink:0;}
+.vol-icon{font-size:20px;cursor:pointer;user-select:none;flex-shrink:0;width:var(--touch);height:var(--touch);display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);transition:background-color .15s;}
+.vol-icon:hover{background:var(--surface2);}
+.vol-pop{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 10px;box-shadow:0 4px 20px var(--shadow);flex-direction:column;align-items:center;gap:10px;z-index:60;}
+.vol-pop.open{display:flex;}
+.vol-pop input[type=range]{writing-mode:vertical-lr;direction:rtl;height:100px;width:28px;accent-color:var(--accent);cursor:pointer;}
+.vol-pop-label{font-size:11px;color:var(--text3);font-weight:600;font-variant-numeric:tabular-nums;}
+.speed-pill{height:32px;min-width:48px;padding:0 12px;border-radius:8px;border:1px solid rgba(91,141,239,.3);background:rgba(91,141,239,.1);color:var(--accent);font-family:var(--font-ui);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;white-space:nowrap;transition:background-color .15s,border-color .15s;flex-shrink:0;}
+.speed-pill:hover{background:rgba(91,141,239,.2);}
 
-/* ── TTS BAR ── */
-.tts-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 14px;gap:10px;flex-shrink:0;display:none;flex-direction:column;}
 
 /* ── TRANSCRIPT BANNER ── */
 .tx-banner{display:none;align-items:center;gap:10px;padding:10px 16px;font-size:13px;font-weight:600;flex-shrink:0;position:relative;overflow:hidden;}
@@ -251,6 +264,16 @@ body.theme-hclight{
 .tx-banner.ready::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#28a060,#50e888,#28a060);opacity:.6;}
 @keyframes tx-ready-in{0%{background:#1a6838;border-bottom-color:#50e888;}50%{background:#124a28;}100%{background:#0a2a18;}}
 .tx-banner.error{display:flex;background:#2a0a08;border-bottom:1px solid #5a2010;color:#e06040;}
+.tx-banner.notx{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:10px 14px;background:var(--amber-bg);border-bottom:1px solid var(--amber-border);}
+.tx-banner.notx .notx-top{display:flex;align-items:center;gap:8px;}
+.tx-banner.notx .notx-icon{font-size:13px;flex-shrink:0;}
+.tx-banner.notx .notx-title{font-size:13px;font-weight:600;color:var(--amber-text);}
+.tx-banner.notx .notx-sub{font-size:11px;font-weight:400;color:var(--amber-muted);margin-left:2px;}
+.tx-banner.notx .notx-actions{display:flex;gap:8px;align-items:center;}
+.notx-btn-primary{font-size:12px;font-family:var(--font-ui);padding:5px 12px;border-radius:var(--radius-sm,5px);border:1px solid var(--amber-text);color:var(--amber-text);background:transparent;cursor:pointer;white-space:nowrap;-webkit-appearance:none;}
+.notx-btn-ghost{font-size:12px;font-family:var(--font-ui);padding:5px 12px;border-radius:var(--radius-sm,5px);border:1px solid var(--amber-text);color:var(--amber-text);background:transparent;cursor:pointer;white-space:nowrap;-webkit-appearance:none;}.onboard-card{grid-column:1/-1;background:var(--surface);border:1px dashed var(--border);border-radius:var(--radius);padding:28px 24px;margin-bottom:8px;text-align:center;}
+.onboard-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:10px;}
+.onboard-body{font-size:13px;color:var(--text2);line-height:1.6;max-width:420px;margin:0 auto;}
 .tx-banner.tx-fade{opacity:0;transition:opacity 0.3s ease;}
 .tx-spinner{width:16px;height:16px;border:2.5px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -262,10 +285,6 @@ body.theme-hclight{
 .ebook-area{flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative;}
 
 /* ── READING PROGRESS ── */
-.read-progress-wrap{height:3px;background:var(--border);flex-shrink:0;transition:height .15s;}
-.read-progress-wrap.scrubbing{height:12px;cursor:pointer;}
-.read-progress-wrap.scrubbing .read-progress-bar{border-radius:0 6px 6px 0;}
-.read-progress-bar{height:100%;background:var(--accent);width:0%;transition:width .4s ease;border-radius:0 2px 2px 0;}
 
 /* ── READER BODY ── */
 .reader-body{flex:1;display:flex;overflow:hidden;}
@@ -307,6 +326,14 @@ body.theme-hclight{
 .spd-btn{width:28px;height:24px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background-color .12s,border-color .12s,color .12s;}
 .spd-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(91,141,239,.1);}
 
+/* ── MOBILE BOTTOM CONTROL SIZING ── */
+@media(max-width:639px){
+  .ctrl-row{padding:6px 10px calc(10px + env(safe-area-inset-bottom,0px));}
+  .ctrl-row .ic-btn{width:48px;height:48px;font-size:22px;}
+  .ctrl-row .play-btn{width:56px;height:56px;font-size:20px;box-shadow:0 4px 20px rgba(91,141,239,.45);}
+  .speed-pill{height:36px;min-width:52px;font-size:14px;}
+}
+
 /* ── RELINK OVERLAY ── */
 .relink-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:flex-end;justify-content:center;z-index:2500;}
 .relink-sheet{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:24px 20px 32px;display:flex;flex-direction:column;gap:14px;}
@@ -346,9 +373,9 @@ body.theme-hclight{
   .bk-info{flex:1;min-width:0;max-width:260px;overflow:hidden;}
   .ic-btn{width:32px;height:32px;font-size:13px;}
   .play-btn{width:40px;height:40px;font-size:15px;}
-  .seek-strip{flex-direction:row;align-items:center;gap:10px;padding:8px 18px 10px;}
-  .seek-row{display:contents;}
+  .seek-strip{padding:8px 18px 0;}
   .seek-strip-bar::-webkit-slider-thumb{width:16px;height:16px;}
+  .ctrl-row{padding:6px 18px 8px;}
   .opt-panel{top:68px;right:16px;}
   .toc-item{padding:7px 16px;font-size:13px;}
   .ebook-scroll{padding:52px 36px 60px;}
@@ -357,23 +384,20 @@ body.theme-hclight{
   .toggle{width:36px;height:20px;}
   .toggle::after{width:14px;height:14px;top:3px;}
   .toggle.on::after{left:19px;}
-  .vol-wrap{display:flex;}
 }
 
 /* ── MOBILE ── */
 @media(max-width:639px){
-  .top-bar{height:52px;padding:0 8px;gap:6px;}
+  .top-bar{height:60px;padding:0 6px;gap:2px;}
   .bk-title{font-size:13px;}
   .bk-prog{font-size:10px;}
-  .ic-btn{width:40px;height:40px;font-size:16px;}
+  .ic-btn{width:44px;height:44px;font-size:20px;}
   .play-btn{width:46px;height:46px;font-size:17px;}
-  .back-btn{width:40px;height:40px;}
-  .vol-wrap{display:none;}
-  .seek-strip .vdiv{display:none;}
-  .seek-strip{padding:4px 12px calc(4px + env(safe-area-inset-bottom,0px));}
-  .tts-bar{padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));}
+  .back-btn{width:44px;height:44px;}
+  .seek-strip{padding:4px 12px 0;}
   .seek-time{font-size:11px;min-width:32px;}
   .seek-strip-bar::-webkit-slider-thumb{width:22px;height:22px;}
+  .ctrl-row{padding:6px 12px calc(8px + env(safe-area-inset-bottom,0px));}
   .opt-panel{position:fixed;top:auto !important;bottom:0;left:0;right:0;width:auto !important;border-radius:20px 20px 0 0;max-height:78vh;padding-bottom:env(safe-area-inset-bottom,0px);}
   .lib-grid{grid-template-columns:repeat(2,1fr);gap:12px;padding:0 14px 40px;}
   .lib-header{padding:28px 20px 20px;}
@@ -398,7 +422,7 @@ audio{display:none;}
 /* ── SMOOTH THEME TRANSITION ── */
 html,body,
 #library,#player,#pwaFirstRun,#pwaRegrant,
-.top-bar,.seek-strip,.opt-panel,
+.top-bar,.bottom-controls,.opt-panel,
 .modal,.relink-sheet,.toc-sidebar,
 .book-card,.ebook-scroll,.ebook-content{
   transition:background-color .2s,border-color .2s,color .2s;
@@ -456,12 +480,19 @@ html,body,
 .delete-confirm-no{background:var(--surface2);border:1px solid var(--border);color:var(--text2);
   font-size:12px;font-weight:500;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:var(--font-ui);}
 
+/* ── RELINK INDICATOR ── */
+#bookInfoBtn.needs-relink{position:relative;}
+#bookInfoBtn.needs-relink::after{content:'';position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--amber-text,#d97706);border:1.5px solid var(--bg);pointer-events:none;}
+
 /* ── SLEEP TIMER BADGE ── */
+#sleepTimerBtn{position:relative;}
 #sleepTimerBadge{
-  font-size:11px;font-weight:600;color:var(--accent);
-  background:var(--hl-bg);border:1px solid var(--hl-border);
-  border-radius:10px;padding:1px 7px;margin-left:4px;
-  display:none;vertical-align:middle;font-variant-numeric:tabular-nums;
+  position:absolute;top:-2px;right:-4px;
+  font-size:9px;font-weight:700;color:var(--bg);
+  background:var(--accent);border:1.5px solid var(--bg);
+  border-radius:8px;padding:0 4px;
+  display:none;font-variant-numeric:tabular-nums;
+  line-height:14px;pointer-events:none;
 }
 
 /* ── PWA INSTALL BANNER ── */
@@ -574,20 +605,30 @@ html,body,
 
   <!-- TOP BAR -->
   <div class="top-bar">
-    <button class="back-btn" onclick="goLib()" aria-label="Back to library">←</button>
+    <button class="back-btn" onclick="goLib()" aria-label="Back to library">
+      <svg class="ic-svg" viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg>
+    </button>
     <div class="bk-info">
       <div class="bk-title" id="pTitle">—</div>
       <div class="bk-prog" id="pProg">—</div>
     </div>
     <div class="top-bar-right">
-      <button class="ic-btn" onclick="skip(-15)" title="−15s" aria-label="Skip back 15 seconds">⏮</button>
-      <button class="play-btn" id="playBtn" onclick="togglePlay()" aria-label="Play">▶</button>
-      <button class="ic-btn" onclick="skip(15)" title="+15s" aria-label="Skip forward 15 seconds">⏭</button>
-      <div class="vdiv"></div>
-      <button class="ic-btn" onclick="toggleToc()" title="Contents" aria-label="Table of contents">☰</button>
-      <button class="ic-btn" id="bookInfoBtn" onclick="openBookInfoModal()" title="Book files" aria-label="Book files">ℹ</button>
-      <button class="ic-btn" id="optBtn" onclick="toggleOpts()" aria-label="Settings">⚙</button>
-      <button class="ic-btn" id="sleepTimerBtn" onclick="cycleSleepTimer()" title="Sleep timer" aria-label="Sleep timer">🌙<span id="sleepTimerBadge"></span></button>
+      <button class="ic-btn" onclick="toggleToc()" title="Contents" aria-label="Table of contents">
+        <svg class="ic-svg" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="15" y2="18"/></svg>
+      </button>
+      <button class="ic-btn" id="ttsToggleBtn" onclick="toggleTtsMode()" title="Text-to-speech" aria-label="Text-to-speech" style="display:none">
+        <svg class="ic-svg" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+      <div class="top-bar-divider"></div>
+      <button class="ic-btn" id="bookInfoBtn" onclick="openBookInfoModal()" title="Book files" aria-label="Book files">
+        <svg class="ic-svg" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
+      </button>
+      <button class="ic-btn" id="optBtn" onclick="toggleOpts()" aria-label="Settings">
+        <svg class="ic-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+      <button class="ic-btn" id="sleepTimerBtn" onclick="cycleSleepTimer()" title="Sleep timer" aria-label="Sleep timer">
+        <svg class="ic-svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg><span id="sleepTimerBadge"></span>
+      </button>
     </div>
 
     <!-- OPTIONS PANEL -->
@@ -598,11 +639,12 @@ html,body,
         <button class="op-tab" onclick="switchOptTab('advanced',this)">Advanced</button>
       </div>
       <div class="op-tab-body" id="opTab-playback">
-        <div class="op-sec">
-          <div class="op-ttl">Volume</div>
+        <div class="op-sec" id="ttsVoiceSec" style="display:none">
+          <div class="op-ttl">TTS Voice</div>
           <div class="op-row">
-            <span id="volIconOpt" onclick="toggleMute()" style="font-size:18px;cursor:pointer;user-select:none">🔊</span>
-            <input type="range" class="op-slider" id="volSliderOpt" min="0" max="1" step="0.02" value="1" oninput="setVolBoth(this.value)">
+            <select id="ttsVoiceSel" class="rate-sel" style="flex:1;min-width:0;max-width:100%;font-size:12px" onchange="setTtsVoice(this.value)">
+              <option>Loading voices…</option>
+            </select>
           </div>
         </div>
         <div class="op-sec">
@@ -625,28 +667,13 @@ html,body,
             </div>
           </div>
         </div>
-        <div class="op-sec">
-          <div class="op-ttl">Playback Rate <span class="op-info-btn" onclick="toggleOpInfo(this)">ⓘ</span></div>
-          <div class="op-desc" style="display:none">Speed multiplier for audio and TTS playback. 1× is normal speed.</div>
-          <div class="op-row">
-            <div class="rate-presets">
-              <button class="rate-preset-btn" onclick="setRate(0.75)">0.75×</button>
-              <button class="rate-preset-btn active" onclick="setRate(1)">1×</button>
-              <button class="rate-preset-btn" onclick="setRate(1.25)">1.25×</button>
-              <button class="rate-preset-btn" onclick="setRate(1.5)">1.5×</button>
-              <button class="rate-preset-btn" onclick="setRate(2)">2×</button>
-              <input type="number" class="rate-custom-input" id="rateCustom" value="1" min="0.1" max="4" step="0.05"
-                title="Custom speed" onchange="setRate(this.value)" onkeydown="if(event.key==='Enter')setRate(this.value)">
-            </div>
-          </div>
-        </div>
+        <input type="hidden" id="rateCustom" value="1">
         <div class="op-sec">
           <div class="op-ttl">Controls</div>
           <div class="op-row"><span class="op-lbl">Auto-scroll <span class="op-info-btn" onclick="toggleOpInfo(this)">ⓘ</span></span><button class="toggle on" id="asToggle" onclick="toggleAS()"></button></div>
           <div class="op-desc" style="display:none">Keeps the current sentence in view during playback.</div>
           <div class="op-row" style="gap:8px">
             <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" id="resyncBtn" onclick="resync()">↺ Resync</button>
-            <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="mediaStop()">⏹ Stop</button>
           </div>
           <div class="op-row" id="offsetRow" style="display:none">
             <span class="op-lbl">Sync offset <span class="op-info-btn" onclick="toggleOpInfo(this)">ⓘ</span></span>
@@ -675,9 +702,9 @@ html,body,
           <div class="pills">
             <button class="pill active" id="fontPill-lora" onclick="setFont('Lora,Georgia,serif','lora',this)">Lora</button>
             <button class="pill" id="fontPill-georgia" onclick="setFont('Georgia,serif','georgia',this)">Georgia</button>
-            <button class="pill" id="fontPill-sans" onclick="setFont('DM Sans,sans-serif','sans',this)">Sans</button>
-            <button class="pill" id="fontPill-mono" onclick="setFont('Courier New,monospace','mono',this)">Mono</button>
-            <button class="pill" id="fontPill-dyslexic" onclick="setFont(&quot;'OpenDyslexic',sans-serif&quot;,'dyslexic',this)">Dyslexic</button>
+            <button class="pill" id="fontPill-sans" onclick="setFont('DM Sans,sans-serif','sans',this)">DM Sans</button>
+            <button class="pill" id="fontPill-mono" onclick="setFont('Courier New,monospace','mono',this)">Courier New</button>
+            <button class="pill" id="fontPill-dyslexic" onclick="setFont(&quot;'OpenDyslexic',sans-serif&quot;,'dyslexic',this)">OpenDyslexic</button>
           </div>
         </div>
         <div class="op-sec">
@@ -699,53 +726,22 @@ html,body,
     </div>
   </div><!-- /top-bar -->
 
-  <!-- SEEK STRIP -->
-  <div class="seek-strip" id="seekStrip">
-    <div class="seek-row">
-      <span class="seek-time" id="tCur">0:00</span>
-      <input type="range" class="seek-strip-bar" id="seekBar" value="0" min="0" max="100" step="0.05"
-        oninput="onSeekInput(this.value)" onchange="onSeekChange(this.value)">
-      <span class="seek-time right" id="tTot">0:00</span>
-      <div class="vdiv" style="height:20px"></div>
-      <div class="vol-wrap">
-        <span class="vol-icon" id="volIcon" onclick="toggleMute()">🔊</span>
-        <input type="range" class="vol-slider" id="volBar" min="0" max="1" step="0.02" value="1" oninput="setVol(this.value)">
-      </div>
-      <div class="speed-strip">
-        <button class="spd-btn" onclick="changeSpeed(-1)" aria-label="Decrease speed">−</button>
-        <button class="rate-btn-inline" id="rateBtnInline" onclick="toggleOpts();switchOptTab('playback',document.querySelector('.op-tab'))" title="Playback rate">1×</button>
-        <button class="spd-btn" onclick="changeSpeed(1)" aria-label="Increase speed">+</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TTS BAR -->
-  <div class="tts-bar" id="ttsBar">
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <span style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;">🔊 TTS</span>
-      <select id="ttsVoiceSel" class="rate-sel" style="flex:1;min-width:120px;max-width:240px;font-size:12px" onchange="setTtsVoice(this.value)">
-        <option>Loading voices…</option>
-      </select>
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-        <span style="font-size:11px;color:var(--text3);">Speed</span>
-        <span style="font-size:12px;font-weight:600;color:var(--text);min-width:34px;text-align:right;" id="ttsRateLbl">1×</span>
-        <input type="range" id="ttsRateSlider" min="0.5" max="2.5" step="0.05" value="1"
-          style="width:90px;accent-color:var(--accent);" oninput="setTtsRate(this.value)">
-      </div>
-      <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;height:auto;min-height:0;flex-shrink:0;" onclick="openLinkAudioModal()">🎧 Link Audiobook</button>
-    </div>
-  </div>
-
   <!-- TRANSCRIPT BANNER -->
   <div class="tx-banner" id="txBanner">
-    <span id="txBannerIcon">📝</span>
-    <span class="tx-check">✓</span>
-    <span id="txBannerText"></span>
+    <div class="notx-top" id="txBannerTop" style="display:none">
+      <span class="notx-icon">⚠</span>
+      <span class="notx-title">No transcript</span>
+      <span class="notx-sub">Highlighting unavailable in audio mode</span>
+    </div>
+    <div class="notx-actions" id="txBannerActions" style="display:none">
+      <button class="notx-btn-primary" onclick="openTranscriptModal()">Add transcript →</button>
+      <button class="notx-btn-ghost" onclick="setHighlightMode('off')">Disable highlighting</button>
+    </div>
+    <span id="txBannerIcon" class="tx-check"></span>
+    <span id="txBannerMsg"></span>
+    <span class="tx-spinner" id="txBannerSpinner" style="display:none"></span>
     <span class="tx-detail" id="txBannerDetail"></span>
   </div>
-
-  <!-- READING PROGRESS -->
-  <div class="read-progress-wrap"><div class="read-progress-bar" id="readProg"></div></div>
 
   <!-- READER BODY -->
   <div class="reader-body">
@@ -763,6 +759,31 @@ html,body,
           <p style="color:var(--text3);font-style:italic;text-align:center;padding:80px 0">Open a book to begin reading.</p>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM CONTROLS -->
+  <div class="bottom-controls" id="bottomControls">
+    <div class="seek-strip" id="seekStrip">
+      <div class="seek-row">
+        <span class="seek-time" id="tCur">0:00</span>
+        <input type="range" class="seek-strip-bar" id="seekBar" value="0" min="0" max="100" step="0.05"
+          oninput="onSeekInput(this.value)" onchange="onSeekChange(this.value)">
+        <span class="seek-time right" id="tTot">0:00</span>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <div class="vol-wrap" id="volWrap">
+        <span class="vol-icon" id="volIcon" onclick="toggleVolPop()">🔊</span>
+        <div class="vol-pop" id="volPop">
+          <input type="range" id="volBar" min="0" max="1" step="0.02" value="1" oninput="setVol(this.value)">
+          <span class="vol-pop-label" id="volPopLabel">100%</span>
+        </div>
+      </div>
+      <button class="ic-btn" onclick="skip(-15)" title="−15s" aria-label="Skip back 15 seconds">⏮</button>
+      <button class="play-btn" id="playBtn" onclick="togglePlay()" aria-label="Play">▶</button>
+      <button class="ic-btn" onclick="skip(15)" title="+15s" aria-label="Skip forward 15 seconds">⏭</button>
+      <button class="speed-pill" id="rateBtnInline" onclick="cycleSpeed()" title="Tap to cycle speed" aria-label="Playback speed">1×</button>
     </div>
   </div>
 
@@ -915,7 +936,7 @@ html,body,
 'use strict';
 
 // ── App version ───────────────────────────────────
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.17.0';
 
 // ══════════════════════════════════════════════════════
 // STATE
@@ -969,7 +990,7 @@ function showSyncHintOnce(){
   if(localStorage.getItem(SYNC_HINT_KEY)) return;
   if(ttsMode) return;
   localStorage.setItem(SYNC_HINT_KEY,'1');
-  showToast('Highlight off? Adjust it in Options → Sync offset','info',6000);
+  showToast('Highlight not aligned? Adjust sync offset in Options','info',6000);
 }
 function showToast(msg, type='', duration=2200){
   const container = document.getElementById('toastContainer');
@@ -1126,7 +1147,7 @@ function _updateSleepBadge(){
   if(!badge) return;
   if(!_sleepEndTime){ badge.style.display='none'; return; }
   const remaining = Math.max(0, Math.round((_sleepEndTime - Date.now()) / 60000));
-  badge.textContent = ' ' + remaining + 'm';
+  badge.textContent = remaining + 'm';
   badge.style.display = 'inline';
 }
 
@@ -1569,6 +1590,12 @@ function renderLib(){
     grid.appendChild(card);
   });
   if(!IS_PWA){
+    if(library.length===0){
+      const onboard=document.createElement('div');
+      onboard.className='onboard-card';
+      onboard.innerHTML='<div class="onboard-title">Welcome to Folio</div><div class="onboard-body">Read ebooks with synced audio highlighting.<br>Add a book to get started — you\'ll need an audio file (.mp3, .m4b, etc.) and an ebook (.epub, .txt, .html, or .md).<br>Add a Whisper transcript (.json) for word-level sync.</div>';
+      grid.appendChild(onboard);
+    }
     const add=document.createElement('div');
     add.className='add-card';
     add.innerHTML='<div class="add-card-icon">+</div><div style="font-size:13px;font-weight:500">Add Book</div>';
@@ -1711,12 +1738,18 @@ function deleteBook(i,e){
 
 // ── Shared setup when opening any book ──
 function configurePlayerForMode(b, audioSrc, rate){
-  ttsMode = audioSrc === null && !b.audioHandle;
-  $('seekStrip').style.display = ttsMode ? 'none' : '';
-  $('ttsBar').style.display    = ttsMode ? 'flex' : 'none';
-  const _ss = document.querySelector('.speed-strip');
-  if(_ss) _ss.style.display = ttsMode ? 'none' : '';
-  if(!ttsMode && audioSrc){
+  const canTts = audioSrc === null && !b.audioHandle;
+  ttsMode = false;
+  $('seekStrip').style.display = canTts ? 'none' : '';
+  $('ttsToggleBtn').style.display = canTts ? '' : 'none';
+  $('ttsToggleBtn').classList.remove('active');
+  $('ttsVoiceSec').style.display = canTts ? '' : 'none';
+  $('bottomControls').style.display = canTts ? 'none' : '';
+  const needsRelink=!!(b.audioName&&!audioSrc&&!b.audioHandle);
+  $('bookInfoBtn').classList.toggle('needs-relink',needsRelink);
+  if(canTts) setHighlightMode('off');
+  else if(!sentHlOn) setHighlightMode('word');
+  if(!canTts && audioSrc){
     if(_audio.src && _audio.src.startsWith('blob:')) URL.revokeObjectURL(_audio.src);
     _audio.src = audioSrc;
     _audio.playbackRate = rate;
@@ -1730,9 +1763,19 @@ function configurePlayerForMode(b, audioSrc, rate){
       _audio.removeEventListener('loadedmetadata', restore);
     });
   }
-  document.querySelector('.read-progress-wrap').classList.toggle('scrubbing', ttsMode);
   setRate(rate);
   setMediaState('stopped');
+}
+function toggleTtsMode(){
+  ttsMode=!ttsMode;
+  $('ttsToggleBtn').classList.toggle('active',ttsMode);
+  $('bottomControls').style.display=ttsMode?'':'none';
+  if(ttsMode){
+    if(!sentHlOn) setHighlightMode('sentence');
+  } else {
+    ttsStop();
+    setHighlightMode('off');
+  }
 }
 
 // ══════════════════════════════════════════════════════
@@ -1748,6 +1791,7 @@ async function openBook(i){
   $('player').style.display='flex';
   $('pTitle').textContent=b.title;
   configurePlayerForMode(b, b.audioUrl||null, b.playbackRate||1);
+  if(b.audioName&&!b.audioUrl&&!b.audioHandle) showRelink(i);
   await loadTranscriptData(b);
   loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); seekAudioToSentence(); pulseResumeSent(true); });
   setupMediaSession();
@@ -1800,6 +1844,7 @@ function setMediaState(s){
 }
 function togglePlay(){
   if(ttsMode){ ttsSpeaking?ttsPause():ttsPlay(); return; }
+  if(!_audio.src){ showToast('Enable TTS or link an audiobook to play'); return; }
   if(_audio.paused) mediaPlay(); else mediaPause();
 }
 function mediaPlay(){
@@ -1848,6 +1893,12 @@ function changeSpeed(dir){
   const next=RATE_STEPS[Math.max(0,Math.min(RATE_STEPS.length-1,(idx===-1?2:idx)+dir))];
   setRate(next);
 }
+function cycleSpeed(){
+  const cur=ttsMode?(parseFloat($('rateCustom').value)||1):(_audio.playbackRate||1);
+  const idx=RATE_STEPS.findIndex(r=>Math.abs(r-cur)<0.05);
+  const next=RATE_STEPS[(idx===-1?2:idx+1)%RATE_STEPS.length];
+  setRate(next);
+}
 function setRate(v){
   v=parseFloat(v);
   if(!isFinite(v)||v<=0) return;
@@ -1889,18 +1940,30 @@ function setVol(v){
   _audio.volume=v;
   const icon=v>0.5?'🔊':v>0?'🔉':'🔇';
   $('volIcon').textContent=icon;
-  $('volIconOpt').textContent=icon;
+  const lbl=$('volPopLabel');
+  if(lbl) lbl.textContent=Math.round(v*100)+'%';
 }
 function setVolBoth(v){
   setVol(v);
   $('volBar').value=v;
-  $('volSliderOpt').value=v;
 }
 function toggleMute(){
   _audio.muted=!_audio.muted;
   const icon=_audio.muted?'🔇':'🔊';
   $('volIcon').textContent=icon;
-  $('volIconOpt').textContent=icon;
+}
+function toggleVolPop(){
+  const pop=$('volPop');
+  const isOpen=pop.classList.toggle('open');
+  if(isOpen){
+    const close=(e)=>{
+      if(!$('volWrap').contains(e.target)){
+        pop.classList.remove('open');
+        document.removeEventListener('pointerdown',close);
+      }
+    };
+    document.addEventListener('pointerdown',close);
+  }
 }
 function onSeekInput(v){ isSeeking=true; $('tCur').textContent=fmt(_audio.duration*v/100); }
 function onSeekChange(v){
@@ -2110,7 +2173,7 @@ function ttsPlay(){
     updateHL(); updateProg(); if(autoScroll) scrollToSent(curSent);
     const utt=new SpeechSynthesisUtterance(s.text);
     ttsUtterance=utt;
-    utt.rate=parseFloat(document.getElementById('ttsRateSlider').value)||1;
+    utt.rate=parseFloat($('rateCustom').value)||1;
     if(ttsVoice) utt.voice=ttsVoice;
     utt.onboundary=ev=>{
       if(ev.name!=='word'||!sentHlOn||!wordHlOn) return;
@@ -2190,7 +2253,7 @@ function updateHL(){
 }
 function updateProg(){
   const pct=sentences.length>1?curSent/(sentences.length-1)*100:0;
-  _readProg.style.width=pct+'%';
+  if(_readProg) _readProg.style.width=pct+'%';
   let chapterLabel='';
   if(tocEntries&&tocEntries.length){
     let active=null;
@@ -2281,6 +2344,14 @@ function setHighlightMode(mode){
   }
   _syncHlPills();
   saveDisplayPrefs();
+  // Update notx banner to match current highlight state
+  if(curBookIdx>=0){
+    const b=library[curBookIdx];
+    if(b&&!b.transcriptType){
+      if(sentHlOn&&!ttsMode&&(b.audioUrl||b.audioHandle)) setBannerState('notx','No transcript','Highlighting requires a transcript in audio mode');
+      else if(document.getElementById('txBanner').classList.contains('notx')) setBannerState('hidden');
+    }
+  }
 }
 
 // ══════════════════════════════════════════════════════
@@ -2442,7 +2513,10 @@ async function loadTranscriptData(b){
   document.getElementById('resyncBtn').style.display='none';
   document.getElementById('offsetRow').style.display='none';
   setBannerState('hidden');
-  if(!b.transcriptType) return;
+  if(!b.transcriptType){
+    if((b.audioUrl||b.audioHandle)&&sentHlOn&&!ttsMode) setBannerState('notx','No transcript','Highlighting requires a transcript in audio mode');
+    return;
+  }
   setBannerState('loading','Loading transcript…');
   await yieldToMain();
   try{
@@ -2494,11 +2568,29 @@ function setBannerState(state,text,detail){
   b.className='tx-banner';
   if(state==='hidden'){ return; }
   b.classList.add(state);
+  const txTop=document.getElementById('txBannerTop');
+  const txActions=document.getElementById('txBannerActions');
   const icon=document.getElementById('txBannerIcon');
-  if(state==='loading'||state==='syncing') icon.innerHTML='<div class="tx-spinner"></div>';
-  else icon.textContent='📝';
-  document.getElementById('txBannerText').textContent=text||'';
-  document.getElementById('txBannerDetail').textContent=detail||'';
+  const msg=document.getElementById('txBannerMsg');
+  const spinner=document.getElementById('txBannerSpinner');
+  const det=document.getElementById('txBannerDetail');
+  if(state==='notx'){
+    txTop.style.display='flex';
+    txActions.style.display='flex';
+    icon.style.display='none';
+    msg.style.display='none';
+    det.style.display='none';
+    spinner.style.display='none';
+  } else {
+    txTop.style.display='none';
+    txActions.style.display='none';
+    msg.style.display='';
+    det.style.display='';
+    if(state==='loading'||state==='syncing'){ icon.style.display='none'; spinner.style.display=''; icon.textContent=''; }
+    else { icon.style.display=''; spinner.style.display='none'; icon.textContent=state==='ready'?'✓':'📝'; icon.className=state==='ready'?'tx-check':''; }
+    msg.textContent=text||'';
+    det.textContent=detail||'';
+  }
   if(state==='ready'){
     _bannerHideTimer=setTimeout(()=>{
       b.classList.add('tx-fade');
@@ -3034,13 +3126,13 @@ async function loadEbook(book,onDone){
     // Flush the fragment to DOM in one batch, then yield before next chunk
     if(i<items.length){
       content.appendChild(frag);
-      setBannerState('loading','Building ebook\u2026',Math.round(i/items.length*100)+'%');
+      if(!document.getElementById('txBanner').classList.contains('notx')) setBannerState('loading','Building ebook\u2026',Math.round(i/items.length*100)+'%');
       await yieldToMain();
     }
   }
   // Final flush
   content.appendChild(frag);
-  setBannerState('hidden');
+  if(!document.getElementById('txBanner').classList.contains('notx')) setBannerState('hidden');
   // Delegated click handler — one listener instead of one per word/sentence
   if(_contentClickHandler) content.removeEventListener('click',_contentClickHandler);
   _contentClickHandler=function(ev){
@@ -3423,10 +3515,10 @@ function saveLinkAudio(){
   _audio.src=b.audioUrl; _audio.playbackRate=b.playbackRate||1; _audio.load();
   _audio.addEventListener('loadedmetadata',()=>seekAudioToSentence(),{once:true});
   $('seekStrip').style.display='';
-  $('ttsBar').style.display='none';
-  const _ss=document.querySelector('.speed-strip');
-  if(_ss) _ss.style.display='';
-  document.querySelector('.read-progress-wrap').classList.remove('scrubbing');
+  $('ttsToggleBtn').style.display='none';
+  $('ttsVoiceSec').style.display='none';
+  $('bookInfoBtn').classList.remove('needs-relink');
+  if(!b.transcriptType&&sentHlOn&&!ttsMode) setBannerState('notx','No transcript','Highlighting requires a transcript in audio mode');
   if(!IS_PWA) saveLibrary();
   closeLinkAudioModal();
 }
@@ -3475,7 +3567,9 @@ function biReassign(e,type){
     if(!AUDIO_EXTS.has(ext)){ showToast('Not a recognised audio file','error'); return; }
     if(b.audioUrl) URL.revokeObjectURL(b.audioUrl);
     b.audioUrl=URL.createObjectURL(f); b.audioName=f.name;
+    $('bookInfoBtn').classList.remove('needs-relink');
     configurePlayerForMode(b, b.audioUrl, b.playbackRate||1);
+    if(!b.transcriptType&&sentHlOn&&!ttsMode) setBannerState('notx','No transcript','Highlighting requires a transcript in audio mode');
     if(!IS_PWA) saveLibrary();
     showToast('Audio linked','success');
   } else if(type==='ebook'){
@@ -3529,7 +3623,7 @@ function showRelink(i){
   document.getElementById('relinkDropHint').textContent='Tap to browse or drop file here';
   document.getElementById('relinkOverlay').style.display='flex';
 }
-function closeRelink(){ document.getElementById('relinkOverlay').style.display='none'; curBookIdx=-1; }
+function closeRelink(){ document.getElementById('relinkOverlay').style.display='none'; }
 function rlOver(e){ e.preventDefault(); document.getElementById('relinkDrop').classList.add('drag-over'); }
 function rlLeave(){ document.getElementById('relinkDrop').classList.remove('drag-over'); }
 function rlDrop(e){ e.preventDefault(); rlLeave(); if(e.dataTransfer.files[0]) rlLoad(e.dataTransfer.files[0]); }
@@ -3540,6 +3634,7 @@ function rlLoad(f){
   const b=library[curBookIdx];
   if(b.audioUrl) URL.revokeObjectURL(b.audioUrl);
   b.audioUrl=URL.createObjectURL(f); b.audioName=f.name;
+  $('bookInfoBtn').classList.remove('needs-relink');
   saveLibrary();
   document.getElementById('relinkOverlay').style.display='none';
   openBook(curBookIdx);
@@ -3611,10 +3706,9 @@ async function pwaScanAndRender(){
   renderLib();
   await _resolveAmbiguousTranscripts();
   if(scanned.length===0&&grid){
-    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">
-      <div style="font-size:32px;margin-bottom:12px">📂</div>
-      <div style="font-weight:600;color:var(--text2);margin-bottom:8px">No books found in "${xh(pwaRootHandle.name)}"</div>
-      <div>Each book should be in its own subfolder with an audio or ebook file.</div>
+    grid.innerHTML=`<div class="onboard-card">
+      <div class="onboard-title">No books found in "${xh(pwaRootHandle.name)}"</div>
+      <div class="onboard-body">Each book needs its own subfolder containing an audio file (.mp3, .m4b, .opus, .ogg) or ebook (.epub, .txt, .html, .md).<br>Add a Whisper transcript (.json) for word-level sync.</div>
     </div>`;
   }
 }
@@ -3847,11 +3941,6 @@ async function init(){
   try{ loadDisplayPrefs(); }catch(e){}
   try{ setMediaState('stopped'); }catch(e){}
   try{ getTtsVoices(); }catch(e){}
-  try{
-    const progWrap = _readProg.parentElement;
-    progWrap.addEventListener('click', scrubToPosition);
-    progWrap.addEventListener('touchend', scrubToPosition);
-  }catch(e){}
   try{
     if(IS_PWA && CAN_FS){
       await pwaCheckOnLaunch();
