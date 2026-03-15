@@ -677,7 +677,7 @@ html,body,
             <button class="pill" id="fontPill-georgia" onclick="setFont('Georgia,serif','georgia',this)">Georgia</button>
             <button class="pill" id="fontPill-sans" onclick="setFont('DM Sans,sans-serif','sans',this)">Sans</button>
             <button class="pill" id="fontPill-mono" onclick="setFont('Courier New,monospace','mono',this)">Mono</button>
-            <button class="pill" id="fontPill-dyslexic" onclick="setFont(&quot;'Open Dyslexic',sans-serif&quot;,'dyslexic',this)">Dyslexic</button>
+            <button class="pill" id="fontPill-dyslexic" onclick="setFont(&quot;'OpenDyslexic',sans-serif&quot;,'dyslexic',this)">Dyslexic</button>
           </div>
         </div>
         <div class="op-sec">
@@ -799,6 +799,13 @@ html,body,
           <div class="fp-info"><div class="fp-label">Ebook</div><div class="fp-name empty" id="ebookName">No file selected</div></div>
           <input type="file" id="ebookInput" accept=".txt,.epub,.html,.htm,.md,.xhtml" style="display:none" onchange="fileChosen(event,'ebook')">
           <button class="fp-clear" onclick="clearSlot('ebook')" title="Clear">✕</button>
+        </div>
+        <div class="file-pill" id="transcriptPill"
+          ondragover="dzOver(event,'transcriptPill')" ondragleave="dzLeave('transcriptPill')" ondrop="dzDrop(event,'transcript')">
+          <span class="fp-icon">📝</span>
+          <div class="fp-info"><div class="fp-label">Transcript (optional)</div><div class="fp-name empty" id="transcriptName">No file selected</div></div>
+          <input type="file" id="transcriptInput" accept=".json,.txt" style="display:none" onchange="fileChosen(event,'transcript')">
+          <button class="fp-clear" onclick="clearSlot('transcript')" title="Clear">✕</button>
         </div>
         <div class="file-pill" id="coverPill"
           ondragover="dzOver(event,'coverPill')" ondragleave="dzLeave('coverPill')" ondrop="dzDrop(event,'cover')">
@@ -1473,6 +1480,8 @@ function loadDisplayPrefs(){
       document.getElementById(tid)?.classList.add('active');
     }
     if(p.fontBody){
+      // Migrate old font-family name for OpenDyslexic (CDN changed)
+      if(p.fontBody.includes('Open Dyslexic')) p.fontBody=p.fontBody.replace('Open Dyslexic','OpenDyslexic');
       _fontBody=p.fontBody;
       document.documentElement.style.setProperty('--font-body',p.fontBody);
       document.querySelectorAll('[id^=fontPill]').forEach(b=>b.classList.remove('active'));
@@ -1480,9 +1489,12 @@ function loadDisplayPrefs(){
       if(p.fontKey==='dyslexic'&&!document.getElementById('font-opendyslexic')){
         const link=document.createElement('link');
         link.id='font-opendyslexic'; link.rel='stylesheet';
-        link.href='https://fonts.cdnfonts.com/css/open-dyslexic';
+        link.href='https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic/index.css';
         link.onload=()=>{ document.documentElement.style.setProperty('--font-body',_fontBody); };
         document.head.appendChild(link);
+        const b=document.createElement('link'); b.rel='stylesheet';
+        b.href='https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic/700.css';
+        document.head.appendChild(b);
       }
     }
     if(p.fontSize){ _fontSize=parseInt(p.fontSize); document.documentElement.style.setProperty('--font-size',p.fontSize); const v=parseInt(p.fontSize); document.getElementById('fsSlider').value=v; document.getElementById('fsLbl').textContent=p.fontSize; }
@@ -2364,9 +2376,12 @@ function setFont(f,key,btn){
   if(key==='dyslexic'&&!document.getElementById('font-opendyslexic')){
     const link=document.createElement('link');
     link.id='font-opendyslexic'; link.rel='stylesheet';
-    link.href='https://fonts.cdnfonts.com/css/open-dyslexic';
+    link.href='https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic/index.css';
     link.onload=()=>{ document.documentElement.style.setProperty('--font-body',_fontBody); };
     document.head.appendChild(link);
+    const b=document.createElement('link'); b.rel='stylesheet';
+    b.href='https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic/700.css';
+    document.head.appendChild(b);
   }
   _fontBody=f;
   document.documentElement.style.setProperty('--font-body',f);
@@ -3204,7 +3219,25 @@ function folderChosen(e){
   const audioFile=files.find(f=>AUDIO_EXTS.has(f.name.split('.').pop().toLowerCase()));
   const ebookFile=files.find(f=>EBOOK_EXTS.has(f.name.split('.').pop().toLowerCase()));
   const jsonFiles=files.filter(f=>f.name.split('.').pop().toLowerCase()==='json');
-  const jsonFile=jsonFiles.find(f=>/transcript/i.test(f.name))||jsonFiles[0]||null;
+  // Tiered transcript matching (same logic as PWA pwaScanBookFolder)
+  let jsonFile=null;
+  if(jsonFiles.length){
+    // Tier 1: filename contains 'transcript' or 'whisper'
+    jsonFile=jsonFiles.find(f=>/transcript|whisper/i.test(f.name.replace(/\.[^.]+$/,'')))||null;
+    // Tier 2: filename contains any meaningful word from folder/title name (3+ chars)
+    if(!jsonFile){
+      const titleSrc=files[0].webkitRelativePath?.split('/')[0]||'';
+      const titleWords=titleSrc.toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w=>w.length>=3);
+      if(titleWords.length){
+        jsonFile=jsonFiles.find(f=>{
+          const base=f.name.replace(/\.[^.]+$/,'').toLowerCase();
+          return titleWords.some(w=>base.includes(w));
+        })||null;
+      }
+    }
+    // Tier 3: only one JSON file — use it
+    if(!jsonFile&&jsonFiles.length===1) jsonFile=jsonFiles[0];
+  }
   // Cover: prefer file named "cover", otherwise first image
   const imageFiles=files.filter(f=>IMAGE_EXTS.has(f.name.split('.').pop().toLowerCase()));
   const coverFile=imageFiles.find(f=>/cover/i.test(f.name.replace(/\.[^.]+$/,'')))||imageFiles[0]||null;

@@ -2,6 +2,28 @@
 
 ---
 
+## v1.15 — 2026-03-14
+
+### Added
+- PWA "Hide" replaces "Delete" on library cards — hidden books persist across scans in a collapsible section with "Show" to restore
+- Pre-pick warning sheet before Android folder picker warns about back-button behaviour
+- 3-option highlight pill selector (Off / Sentence / Sentence + Word) replaces two separate toggles
+- Transcript file pill restored to Add Book modal (Audio, Ebook, Transcript, Cover)
+- Browser folder picker now uses same tiered JSON transcript auto-assignment as PWA (keyword → title-word → lone-file)
+
+### Changed
+- OpenDyslexic font CDN switched from cdnfonts.com to jsdelivr @fontsource/opendyslexic (400 + 700 weights)
+- OpenDyslexic font-family corrected from `'Open Dyslexic'` to `'OpenDyslexic'` to match new CDN
+- Post-pick folder confirmation sheet removed — OS picker confirmation is sufficient
+
+### Fixed
+- OpenDyslexic font fails to load — old CDN (cdnfonts.com) returns 403 Forbidden
+- Add Book modal crashes on open — `resetModal()` referenced removed `#transcriptName` element
+- Highlight snaps to wrong sentence when re-enabled on low transcript match % books — `_resyncAndHL()` now resyncs `curSent` via reverse linear scan before highlighting
+- Saved display prefs with old font-family name `'Open Dyslexic'` auto-migrated on load
+
+---
+
 ## v1.14 — 2026-03-14
 
 ### Fixed
