@@ -2,6 +2,13 @@
 
 ---
 
+## v2.5 — 2026-03-16
+
+### Added
+- Ebook scrub bar — Kindle-style draggable progress bar at the bottom of the reader for fast position jumping. Shows chapter name and percentage in a floating tooltip while dragging. Works in all ebook modes (plain reading, TTS, audio+ebook). Visible as the sole bottom element for ebook-only books without TTS enabled
+
+---
+
 ## v2.4 — 2026-03-16
 
 ### Added

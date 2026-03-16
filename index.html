@@ -267,6 +267,16 @@ body.theme-hclight{
 .speed-pill{height:32px;min-width:48px;padding:0 12px;border-radius:8px;border:1px solid rgba(91,141,239,.3);background:rgba(91,141,239,.1);color:var(--accent);font-family:var(--font-ui);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;white-space:nowrap;transition:background-color .15s,border-color .15s;flex-shrink:0;}
 .speed-pill:hover{background:rgba(91,141,239,.2);}
 
+/* ── EBOOK SCRUB BAR ── */
+.ebook-scrub{padding:10px 14px 6px;position:relative;}
+.ebook-scrub-track{position:relative;height:3px;background:var(--border);border-radius:2px;cursor:pointer;touch-action:none;}
+.ebook-scrub-fill{position:absolute;top:0;left:0;height:100%;background:var(--text3);border-radius:2px;pointer-events:none;transition:width .15s;opacity:.5;}
+.ebook-scrub-thumb{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;background:var(--text3);transform:translate(-50%,-50%);cursor:grab;touch-action:none;transition:transform .15s,left .15s,width .15s,height .15s,background-color .15s;}
+.ebook-scrub-thumb:hover,.ebook-scrub.scrubbing .ebook-scrub-thumb{width:14px;height:14px;background:var(--accent);}
+.ebook-scrub.scrubbing .ebook-scrub-fill,
+.ebook-scrub.scrubbing .ebook-scrub-thumb{transition:none;}
+.ebook-scrub-tooltip{position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 10px;font-size:12px;color:var(--text);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;box-shadow:0 2px 8px var(--shadow);z-index:10;font-family:var(--font-ui);}
+.ebook-scrub.scrubbing .ebook-scrub-tooltip{opacity:1;}
 
 /* ── TRANSCRIPT BANNER ── */
 .tx-banner{display:none;align-items:center;gap:10px;padding:10px 16px;font-size:13px;font-weight:600;flex-shrink:0;position:relative;overflow:hidden;}
@@ -390,6 +400,7 @@ body.theme-hclight{
   .play-btn{width:40px;height:40px;font-size:15px;}
   .seek-strip{padding:8px 18px 0;}
   .seek-strip-bar::-webkit-slider-thumb{width:16px;height:16px;}
+  .ebook-scrub{padding:10px 18px 6px;}
   .ctrl-row{padding:6px 18px 8px;}
   .opt-panel{top:68px;right:16px;}
   .toc-item{padding:7px 16px;font-size:13px;}
@@ -410,6 +421,9 @@ body.theme-hclight{
   .seek-strip{padding:4px 12px 0;}
   .seek-time{font-size:11px;min-width:32px;}
   .seek-strip-bar::-webkit-slider-thumb{width:22px;height:22px;}
+  .ebook-scrub-thumb{width:12px;height:12px;}
+  .ebook-scrub-thumb:hover,.ebook-scrub.scrubbing .ebook-scrub-thumb{width:18px;height:18px;}
+  .ebook-scrub.scrub-sole{padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));}
   .ctrl-row{padding:6px 8px calc(8px + env(safe-area-inset-bottom,0px));gap:2px;}
   .ctrl-row .skip-btn{width:40px;height:40px;}
   .ctrl-row .skip-btn .ic-svg{width:24px;height:24px;}
@@ -796,6 +810,13 @@ html,body,
 
   <!-- BOTTOM CONTROLS -->
   <div class="bottom-controls" id="bottomControls">
+    <div class="ebook-scrub" id="ebookScrub" style="display:none">
+      <div class="ebook-scrub-tooltip" id="ebookScrubTip"></div>
+      <div class="ebook-scrub-track" id="ebookScrubTrack">
+        <div class="ebook-scrub-fill" id="ebookScrubFill"></div>
+        <div class="ebook-scrub-thumb" id="ebookScrubThumb"></div>
+      </div>
+    </div>
     <div class="seek-strip" id="seekStrip">
       <div class="seek-row">
         <span class="seek-time" id="tCur">0:00</span>
@@ -804,7 +825,7 @@ html,body,
         <span class="seek-time right" id="tTot">0:00</span>
       </div>
     </div>
-    <div class="ctrl-row">
+    <div class="ctrl-row" id="ctrlRow">
       <div class="vol-wrap" id="volWrap">
         <span class="vol-icon" id="volIcon" onclick="toggleVolPop()">🔊</span>
         <div class="vol-pop" id="volPop">
@@ -996,7 +1017,7 @@ html,body,
 'use strict';
 
 // ── App version ───────────────────────────────────
-const APP_VERSION = '2.4.0';
+const APP_VERSION = '2.5.0';
 
 // ══════════════════════════════════════════════════════
 // STATE
@@ -1822,7 +1843,10 @@ function configurePlayerForMode(b, audioSrc, rate){
   $('ttsToggleBtn').style.display = canTts ? '' : 'none';
   $('ttsToggleBtn').classList.remove('active');
   $('ttsVoiceSec').style.display = canTts ? '' : 'none';
-  $('bottomControls').style.display = canTts ? 'none' : '';
+  $('ctrlRow').style.display = canTts ? 'none' : '';
+  _showEbookScrub(sentences.length > 0);
+  if(_ebookScrubEl) _ebookScrubEl.classList.toggle('scrub-sole', canTts);
+  $('bottomControls').style.display = (canTts && !sentences.length) ? 'none' : '';
   _updateSkipBtns();
   if(canTts) setHighlightMode('off');
   else if(!sentHlOn) setHighlightMode('word');
@@ -1849,7 +1873,10 @@ function configurePlayerForMode(b, audioSrc, rate){
 function toggleTtsMode(){
   ttsMode=!ttsMode;
   $('ttsToggleBtn').classList.toggle('active',ttsMode);
-  $('bottomControls').style.display=ttsMode?'':'none';
+  $('bottomControls').style.display='';
+  $('ctrlRow').style.display=ttsMode?'':'none';
+  _showEbookScrub(true);
+  _ebookScrubEl.classList.toggle('scrub-sole',!ttsMode);
   _updateSkipBtns();
   if(ttsMode){
     if(!sentHlOn) setHighlightMode('sentence');
@@ -1875,7 +1902,7 @@ async function openBook(i){
   configurePlayerForMode(b, b.audioUrl||null, b.playbackRate||1);
   if(b.audioName&&!b.audioUrl&&!b.audioHandle) showRelink(i);
   await loadTranscriptData(b);
-  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); seekAudioToSentence(); pulseResumeSent(true); });
+  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); _showEbookScrub(true); if(_ebookScrubEl) _ebookScrubEl.classList.toggle('scrub-sole',!ttsMode&&!_audio.src); seekAudioToSentence(); pulseResumeSent(true); });
   setupMediaSession();
   updatePageTitle();
 }
@@ -1906,6 +1933,7 @@ function goLib(){
   sentences=[]; tocEntries=[];
   _tocItems=[]; _prevTocActive=-1;
   _activeSentEl=null; _activeWordEl=null;
+  _showEbookScrub(false);
   releaseWakeLock();
   clearSleepTimer(); _sleepTimerIdx=0;
   updatePageTitle();
@@ -2343,6 +2371,90 @@ function scrubToPosition(ev){
   if(mediaState === 'playing'){ ttsStop(); ttsPlay(); }
 }
 
+// ── EBOOK SCRUB BAR ──
+let _ebookScrubEl, _ebookScrubTrack, _ebookScrubFill, _ebookScrubThumb, _ebookScrubTip;
+
+function _resolveChapterAtIdx(idx){
+  if(!tocEntries||!tocEntries.length) return '';
+  for(let i=tocEntries.length-1;i>=0;i--){if(tocEntries[i].sentIdx<=idx) return tocEntries[i].text.slice(0,28);}
+  return '';
+}
+function _updateEbookScrub(){
+  if(!_ebookScrubTrack) return;
+  const pct=sentences.length>1?curSent/(sentences.length-1)*100:0;
+  _ebookScrubFill.style.width=pct+'%';
+  _ebookScrubThumb.style.left=pct+'%';
+}
+function _showEbookScrub(show){
+  if(!_ebookScrubEl) return;
+  const vis=show&&sentences.length>0;
+  _ebookScrubEl.style.display=vis?'':'none';
+  if(vis){ const bc=$('bottomControls'); if(bc) bc.style.display=''; }
+}
+function _wireEbookScrub(){
+  _ebookScrubEl=$('ebookScrub');
+  _ebookScrubTrack=$('ebookScrubTrack');
+  _ebookScrubFill=$('ebookScrubFill');
+  _ebookScrubThumb=$('ebookScrubThumb');
+  _ebookScrubTip=$('ebookScrubTip');
+  if(!_ebookScrubTrack) return;
+  let scrubbing=false, wasTtsPlaying=false;
+  function pctFromEv(ev){
+    const rect=_ebookScrubTrack.getBoundingClientRect();
+    const x=(ev.touches?ev.touches[0].clientX:ev.clientX)-rect.left;
+    return Math.max(0,Math.min(1,x/rect.width));
+  }
+  function updateTip(pct,ev){
+    const idx=Math.round(pct*(sentences.length-1));
+    const ch=_resolveChapterAtIdx(idx);
+    _ebookScrubTip.textContent=ch?(ch+' · '+Math.round(pct*100)+'%'):Math.round(pct*100)+'%';
+    const rect=_ebookScrubTrack.getBoundingClientRect();
+    const x=(ev.touches?ev.touches[0].clientX:ev.clientX)-rect.left;
+    const tipW=_ebookScrubTip.offsetWidth;
+    let left=Math.max(tipW/2,Math.min(rect.width-tipW/2,x));
+    _ebookScrubTip.style.left=left+'px';
+    _ebookScrubTip.style.transform='translateX(-50%)';
+  }
+  function onDown(ev){
+    if(!sentences.length) return;
+    ev.preventDefault();
+    scrubbing=true;
+    wasTtsPlaying=ttsMode&&mediaState==='playing';
+    if(wasTtsPlaying) ttsPause();
+    _ebookScrubEl.classList.add('scrubbing');
+    const pct=pctFromEv(ev);
+    _ebookScrubFill.style.width=(pct*100)+'%';
+    _ebookScrubThumb.style.left=(pct*100)+'%';
+    updateTip(pct,ev);
+    _ebookScrubThumb.setPointerCapture(ev.pointerId);
+  }
+  function onMove(ev){
+    if(!scrubbing) return;
+    const pct=pctFromEv(ev);
+    _ebookScrubFill.style.width=(pct*100)+'%';
+    _ebookScrubThumb.style.left=(pct*100)+'%';
+    updateTip(pct,ev);
+  }
+  function onUp(ev){
+    if(!scrubbing) return;
+    scrubbing=false;
+    _ebookScrubEl.classList.remove('scrubbing');
+    const pct=pctFromEv(ev);
+    const target=Math.round(pct*(sentences.length-1));
+    curSent=target; curWord=-1;
+    updateHL(); updateProg(); saveBookProgressDebounced();
+    scrollToSent(curSent,true);
+    if(wasTtsPlaying){ ttsStop(); ttsPlay(); }
+    if(typeof seekAudioToSentence==='function'&&_audio.src&&sentenceTimings&&sentenceTimings[curSent]) seekAudioToSentence(curSent);
+    if(typeof resetBarTimer==='function') resetBarTimer();
+  }
+  _ebookScrubTrack.addEventListener('pointerdown',onDown);
+  _ebookScrubThumb.addEventListener('pointerdown',onDown);
+  _ebookScrubThumb.addEventListener('pointermove',onMove);
+  _ebookScrubThumb.addEventListener('pointerup',onUp);
+  _ebookScrubThumb.addEventListener('pointercancel',onUp);
+}
+
 // ══════════════════════════════════════════════════════
 // HIGHLIGHTING & PROGRESS
 // ══════════════════════════════════════════════════════
@@ -2365,14 +2477,11 @@ function updateHL(){
 function updateProg(){
   const pct=sentences.length>1?curSent/(sentences.length-1)*100:0;
   if(_readProg) _readProg.style.width=pct+'%';
-  let chapterLabel='';
-  if(tocEntries&&tocEntries.length){
-    let active=null;
-    for(let i=tocEntries.length-1;i>=0;i--){if(tocEntries[i].sentIdx<=curSent){active=tocEntries[i];break;}}
-    if(active) chapterLabel=active.text.slice(0,28)+' · ';
-  }
+  const ch=_resolveChapterAtIdx(curSent);
+  const chapterLabel=ch?(ch+' · '):'';
   _pProg.textContent=sentences.length?chapterLabel+Math.round(pct)+'%':'—';
   if(curBookIdx>=0){ library[curBookIdx].totalSents=sentences.length; }
+  _updateEbookScrub();
 }
 function _cacheScrollMetrics(){
   if(!_eScroll) return;
@@ -4156,7 +4265,7 @@ async function pwaOpenBook(i){
       localStorage.setItem(PWA_PROG_KEY,JSON.stringify(all));
     }
   }
-  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); seekAudioToSentence(); pulseResumeSent(true); });
+  loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); _showEbookScrub(true); if(_ebookScrubEl) _ebookScrubEl.classList.toggle('scrub-sole',!ttsMode&&!_audio.src); seekAudioToSentence(); pulseResumeSent(true); });
   setupMediaSession();
   updatePageTitle();
 }
@@ -4300,6 +4409,7 @@ async function init(){
   if(avEl) avEl.textContent = 'Version ' + APP_VERSION;
   try{ _cacheScrollMetrics(); window.addEventListener('resize',_cacheScrollMetrics,{passive:true}); }catch(e){}
   try{ wireAudioEvents(); }catch(e){}
+  try{ _wireEbookScrub(); }catch(e){}
   try{ loadDisplayPrefs(); }catch(e){}
   try{ setMediaState('stopped'); }catch(e){}
   try{ getTtsVoices(); }catch(e){}
