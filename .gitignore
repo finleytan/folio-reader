@@ -4,16 +4,16 @@ tests/playwright-report/
 tests/test-results/
 test-results/
 
-# Superseded by folio-work-items.md and folio-prompts.md
-folio-prompts.html
+# Superseded by verte-work-items.md and verte-prompts.md
+verte-prompts.html
 prompts-manager.js
-folio-workflow-prompts.html
+verte-workflow-prompts.html
 
 # Dev reference — not part of the deployed app
-folio-context.md
-folio-fragile.md
-folio-prompts.md
-folio-work-items.md
+verte-context.md
+verte-fragile.md
+verte-prompts.md
+verte-work-items.md
 
 *.epub
 package.json

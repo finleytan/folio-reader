@@ -7,7 +7,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { clearStorage, gotoFolio, injectFixtureBook, openBook, getAppState } from '../helpers/folio.js';
+import { clearStorage, gotoVerte, injectFixtureBook, openBook, getAppState } from '../helpers/verte.js';
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -32,7 +32,7 @@ async function injectBookWithTranscript(page, transcriptData, transcriptType = '
     try { lib = JSON.parse(localStorage.getItem(lsKey)) || []; } catch (e) {}
     lib.push(book);
     localStorage.setItem(lsKey, JSON.stringify(lib));
-  }, { book, lsKey: 'folio_library_v2' });
+  }, { book, lsKey: 'verte_library_v2' });
   await page.reload();
   await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
   return book.id;
@@ -42,7 +42,7 @@ async function injectBookWithTranscript(page, transcriptData, transcriptType = '
 
 test.describe('#4 — JSON transcript validation', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -86,7 +86,7 @@ test.describe('#4 — JSON transcript validation', () => {
 
 test.describe('#6 — Sentence boundary highlight', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -126,7 +126,7 @@ test.describe('#6 — Sentence boundary highlight', () => {
 
 test.describe('#7 — Rate change recalculation', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -164,7 +164,7 @@ test.describe('#7 — Rate change recalculation', () => {
 
 test.describe('#8 — Progress percentage display', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -195,7 +195,7 @@ test.describe('#8 — Progress percentage display', () => {
 
 test.describe('#10 — Auto-hide transcript banner', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -253,7 +253,7 @@ test.describe('#10 — Auto-hide transcript banner', () => {
 
 test.describe('#31 — TOC scroll to active chapter', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -277,7 +277,7 @@ test.describe('#31 — TOC scroll to active chapter', () => {
       try { lib = JSON.parse(localStorage.getItem(lsKey)) || []; } catch (e) {}
       lib.push(book);
       localStorage.setItem(lsKey, JSON.stringify(lib));
-    }, { book, lsKey: 'folio_library_v2' });
+    }, { book, lsKey: 'verte_library_v2' });
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
     await openBook(page, 0);
@@ -296,7 +296,7 @@ test.describe('#31 — TOC scroll to active chapter', () => {
 
 test.describe('#40 — Speed badge removed from play button', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });

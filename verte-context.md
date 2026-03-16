@@ -1,4 +1,4 @@
-# Folio — Function Index & Context
+# Verte — Function Index & Context
 
 ## File Layout
 
@@ -6,7 +6,7 @@
 |------|-------|----------|
 | CSS | 16–553 | All styles |
 | HTML | 555–978 | 4 screens + 4 modals |
-| JS | 978–4142 | All logic |
+| JS | 978–4203 | All logic |
 
 ### HTML Structure
 
@@ -115,7 +115,7 @@
 | `_buildTimingsFromPlainTextSync` | 3090 | Transcript | Calls `seekAudioToSentence()` or `_resyncAndHL()` after timings built |
 | `similarity` / `updateTranscriptUI` | 3122 | Transcript | |
 | `yieldToMain` | 3137 | Ebook | |
-| `loadEbook` | 3143 | Ebook | ⚠️ No cancellation guard — race possible on rapid book switch (see folio-fragile.md #4). Sets `totalSents` on book object after DOM build |
+| `loadEbook` | 3143 | Ebook | ⚠️ No cancellation guard — race possible on rapid book switch (see verte-fragile.md #4). Sets `totalSents` on book object after DOM build |
 | `splitSentences` | 3247 | Ebook | ⚠️ Two copies must stay in sync — worker copy inside _timingWorkerFn (~2673) |
 | `parseTxt` / `parseMd` / `parseHtml` | 3266 | Ebook | |
 | `extractFromDom` | 3288 | Ebook | ⚠️ Skips bare text nodes in divs — text with no block children silently dropped |
@@ -138,7 +138,7 @@
 | `saveEditBook` | 3693 | Edit Book Modal | Saves title and author; persists to localStorage (browser) or PWA_PROG_KEY (PWA) |
 | `editBookReassign` | 3716 | Edit Book Modal | Handles file replacement for audio/ebook/transcript/cover from library |
 | `showRelink` / `closeRelink` | 3768 | Relink | ⚠️ `showRelink` checks dismiss flags before showing. `closeRelink` no longer resets `curBookIdx` |
-| `rlDontRemind` / `rlDismissBook` / `rlDismissAll` / `rlDismissCancel` | 3779 | Relink | "Don't remind me" flow: per-book (`relinkDismissed`) or global (`folio_relink_dismissed_all` localStorage) |
+| `rlDontRemind` / `rlDismissBook` / `rlDismissAll` / `rlDismissCancel` | 3779 | Relink | "Don't remind me" flow: per-book (`relinkDismissed`) or global (`verte_relink_dismissed_all` localStorage) |
 | `rlLoad` | 3802 | Relink | |
 | `pwaFolderChangeTap` | 3816 | PWA | ⚠️ Pre-pick warning only — pwaPickFolder commits immediately (see fragile #18) |
 | `pwaPickFolder` | 3832 | PWA | |
@@ -150,7 +150,8 @@
 | `showScreen` | 4050 | Screen Router | |
 | `pwaCheckOnLaunch` | 4059 | Screen Router | |
 | `__testBridge` | 4099 | Test Bridge | |
-| `init` | 4116 | Init | |
+| `migrateFromFolio` | 4116 | Migration | ⚠️ Migrates localStorage keys (`folio_*` → `verte_*`) and IndexedDB (`folio_pwa` → `verte_pwa`). Must run before any storage reads. Uses `indexedDB.databases()` (not available in Safari — OK, targets web + Android only). Idempotent |
+| `init` | 4174 | Init | Calls `await migrateFromFolio()` before `cacheDOM()` |
 
 ---
 
@@ -188,11 +189,12 @@ transcriptWords[i] = { word: string, start: number, end: number }
 
 ## Storage Modes
 
-- **Browser mode** (`!IS_PWA`): metadata in localStorage (`folio_library_v2`), blobs in IndexedDB
-- **PWA mode** (`IS_PWA && CAN_FS`): files from disk via File System Access handles, progress in localStorage (`folio_pwa_progress_v1`)
+- **Browser mode** (`!IS_PWA`): metadata in localStorage (`verte_library_v2`), blobs in IndexedDB
+- **PWA mode** (`IS_PWA && CAN_FS`): files from disk via File System Access handles, progress in localStorage (`verte_pwa_progress_v1`)
 - `saveBookProgress()` routes correctly for both — always use it, not `saveLibrary()` directly
-- **Display prefs**: `folio_display_prefs_v1` (both modes)
-- **Relink dismiss (all books)**: `folio_relink_dismissed_all` in localStorage
+- **Display prefs**: `verte_display_prefs_v1` (both modes)
+- **Relink dismiss (all books)**: `verte_relink_dismissed_all` in localStorage
+- **Migration**: `migrateFromFolio()` runs once on first load after rebrand — copies all `folio_*` localStorage keys to `verte_*` and clones `folio_pwa` IndexedDB to `verte_pwa`, then deletes old entries
 
 ---
 
@@ -244,5 +246,5 @@ transcriptWords[i] = { word: string, start: number, end: number }
 ### Relink Dismiss
 - "Don't remind me" button on relink overlay → choice of "This book" / "All books" / Cancel
 - Per-book: `b.relinkDismissed = true` (persisted in library)
-- Global: `folio_relink_dismissed_all` localStorage flag
+- Global: `verte_relink_dismissed_all` localStorage flag
 - `showRelink()` checks both flags before displaying

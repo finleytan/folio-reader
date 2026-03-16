@@ -7,7 +7,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { clearStorage, gotoFolio, injectFixtureBook, openBook, getAppState } from '../helpers/folio.js';
+import { clearStorage, gotoVerte, injectFixtureBook, openBook, getAppState } from '../helpers/verte.js';
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -75,7 +75,7 @@ async function mockAudio(page, { currentTime, duration = 200, paused = true }) {
 // ── Setup ────────────────────────────────────────────────────
 
 test.beforeEach(async ({ page }) => {
-  await gotoFolio(page);
+  await gotoVerte(page);
   await clearStorage(page);
   await page.reload();
   await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });

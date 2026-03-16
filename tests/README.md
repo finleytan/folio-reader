@@ -1,6 +1,6 @@
-# Folio — Regression Tests
+# Verte — Regression Tests
 
-Playwright test suite for Folio. Runs against a local static server.
+Playwright test suite for Verte. Runs against a local static server.
 Does not touch or modify index.html.
 
 ## First-time setup
@@ -32,5 +32,5 @@ npm run test:ui
 
 ## Adding a new test
 
-Add a `.spec.js` file to `specs/`. Import helpers from `../helpers/folio.js`.
+Add a `.spec.js` file to `specs/`. Import helpers from `../helpers/verte.js`.
 Use `injectFixtureBook()` instead of loading real files.

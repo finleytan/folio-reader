@@ -1,6 +1,6 @@
 {
-  "name": "Folio — Audiobook & Ebook Reader",
-  "short_name": "Folio",
+  "name": "Verte — Audiobook & Ebook Reader",
+  "short_name": "Verte",
   "description": "Audiobook and ebook reader with transcript sync",
   "start_url": "./",
   "display": "standalone",

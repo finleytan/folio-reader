@@ -1,6 +1,6 @@
-# Folio
+# Verte
 
-Single-file HTML PWA (~4,142 lines). Audiobook/ebook reader with synced highlighting.
+Single-file HTML PWA (~4,203 lines). Audiobook/ebook reader with synced highlighting.
 
 ## CSS variable groups
 - Core palette: `--bg`, `--surface`, `--border`, `--text`, `--accent`, etc.
@@ -8,7 +8,7 @@ Single-file HTML PWA (~4,142 lines). Audiobook/ebook reader with synced highligh
 
 ## Before every edit
 
-1. Look up the function in the Function Index ([folio-context.md](folio-context.md)) to get its exact line number
+1. Look up the function in the Function Index ([verte-context.md](verte-context.md)) to get its exact line number
 2. Read that line range in index.html before writing any code
 3. Check any ⚠️ flags on that function in the index
 4. Run the syntax check after every change:
@@ -28,5 +28,5 @@ Single-file HTML PWA (~4,142 lines). Audiobook/ebook reader with synced highligh
 - Deliver changes as find/replace pairs only — never as diffs or patches
 - After delivering changes, always include the syntax check command
 
-Detailed context and function line numbers: [folio-context.md](folio-context.md)
-Deep-reference fragile areas: [folio-fragile.md](folio-fragile.md)
+Detailed context and function line numbers: [verte-context.md](verte-context.md)
+Deep-reference fragile areas: [verte-fragile.md](verte-fragile.md)

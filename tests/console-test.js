@@ -1,8 +1,8 @@
-// Folio Debug Panel — Console Test Runner
+// Verte Debug Panel — Console Test Runner
 // Open index.html?debug in a browser tab, then paste this entire script into DevTools console.
 // The panel does NOT need to be open before pasting — the script opens it automatically.
 
-(async function FolioTest() {
+(async function VerteTest() {
   'use strict';
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -27,7 +27,7 @@
   const origConfirm = window.confirm;
 
   // ── Guard ────────────────────────────────────────────────────────────────────
-  console.group('🛠 Folio Debug Panel Tests');
+  console.group('🛠 Verte Debug Panel Tests');
   if (!$id('dbg-panel')) {
     console.error('Panel not found. Open index.html?debug first.');
     console.groupEnd();
@@ -99,7 +99,7 @@
   window.confirm = origConfirm;
   ok('Clear All confirm — library empty', library.length === 0, library.length);
   ok('Clear All confirm — LS empty array', (() => {
-    try { return JSON.parse(localStorage.getItem('folio_library_v2') || '[]').length === 0; }
+    try { return JSON.parse(localStorage.getItem('verte_library_v2') || '[]').length === 0; }
     catch (e) { return false; }
   })());
 
@@ -251,26 +251,26 @@
   ok('Dump Prefs — no throw', prefsOk);
 
   // Clear LS — cancel: key intact
-  const lsBefore = localStorage.getItem('folio_library_v2');
+  const lsBefore = localStorage.getItem('verte_library_v2');
   window.confirm = () => false;
   click('dbg-clear-ls'); await ms(50);
   window.confirm = origConfirm;
-  ok('Clear LS cancel — key intact', localStorage.getItem('folio_library_v2') === lsBefore);
+  ok('Clear LS cancel — key intact', localStorage.getItem('verte_library_v2') === lsBefore);
 
   // Reset Prefs — cancel: key intact
-  const prefsBefore = localStorage.getItem('folio_display_prefs_v1');
+  const prefsBefore = localStorage.getItem('verte_display_prefs_v1');
   window.confirm = () => false;
   click('dbg-reset-prefs'); await ms(50);
   window.confirm = origConfirm;
   ok('Reset Prefs cancel — key intact',
-    localStorage.getItem('folio_display_prefs_v1') === prefsBefore);
+    localStorage.getItem('verte_display_prefs_v1') === prefsBefore);
 
   // Reset Prefs — accept
   window.confirm = () => true;
   click('dbg-reset-prefs'); await ms(100);
   window.confirm = origConfirm;
   ok('Reset Prefs confirm — key removed',
-    localStorage.getItem('folio_display_prefs_v1') === null);
+    localStorage.getItem('verte_display_prefs_v1') === null);
 
   // List IDB Blobs — no throw, output populated
   click('dbg-list-idb'); await ms(500);

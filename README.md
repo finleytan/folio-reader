@@ -1,8 +1,8 @@
-# 📖 Folio
+# 📖 Verte
 
 **An audiobook + ebook reader that runs in your browser — syncs your text to your audio word by word.**
 
-> 🔗 **[Open Folio →](finleytan.github.io/folio-reader/ )**
+> 🔗 **[Open Verte →](finleytan.github.io/folio-reader/ )**
 
 ---
 
@@ -21,7 +21,7 @@ Your library, reading positions, and settings are all saved in your browser auto
 
 Click **+ Add Book**, then either use the folder picker or drop files into the three slots individually.
 
-**Folder picker (easiest):** click **📁 Browse Folder**, select the folder containing your book files, and Folio auto-assigns everything. The title defaults to the folder name.
+**Folder picker (easiest):** click **📁 Browse Folder**, select the folder containing your book files, and Verte auto-assigns everything. The title defaults to the folder name.
 
 | Slot | Accepted formats |
 |---|---|
@@ -29,14 +29,14 @@ Click **+ Add Book**, then either use the folder picker or drop files into the t
 | 📄 Ebook | EPUB, TXT, HTML, HTM, XHTML, MD |
 | 📝 Transcript *(optional)* | Whisper JSON, plain TXT |
 
-> **Ebook only?** No problem — Folio will read it aloud using your browser's built-in text-to-speech. You can link an audio file later from inside the player.
+> **Ebook only?** No problem — Verte will read it aloud using your browser's built-in text-to-speech. You can link an audio file later from inside the player.
 
 ### On Android (PWA)
 
-Folio scans your library folder automatically. Keep one subfolder per book:
+Verte scans your library folder automatically. Keep one subfolder per book:
 
 ```
-Folio Library/
+Verte Library/
 ├── Dune/
 │   ├── Dune.mp3
 │   ├── Dune.epub
@@ -52,11 +52,11 @@ Each time you open the app, tap the one-tap permission prompt to reload your lib
 
 ## Text sync
 
-Folio uses the best sync method available for each book:
+Verte uses the best sync method available for each book:
 
 ### Whisper JSON — word-level highlight
 
-With a Whisper transcript, Folio highlights the exact word being spoken in real time as you listen. Generate one on your computer (requires Python and ffmpeg):
+With a Whisper transcript, Verte highlights the exact word being spoken in real time as you listen. Generate one on your computer (requires Python and ffmpeg):
 
 ```bash
 pip install openai-whisper
@@ -74,7 +74,7 @@ Drop the `.json` output file into the transcript slot. Use `--model large-v3` fo
 
 ### Plain text transcript — sentence sync
 
-Drop a `.txt` file of the narration into the transcript slot. Folio aligns it to the ebook by word overlap and estimates timing from the audio duration.
+Drop a `.txt` file of the narration into the transcript slot. Verte aligns it to the ebook by word overlap and estimates timing from the audio duration.
 
 ### No transcript — manual anchors
 

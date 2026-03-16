@@ -6,13 +6,13 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { clearStorage, gotoFolio, injectFixtureBook, openBook, getAppState } from '../helpers/folio.js';
+import { clearStorage, gotoVerte, injectFixtureBook, openBook, getAppState } from '../helpers/verte.js';
 
 // ── #39: Transcript pill removed from add-book modal ──────
 
 test.describe('#39 — Transcript pill removed', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -49,7 +49,7 @@ test.describe('#39 — Transcript pill removed', () => {
 
 test.describe('#11 — Toast container safe-area', () => {
   test('toast container uses env safe-area-inset-bottom', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const bottom = await page.evaluate(() => {
       const el = document.getElementById('toastContainer');
       return getComputedStyle(el).bottom;
@@ -63,7 +63,7 @@ test.describe('#11 — Toast container safe-area', () => {
 
 test.describe('#13 — Sync offset toast', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -103,7 +103,7 @@ test.describe('#13 — Sync offset toast', () => {
 
 test.describe('#14 — Icon drift fix', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -142,7 +142,7 @@ test.describe('#14 — Icon drift fix', () => {
 
 test.describe('#16 — Inline rename', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -203,7 +203,7 @@ test.describe('#16 — Inline rename', () => {
 
 test.describe('#12 — is-pwa body class', () => {
   test('IS_PWA detection does not add is-pwa in browser mode', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const hasPwaClass = await page.evaluate(() => document.body.classList.contains('is-pwa'));
     // In normal browser mode (not standalone), is-pwa should NOT be present
     expect(hasPwaClass).toBe(false);
@@ -216,7 +216,7 @@ test.describe('Error resilience', () => {
   test('no JS errors during rename flow', async ({ page }) => {
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -231,7 +231,7 @@ test.describe('Error resilience', () => {
   test('no JS errors during offset adjustment', async ({ page }) => {
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });

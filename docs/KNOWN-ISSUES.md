@@ -1,4 +1,4 @@
-# Folio Reader — Known Issues
+# Verte Reader — Known Issues
 
 Last updated: 2026-03-11
 Current version: v1.1

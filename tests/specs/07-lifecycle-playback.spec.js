@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { clearStorage, gotoFolio, injectFixtureBook, openBook, getAppState, nudge } from '../helpers/folio.js';
+import { clearStorage, gotoVerte, injectFixtureBook, openBook, getAppState, nudge } from '../helpers/verte.js';
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -7,10 +7,10 @@ import { clearStorage, gotoFolio, injectFixtureBook, openBook, getAppState, nudg
 // We inject a tiny <script> that exposes a reader function on window.
 async function injectStateReader(page) {
   await page.evaluate(() => {
-    if (window.__folioTestState) return;
+    if (window.__verteTestState) return;
     const s = document.createElement('script');
     s.textContent = `
-      window.__folioTestState = function() {
+      window.__verteTestState = function() {
         return {
           mediaState,
           ttsMode,
@@ -27,15 +27,15 @@ async function injectStateReader(page) {
           _programmaticScroll,
         };
       };
-      window.__folioSetMediaState = function(s) { mediaState = s; };
-      window.__folioSetScrollPaused = function(v) { scrollPaused = v; };
+      window.__verteSetMediaState = function(s) { mediaState = s; };
+      window.__verteSetScrollPaused = function(v) { scrollPaused = v; };
     `;
     document.head.appendChild(s);
   });
 }
 
 async function getInternalState(page) {
-  return page.evaluate(() => window.__folioTestState());
+  return page.evaluate(() => window.__verteTestState());
 }
 
 // Generate a tiny silent WAV (44-byte header + 1 second of silence at 8000Hz mono 8-bit)
@@ -108,7 +108,7 @@ async function injectAudioFixtureBook(page, opts = {}) {
     try { lib = JSON.parse(localStorage.getItem(lsKey)) || []; } catch (e) {}
     lib.push(book);
     localStorage.setItem(lsKey, JSON.stringify(lib));
-  }, { book, lsKey: 'folio_library_v2' });
+  }, { book, lsKey: 'verte_library_v2' });
 
   await page.reload();
   await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
@@ -137,7 +137,7 @@ async function stubSpeechSynthesis(page) {
 
 test.describe('Fix #1 & #3 — Page Lifecycle', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible' });
@@ -179,7 +179,7 @@ test.describe('Fix #1 & #3 — Page Lifecycle', () => {
     await page.evaluate(() => {
       // Manually wire the same logic the IS_PWA guard would have wired
       window.__testFreezeHandler = () => {
-        const s = window.__folioTestState();
+        const s = window.__verteTestState();
         if (s.ttsMode && s.mediaState === 'playing') {
           // Would call ttsPause() and set flag — verify the logic path exists
           window.__testFreezeTriggered = true;
@@ -205,7 +205,7 @@ test.describe('Fix #1 & #3 — Page Lifecycle', () => {
 
 test.describe('Fix #2 — State quad consistency (TTS)', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible' });
@@ -284,7 +284,7 @@ test.describe('Fix #2 — State quad consistency (TTS)', () => {
 
 test.describe('Fix #2 — State quad consistency (audio mode)', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible' });
@@ -325,7 +325,7 @@ test.describe('Fix #2 — State quad consistency (audio mode)', () => {
 
 test.describe('Fix #4 — Scroll timer separation', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible' });
@@ -403,7 +403,7 @@ test.describe('Fix #4 — Scroll timer separation', () => {
       return new Promise(resolve => {
         scrollToSent(5, true);
         // Check synchronously — _programmaticScroll should be true right now
-        const val = window.__folioTestState()._programmaticScroll;
+        const val = window.__verteTestState()._programmaticScroll;
         resolve(val);
       });
     });
@@ -418,7 +418,7 @@ test.describe('Fix #4 — Scroll timer separation', () => {
 
 test.describe('Fix #4 — _wordTick robustness', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible' });

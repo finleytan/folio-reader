@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { clearStorage, gotoFolio, injectFixtureBook, openBook } from '../helpers/folio.js';
+import { clearStorage, gotoVerte, injectFixtureBook, openBook } from '../helpers/verte.js';
 
 test.beforeEach(async ({ page }) => {
-  await gotoFolio(page);
+  await gotoVerte(page);
   await clearStorage(page);
   await page.reload();
   await page.waitForSelector('#library', { state: 'visible' });

@@ -1,8 +1,8 @@
-// Folio Service Worker — offline caching
+// Verte Service Worker — offline caching
 // Cache version: bump this string to force a cache refresh on update
-const CACHE = 'folio-v3';
+const CACHE = 'verte-v1';
 
-// Everything Folio needs to run offline
+// Everything Verte needs to run offline
 const PRECACHE = [
   './',
   './index.html',

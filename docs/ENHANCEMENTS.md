@@ -1,4 +1,4 @@
-# Folio Reader — Enhancement Ideas
+# Verte Reader — Enhancement Ideas
 
 Last updated: 2026-03-11
 

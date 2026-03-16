@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * prompts-manager.js — CLI tool for managing folio-prompts.html
+ * prompts-manager.js — CLI tool for managing verte-prompts.html
  *
  * Usage:
  *   node prompts-manager.js list [--status active|backlog|done|deferred]
@@ -12,7 +12,7 @@
  *   node prompts-manager.js show <num>         (print full prompt text for a card)
  *   node prompts-manager.js edit <num> --title "..." --desc "..." --prompt "..."  (update fields)
  *
- * All operations edit folio-prompts.html in place.
+ * All operations edit verte-prompts.html in place.
  * Run from the project root: node prompts-manager.js <command>
  */
 
@@ -20,7 +20,7 @@
 
 const fs   = require('fs');
 const path = require('path');
-const FILE = path.resolve(__dirname, 'folio-prompts.html');
+const FILE = path.resolve(__dirname, 'verte-prompts.html');
 
 // ── Argument parsing ──────────────────────────────────────────────────────────
 
@@ -457,7 +457,7 @@ function cmdEdit() {
 
 function showHelp() {
   console.log(`
-\x1b[1mfolio-prompts manager\x1b[0m  —  edit folio-prompts.html from the command line
+\x1b[1mverte-prompts manager\x1b[0m  —  edit verte-prompts.html from the command line
 
 \x1b[1mUsage:\x1b[0m
   node prompts-manager.js <command> [options]

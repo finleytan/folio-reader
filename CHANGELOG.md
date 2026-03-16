@@ -1,4 +1,23 @@
-# Folio Reader — Changelog
+# Verte Reader — Changelog
+
+---
+
+## v2.0 — 2026-03-16
+
+### Changed
+- App rebranded from "Folio" to "Verte" — all user-visible strings, page title, manifest name, MediaSession artist, install banner, onboarding, PWA setup text, and console message prefixes updated
+- All localStorage keys renamed from `folio_*` to `verte_*` (library, PWA progress, display prefs, sync hint, install dismissed, relink dismissed)
+- IndexedDB database renamed from `folio_pwa` to `verte_pwa`
+- Service worker cache key reset from `folio-v3` to `verte-v1`
+- Documentation files renamed (`folio-context.md` → `verte-context.md`, `folio-fragile.md` → `verte-fragile.md`, etc.)
+- Test helper renamed from `folio.js` to `verte.js`; `gotoFolio` → `gotoVerte` across all spec files
+- App version bumped to 2.0.0
+
+### Added
+- `migrateFromFolio()` — one-time migration function that copies all `folio_*` localStorage keys to `verte_*` and clones `folio_pwa` IndexedDB to `verte_pwa` on first load, preserving existing user data
+
+### Fixed
+- `console.log` in blob migration path changed to `console.warn` to comply with production code rules
 
 ---
 

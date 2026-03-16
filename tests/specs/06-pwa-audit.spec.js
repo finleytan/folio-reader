@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { clearStorage, gotoFolio, injectFixtureBook, openBook, nudge, getAppState } from '../helpers/folio.js';
+import { clearStorage, gotoVerte, injectFixtureBook, openBook, nudge, getAppState } from '../helpers/verte.js';
 
 // ────────────────────────────────────────────────────────────────
 // PWA Audit — tests for all 9 fixes from the PWA comprehensive audit.
@@ -10,17 +10,17 @@ import { clearStorage, gotoFolio, injectFixtureBook, openBook, nudge, getAppStat
 //   (a) patch IS_PWA to true inside page.evaluate(), or
 //   (b) call the underlying functions directly (savePwaProgress, etc.)
 //
-// "function" declarations in Folio's <script> ARE on window; "let/const"
+// "function" declarations in Verte's <script> ARE on window; "let/const"
 // variables are NOT.  We work around this with page.addInitScript or
 // page.evaluate wrappers.
 // ────────────────────────────────────────────────────────────────
 
-const PWA_PROG_KEY = 'folio_pwa_progress_v1';
-const LS_KEY = 'folio_library_v2';
+const PWA_PROG_KEY = 'verte_pwa_progress_v1';
+const LS_KEY = 'verte_library_v2';
 
 test.describe('Fix 1 — syncOffset saved in PWA progress', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible' });
@@ -49,7 +49,7 @@ test.describe('Fix 1 — syncOffset saved in PWA progress', () => {
       // Call flushPositionSync which writes to localStorage
       window.flushPositionSync();
 
-      const raw = localStorage.getItem('folio_library_v2');
+      const raw = localStorage.getItem('verte_library_v2');
       if (!raw) return null;
       const lib = JSON.parse(raw);
       return lib[0];
@@ -70,7 +70,7 @@ test.describe('Fix 1 — syncOffset saved in PWA progress', () => {
 
     // Read back from localStorage — browser mode saves via saveLibrary
     const saved = await page.evaluate(() => {
-      const raw = localStorage.getItem('folio_library_v2');
+      const raw = localStorage.getItem('verte_library_v2');
       return raw ? JSON.parse(raw)[0] : null;
     });
     expect(saved).not.toBeNull();
@@ -86,7 +86,7 @@ test.describe('Fix 1 — syncOffset saved in PWA progress', () => {
 
     // Verify stored value
     const stored = await page.evaluate(() => {
-      const raw = localStorage.getItem('folio_library_v2');
+      const raw = localStorage.getItem('verte_library_v2');
       return raw ? JSON.parse(raw)[0] : null;
     });
     expect(stored.syncOffset).toBe(-1.0);
@@ -98,7 +98,7 @@ test.describe('Fix 1 — syncOffset saved in PWA progress', () => {
     await page.evaluate(() => flushPositionSync());
 
     const stored = await page.evaluate(() => {
-      const raw = localStorage.getItem('folio_library_v2');
+      const raw = localStorage.getItem('verte_library_v2');
       return raw ? JSON.parse(raw)[0] : null;
     });
     expect(stored).not.toBeNull();
@@ -108,7 +108,7 @@ test.describe('Fix 1 — syncOffset saved in PWA progress', () => {
 
 test.describe('Fix 1 — syncOffset in PWA-simulated path', () => {
   test('savePwaProgress prog object contains syncOffset field', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible' });
@@ -131,7 +131,7 @@ test.describe('Fix 1 — syncOffset in PWA-simulated path', () => {
   });
 
   test('flushPositionSync PWA branch prog object contains syncOffset field', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible' });
@@ -160,7 +160,7 @@ test.describe('Fix 1 — syncOffset in PWA-simulated path', () => {
 
 test.describe('Fix 2 — Add Book card hidden in PWA mode', () => {
   test('Add Book card IS visible in browser (non-PWA) mode', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible' });
@@ -172,7 +172,7 @@ test.describe('Fix 2 — Add Book card hidden in PWA mode', () => {
 
   test('renderLib skips Add Book card when IS_PWA is true', async ({ page }) => {
     // Verify the code path: check that renderLib wraps add-card in if(!IS_PWA)
-    await gotoFolio(page);
+    await gotoVerte(page);
     const result = await page.evaluate(() => {
       const scriptText = document.querySelector('script').textContent;
       const renderLibStart = scriptText.indexOf('function renderLib()');
@@ -192,7 +192,7 @@ test.describe('Fix 2 — Add Book card hidden in PWA mode', () => {
 
 test.describe('Fix 3 — renameBook persists in PWA mode', () => {
   test('renameBook has PWA persistence branch writing to PWA_PROG_KEY', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const result = await page.evaluate(() => {
       const scriptText = document.querySelector('script').textContent;
       const fnStart = scriptText.indexOf('function renameBook(');
@@ -211,7 +211,7 @@ test.describe('Fix 3 — renameBook persists in PWA mode', () => {
   });
 
   test('pwaScanAndRender spread order lets saved title win over folder name', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const result = await page.evaluate(() => {
       const scriptText = document.querySelector('script').textContent;
       const scanStart = scriptText.indexOf('function pwaScanAndRender');
@@ -228,7 +228,7 @@ test.describe('Fix 3 — renameBook persists in PWA mode', () => {
 
 test.describe('Fix 4 — deleteBook in PWA mode shows informative toast', () => {
   test('deleteBook has PWA-specific toast about folder still existing', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const result = await page.evaluate(() => {
       const scriptText = document.querySelector('script').textContent;
       const fnStart = scriptText.indexOf('function deleteBook(');
@@ -246,7 +246,7 @@ test.describe('Fix 4 — deleteBook in PWA mode shows informative toast', () => 
   });
 
   test('deleteBook in browser mode still shows normal toast', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible' });
@@ -271,7 +271,7 @@ test.describe('Fix 4 — deleteBook in PWA mode shows informative toast', () => 
 
 test.describe('Fix 5 — safe-area-inset-bottom on seek-strip and tts-bar', () => {
   test('seek-strip CSS includes safe-area-inset-bottom in mobile query', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const result = await page.evaluate(() => {
       const styles = document.querySelector('style').textContent;
       // Find the mobile media query block
@@ -290,7 +290,7 @@ test.describe('Fix 5 — safe-area-inset-bottom on seek-strip and tts-bar', () =
   });
 
   test('opt-panel still has safe-area-inset-bottom (existing, not broken)', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const result = await page.evaluate(() => {
       const styles = document.querySelector('style').textContent;
       const mobileIdx = styles.indexOf('@media(max-width:639px)');
@@ -308,14 +308,14 @@ test.describe('Fix 5 — safe-area-inset-bottom on seek-strip and tts-bar', () =
 
 test.describe('Fix 6 — pwaOpenBook shows toast on handle failure', () => {
   test('audio handle catch block has showToast call', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const result = await page.evaluate(() => {
       const scriptText = document.querySelector('script').textContent;
       const fnStart = scriptText.indexOf('async function pwaOpenBook(');
       if (fnStart === -1) return { found: false };
       const fnBody = scriptText.slice(fnStart, fnStart + 1500);
       // Find the audio handle try/catch
-      const audioCatchIdx = fnBody.indexOf("'Folio: audio load failed'");
+      const audioCatchIdx = fnBody.indexOf("'Verte: audio load failed'");
       if (audioCatchIdx === -1) return { found: true, hasAudioToast: false };
       const afterCatch = fnBody.slice(audioCatchIdx, audioCatchIdx + 200);
       return {
@@ -330,13 +330,13 @@ test.describe('Fix 6 — pwaOpenBook shows toast on handle failure', () => {
   });
 
   test('ebook handle catch block has showToast call', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const result = await page.evaluate(() => {
       const scriptText = document.querySelector('script').textContent;
       const fnStart = scriptText.indexOf('async function pwaOpenBook(');
       if (fnStart === -1) return { found: false };
       const fnBody = scriptText.slice(fnStart, fnStart + 2000);
-      const ebookCatchIdx = fnBody.indexOf("'Folio: ebook load failed'");
+      const ebookCatchIdx = fnBody.indexOf("'Verte: ebook load failed'");
       if (ebookCatchIdx === -1) return { found: true, hasEbookToast: false };
       const afterCatch = fnBody.slice(ebookCatchIdx, ebookCatchIdx + 200);
       return {
@@ -351,13 +351,13 @@ test.describe('Fix 6 — pwaOpenBook shows toast on handle failure', () => {
 
 test.describe('Fix 7 — pwaOpenBook transcript handle failure nulls stale data', () => {
   test('transcript catch block logs warning and nulls data fields', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const result = await page.evaluate(() => {
       const scriptText = document.querySelector('script').textContent;
       const fnStart = scriptText.indexOf('async function pwaOpenBook(');
       if (fnStart === -1) return { found: false };
       const fnBody = scriptText.slice(fnStart, fnStart + 2000);
-      const txCatchIdx = fnBody.indexOf("'Folio: transcript load failed'");
+      const txCatchIdx = fnBody.indexOf("'Verte: transcript load failed'");
       if (txCatchIdx === -1) return { found: true, hasWarn: false };
       const afterCatch = fnBody.slice(txCatchIdx, txCatchIdx + 200);
       return {
@@ -376,7 +376,7 @@ test.describe('Fix 7 — pwaOpenBook transcript handle failure nulls stale data'
 
 test.describe('Fix 8 — pwaScanAndRender per-book error handling', () => {
   test('scan loop wraps pwaScanBookFolder in try/catch', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const result = await page.evaluate(() => {
       const scriptText = document.querySelector('script').textContent;
       const fnStart = scriptText.indexOf('async function pwaScanAndRender()');
@@ -391,7 +391,7 @@ test.describe('Fix 8 — pwaScanAndRender per-book error handling', () => {
         found: true,
         hasTryCatch: before.includes('try{'),
         catchPushesSkipped: fnBody.includes("skipped.push(name)"),
-        catchLogsWarning: fnBody.includes("'Folio: error scanning folder'"),
+        catchLogsWarning: fnBody.includes("'Verte: error scanning folder'"),
       };
     });
     expect(result.found).toBe(true);
@@ -403,7 +403,7 @@ test.describe('Fix 8 — pwaScanAndRender per-book error handling', () => {
 
 test.describe('Fix 9 — IS_PWA detection covers all display modes', () => {
   test('IS_PWA checks standalone, fullscreen, and minimal-ui', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     const result = await page.evaluate(() => {
       const scriptText = document.querySelector('script').textContent;
       // Find the IS_PWA declaration line
@@ -426,7 +426,7 @@ test.describe('Fix 9 — IS_PWA detection covers all display modes', () => {
   });
 
   test('IS_PWA is false in normal browser context (no regression)', async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     // In a regular Playwright browser tab, none of the display-mode queries
     // should match, so IS_PWA should be false and the library screen should
     // show the Add Book card.
@@ -441,7 +441,7 @@ test.describe('Fix 9 — IS_PWA detection covers all display modes', () => {
 
 test.describe('Regression — browser mode unchanged', () => {
   test.beforeEach(async ({ page }) => {
-    await gotoFolio(page);
+    await gotoVerte(page);
     await clearStorage(page);
     await page.reload();
     await page.waitForSelector('#library', { state: 'visible' });
@@ -472,7 +472,7 @@ test.describe('Regression — browser mode unchanged', () => {
     await openBook(page, 0);
     await page.evaluate(() => adjustOffset(1.0));
     const stored = await page.evaluate(() => {
-      const raw = localStorage.getItem('folio_library_v2');
+      const raw = localStorage.getItem('verte_library_v2');
       return raw ? JSON.parse(raw)[0] : null;
     });
     expect(stored.syncOffset).toBe(1.0);

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Folio</title>
+<title>Verte</title>
 <meta name="theme-color" id="themeColorMeta" content="#111318">
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -557,7 +557,7 @@ html,body,
 <div id="installBanner">
   <div style="font-size:22px;flex-shrink:0">📚</div>
   <div class="install-banner-text">
-    <div class="install-banner-title">Add Folio to your home screen</div>
+    <div class="install-banner-title">Add Verte to your home screen</div>
     <div>Read offline, full-screen, no browser bar</div>
   </div>
   <button class="btn btn-primary" style="font-size:12px;padding:7px 14px;flex-shrink:0" onclick="installPWA()">Install</button>
@@ -567,15 +567,15 @@ html,body,
 <!-- ════ PWA FIRST-RUN ════ -->
 <div id="pwaFirstRun" style="display:none">
   <div class="lib-header">
-    <div class="lib-logo">Folio</div>
+    <div class="lib-logo">Verte</div>
     <div class="lib-tagline">Audiobook &amp; Ebook Reader</div>
   </div>
   <div class="pwa-setup-card">
     <div class="pwa-setup-icon">📁</div>
     <h2 class="pwa-setup-title">Choose your library folder</h2>
-    <p class="pwa-setup-desc">Folio will scan this folder for books. Keep one subfolder per book — Folio detects the audio, ebook, and transcript automatically.</p>
+    <p class="pwa-setup-desc">Verte will scan this folder for books. Keep one subfolder per book — Verte detects the audio, ebook, and transcript automatically.</p>
     <div class="pwa-folder-example">
-      <div class="pfe-row"><span class="pfe-icon">📁</span><span class="pfe-name">Folio Library/</span></div>
+      <div class="pfe-row"><span class="pfe-icon">📁</span><span class="pfe-name">Verte Library/</span></div>
       <div class="pfe-row pfe-indent"><span class="pfe-icon">📁</span><span class="pfe-name">Dune/</span></div>
       <div class="pfe-row pfe-indent2"><span class="pfe-icon">🎧</span><span class="pfe-name">Dune.mp3</span></div>
       <div class="pfe-row pfe-indent2"><span class="pfe-icon">📄</span><span class="pfe-name">Dune.epub</span></div>
@@ -589,7 +589,7 @@ html,body,
 <div id="pwaRegrant" style="display:none">
   <div class="pwa-regrant-card">
     <div class="pwa-regrant-icon">📚</div>
-    <div class="pwa-regrant-title">Tap to open Folio</div>
+    <div class="pwa-regrant-title">Tap to open Verte</div>
     <p class="pwa-regrant-sub" id="pwaRegrantSub">One tap needed to reload your library. This is a browser security requirement.</p>
     <button class="btn btn-primary pwa-setup-btn" onclick="pwaRegrantAccess()">📂 Open Library</button>
     <p style="font-size:11px;color:var(--text3);margin-top:16px;max-width:280px">Chrome requires this once per session. Your books and progress are always saved.</p>
@@ -605,7 +605,7 @@ html,body,
     <button class="lib-settings-btn" onclick="toggleLibSettings()" aria-label="Settings">
       <svg class="ic-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     </button>
-    <div class="lib-logo">Folio</div>
+    <div class="lib-logo">Verte</div>
     <div class="lib-tagline">Audiobook &amp; Ebook Reader</div>
     <div id="libVersion" style="font-size:10px;color:var(--text3);margin-top:6px;letter-spacing:.04em"></div>
     <div id="pwaFolderBadge" style="display:none;margin-top:8px;font-size:11px;color:var(--text3);cursor:pointer" onclick="pwaFolderChangeTap()">📁 <span id="pwaFolderName"></span> · <span style="color:var(--accent)">Change</span></div>
@@ -733,7 +733,7 @@ html,body,
       <div class="op-tab-body" id="opTab-advanced" style="display:none">
         <div class="op-sec" style="color:var(--text3);font-size:12px;line-height:1.7">
           <div class="op-ttl">About</div>
-          <div>Folio — Audiobook &amp; Ebook Reader</div>
+          <div>Verte — Audiobook &amp; Ebook Reader</div>
           <div id="aboutVersion" style="opacity:.5;margin-top:2px"></div>
           <div style="margin-top:4px;opacity:.6">Settings are saved automatically.</div>
         </div>
@@ -902,7 +902,7 @@ html,body,
 <div class="modal-overlay" id="linkAudioModal" style="display:none" onclick="if(event.target===this)closeLinkAudioModal()" role="dialog" aria-modal="true" aria-label="Link audiobook">
   <div class="modal">
     <div class="modal-title">Link Audiobook</div>
-    <p class="modal-sub">Add an audiobook file to this book. Folio will switch from TTS to the audio file.</p>
+    <p class="modal-sub">Add an audiobook file to this book. Verte will switch from TTS to the audio file.</p>
     <div class="modal-body">
       <div class="dropzone" id="linkAudioDz" ondragover="laDzOver(event)" ondragleave="laDzLeave()" ondrop="laDzDrop(event)">
         <input type="file" id="linkAudioInput" accept=".mp3,.m4a,.m4b,.ogg,.wav,.aac,.flac,.opus" onchange="laFileChosen(event)">
@@ -979,7 +979,7 @@ html,body,
 'use strict';
 
 // ── App version ───────────────────────────────────
-const APP_VERSION = '1.19.0';
+const APP_VERSION = '2.0.0';
 
 // ══════════════════════════════════════════════════════
 // STATE
@@ -1019,12 +1019,12 @@ const CAN_FS = 'showDirectoryPicker' in window;
 const AUDIO_EXTS = new Set(['mp3','m4a','m4b','ogg','wav','aac','flac','opus']);
 const EBOOK_EXTS = new Set(['txt','epub','html','htm','md','xhtml']);
 const IMAGE_EXTS = new Set(['jpg','jpeg','png','webp','gif','avif']);
-const LS_KEY = 'folio_library_v2';
-const PWA_PROG_KEY = 'folio_pwa_progress_v1';
-const DISPLAY_PREFS_KEY = 'folio_display_prefs_v1';
-const IDB_NAME = 'folio_pwa'; const IDB_STORE = 'handles'; const IDB_BLOB_STORE = 'blobs';
+const LS_KEY = 'verte_library_v2';
+const PWA_PROG_KEY = 'verte_pwa_progress_v1';
+const DISPLAY_PREFS_KEY = 'verte_display_prefs_v1';
+const IDB_NAME = 'verte_pwa'; const IDB_STORE = 'handles'; const IDB_BLOB_STORE = 'blobs';
 const BLOB_FIELDS = ['ebookData','transcriptData','coverUrl'];
-const SYNC_HINT_KEY = 'folio_sync_hint_v1';
+const SYNC_HINT_KEY = 'verte_sync_hint_v1';
 
 // ══════════════════════════════════════════════════════
 // TOAST NOTIFICATIONS
@@ -1114,7 +1114,7 @@ function setupMediaSession(){
     const b = library[curBookIdx];
     navigator.mediaSession.metadata = new MediaMetadata({
       title: b.title,
-      artist: 'Folio',
+      artist: 'Verte',
       artwork: b.coverUrl ? [{ src: b.coverUrl }] : [],
     });
   }
@@ -1145,10 +1145,10 @@ function saveBookProgressDebounced(){
 // PAGE TITLE — shows playback state
 // ══════════════════════════════════════════════════════
 function updatePageTitle(){
-  if(curBookIdx < 0){ document.title = 'Folio'; return; }
+  if(curBookIdx < 0){ document.title = 'Verte'; return; }
   const b = library[curBookIdx];
   const icon = mediaState==='playing' ? '▶ ' : mediaState==='paused' ? '⏸ ' : '';
-  document.title = icon + b.title + ' — Folio';
+  document.title = icon + b.title + ' — Verte';
 }
 
 // ══════════════════════════════════════════════════════
@@ -1291,7 +1291,7 @@ window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault();
   _installPromptEvent = e;
   // Show banner only if not already installed and user hasn't dismissed it
-  if(localStorage.getItem('folio_install_dismissed')) return;
+  if(localStorage.getItem('verte_install_dismissed')) return;
   setTimeout(()=>{
     const banner = document.getElementById('installBanner');
     if(banner) banner.classList.add('show');
@@ -1301,14 +1301,14 @@ function installPWA(){
   if(!_installPromptEvent) return;
   _installPromptEvent.prompt();
   _installPromptEvent.userChoice.then(r=>{
-    if(r.outcome==='accepted') showToast('Installing Folio…','success');
+    if(r.outcome==='accepted') showToast('Installing Verte…','success');
     _installPromptEvent=null;
   });
   document.getElementById('installBanner').classList.remove('show');
 }
 function dismissInstall(){
   document.getElementById('installBanner').classList.remove('show');
-  localStorage.setItem('folio_install_dismissed','1');
+  localStorage.setItem('verte_install_dismissed','1');
 }
 
 
@@ -1386,9 +1386,9 @@ function saveLibrary(){
   try{
     const toSave=library.map(b=>_stripBlobs(b));
     localStorage.setItem(LS_KEY,JSON.stringify(toSave));
-  }catch(e){console.warn('Folio: meta save failed',e);}
+  }catch(e){console.warn('Verte: meta save failed',e);}
   // Track pending IDB blob write so we can await it on tab close
-  _pendingBlobSave=_saveBlobs().catch(e=>console.warn('Folio: blob save failed',e)).finally(()=>{_pendingBlobSave=null;});
+  _pendingBlobSave=_saveBlobs().catch(e=>console.warn('Verte: blob save failed',e)).finally(()=>{_pendingBlobSave=null;});
 }
 async function _saveBlobs(){
   const db=await idbOpen();
@@ -1450,12 +1450,12 @@ async function loadLibrary(){
         req.onerror=()=>res();
       });
     }));
-  }catch(e){ console.warn('Folio: blob load failed',e); }
+  }catch(e){ console.warn('Verte: blob load failed',e); }
   // One-time migration: if any book still has blobs in the metadata (old localStorage data),
   // push them to IDB and re-save a slim localStorage entry
   const needsMigrate=library.some(b=>BLOB_FIELDS.some(f=>b[f]!=null));
   if(needsMigrate){
-    console.log('Folio: migrating blobs from localStorage to IndexedDB…');
+    console.warn('Verte: migrating blobs from localStorage to IndexedDB…');
     try{ await _saveBlobs(); }catch(e){}
     try{
       const toSave=library.map(b=>_stripBlobs(b));
@@ -1641,7 +1641,7 @@ function renderLib(){
     if(library.length===0){
       const onboard=document.createElement('div');
       onboard.className='onboard-card';
-      onboard.innerHTML='<div class="onboard-title">Welcome to Folio</div><div class="onboard-body">Read ebooks with synced audio highlighting.<br>Add a book to get started — you\'ll need an audio file (.mp3, .m4b, etc.) and an ebook (.epub, .txt, .html, or .md).<br>Add a Whisper transcript (.json) for word-level sync.</div>';
+      onboard.innerHTML='<div class="onboard-title">Welcome to Verte</div><div class="onboard-body">Read ebooks with synced audio highlighting.<br>Add a book to get started — you\'ll need an audio file (.mp3, .m4b, etc.) and an ebook (.epub, .txt, .html, or .md).<br>Add a Whisper transcript (.json) for word-level sync.</div>';
       grid.appendChild(onboard);
     }
     const add=document.createElement('div');
@@ -3767,7 +3767,7 @@ function editBookReassign(e,type){
 // ══════════════════════════════════════════════════════
 function showRelink(i){
   const b=library[i];
-  if(localStorage.getItem('folio_relink_dismissed_all')||b.relinkDismissed) return;
+  if(localStorage.getItem('verte_relink_dismissed_all')||b.relinkDismissed) return;
   document.getElementById('relinkSub').textContent=`"${b.audioName}" needs to be re-selected. Your position and sync settings are saved.`;
   document.getElementById('relinkDropLbl').textContent=b.audioName;
   document.getElementById('relinkDropHint').textContent='Tap to browse or drop file here';
@@ -3787,7 +3787,7 @@ function rlDismissBook(){
   showToast('Re-link prompt hidden for this book');
 }
 function rlDismissAll(){
-  localStorage.setItem('folio_relink_dismissed_all','1');
+  localStorage.setItem('verte_relink_dismissed_all','1');
   closeRelink();
   showToast('Re-link prompt hidden for all books');
 }
@@ -3821,7 +3821,7 @@ function pwaFolderChangeTap(){
     +'<div class="folder-confirm-sub">Currently: '+xh(folderName)+'</div>'
     +'<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;display:flex;gap:10px;align-items:flex-start">'
     +'<span style="font-size:15px;flex-shrink:0">⚠️</span>'
-    +'<span style="font-size:12px;color:var(--text2);line-height:1.5">The Android folder picker will open. If you press back, you\'ll go to your home screen — just tap the <strong style="color:var(--text)">Folio icon</strong> to come back.</span>'
+    +'<span style="font-size:12px;color:var(--text2);line-height:1.5">The Android folder picker will open. If you press back, you\'ll go to your home screen — just tap the <strong style="color:var(--text)">Verte icon</strong> to come back.</span>'
     +'</div>'
     +'<button class="btn btn-primary" id="folderChangeGo" style="width:100%;justify-content:center">📂 Open folder picker</button>'
     +'<button class="btn btn-ghost" id="folderChangeCancel" style="width:100%;justify-content:center">Cancel</button>';
@@ -3836,7 +3836,7 @@ async function pwaPickFolder(){
     await idbSet('rootHandle',handle);
     await idbSet('rootName',handle.name);
     await pwaScanAndRender();
-  }catch(e){ if(e.name!=='AbortError') console.warn('Folio: folder pick failed',e); }
+  }catch(e){ if(e.name!=='AbortError') console.warn('Verte: folder pick failed',e); }
 }
 async function pwaRegrantAccess(){
   try{
@@ -3849,7 +3849,7 @@ async function pwaRegrantAccess(){
     } else {
       document.getElementById('pwaRegrantSub').textContent='Permission denied. Try again or choose a different folder.';
     }
-  }catch(e){ console.warn('Folio: regrant failed',e); pwaShowFirstRun(); }
+  }catch(e){ console.warn('Verte: regrant failed',e); pwaShowFirstRun(); }
 }
 async function pwaScanAndRender(){
   if(!pwaRootHandle) return;
@@ -3866,7 +3866,7 @@ async function pwaScanAndRender(){
     try{
       const book=await pwaScanBookFolder(name,entry);
       if(book) scanned.push(book); else skipped.push(name);
-    }catch(e){ console.warn('Folio: error scanning folder',name,e); skipped.push(name); }
+    }catch(e){ console.warn('Verte: error scanning folder',name,e); skipped.push(name); }
   }
   scanned.sort((a,b)=>a.title.localeCompare(b.title));
   const saved=getPwaProgress();
@@ -3998,7 +3998,7 @@ async function pwaOpenBook(i){
       const audioFile=await b.audioHandle.getFile();
       if(b.audioUrl) URL.revokeObjectURL(b.audioUrl);
       b.audioUrl=resolvedAudioUrl=URL.createObjectURL(audioFile);
-    }catch(e){ console.warn('Folio: audio load failed',e); showToast('Audio file not found \u2014 playing in TTS mode','error',4000); }
+    }catch(e){ console.warn('Verte: audio load failed',e); showToast('Audio file not found \u2014 playing in TTS mode','error',4000); }
   }
   if(b.transcriptHandle){
     try{
@@ -4006,7 +4006,7 @@ async function pwaOpenBook(i){
       b.transcriptData=await txFile.text();
       b.transcriptType=b.transcriptExt==='json'?'whisper':'txt';
     }catch(e){
-      console.warn('Folio: transcript load failed',e);
+      console.warn('Verte: transcript load failed',e);
       b.transcriptData=null; b.transcriptType=null;
     }
   }
@@ -4015,7 +4015,7 @@ async function pwaOpenBook(i){
     try{
       const imgFile=await b.coverHandle.getFile();
       b.coverUrl=URL.createObjectURL(imgFile);
-    }catch(e){ console.warn('Folio: cover load failed',e); }
+    }catch(e){ console.warn('Verte: cover load failed',e); }
   }
   configurePlayerForMode(b, resolvedAudioUrl, rate);
   await loadTranscriptData(b);
@@ -4025,7 +4025,7 @@ async function pwaOpenBook(i){
       const t=b.ebookType;
       if(t==='epub'){ const ab=await ebookFile.arrayBuffer(); b.ebookData=arrayBufferToBase64(ab); }
       else { b.ebookData=await ebookFile.text(); }
-    }catch(e){ console.warn('Folio: ebook load failed',e); showToast('Ebook file not found \u2014 check your library folder','error',4000); }
+    }catch(e){ console.warn('Verte: ebook load failed',e); showToast('Ebook file not found \u2014 check your library folder','error',4000); }
   }
   if(b.ebookData&&b.ebookType==='epub'&&!b.author){
     const meta=await extractEpubMeta(b.ebookData);
@@ -4111,9 +4111,68 @@ function __testBridge(action, value){
 }
 
 // ══════════════════════════════════════════════════════
+// MIGRATION (Folio → Verte)
+// ══════════════════════════════════════════════════════
+async function migrateFromFolio(){
+  try{
+    const LS_MAP = [
+      ['folio_library_v2','verte_library_v2'],
+      ['folio_pwa_progress_v1','verte_pwa_progress_v1'],
+      ['folio_display_prefs_v1','verte_display_prefs_v1'],
+      ['folio_sync_hint_v1','verte_sync_hint_v1'],
+      ['folio_install_dismissed','verte_install_dismissed'],
+      ['folio_relink_dismissed_all','verte_relink_dismissed_all'],
+    ];
+    for(const [oldK,newK] of LS_MAP){
+      if(localStorage.getItem(oldK)!==null && localStorage.getItem(newK)===null){
+        localStorage.setItem(newK, localStorage.getItem(oldK));
+        localStorage.removeItem(oldK);
+      }
+    }
+    if(typeof indexedDB.databases!=='function') return;
+    const dbs = await indexedDB.databases();
+    const oldExists = dbs.some(d=>d.name==='folio_pwa');
+    if(!oldExists) return;
+    const newExists = dbs.some(d=>d.name==='verte_pwa');
+    if(newExists){ indexedDB.deleteDatabase('folio_pwa'); return; }
+    const oldDb = await new Promise((res,rej)=>{
+      const req = indexedDB.open('folio_pwa',2);
+      req.onsuccess = e=>res(e.target.result);
+      req.onerror = ()=>rej(req.error);
+      req.onupgradeneeded = ()=>{};
+    });
+    const readStore = (db,name)=>new Promise((res,rej)=>{
+      if(!db.objectStoreNames.contains(name)){ res([]); return; }
+      const tx = db.transaction(name,'readonly');
+      const store = tx.objectStore(name);
+      const items = [];
+      const cur = store.openCursor();
+      cur.onsuccess = e=>{ const c=e.target.result; if(c){ items.push({key:c.key,value:c.value}); c.continue(); } else res(items); };
+      cur.onerror = ()=>rej(cur.error);
+    });
+    const handles = await readStore(oldDb,'handles');
+    const blobs = await readStore(oldDb,'blobs');
+    oldDb.close();
+    const newDb = await new Promise((res,rej)=>{
+      const req = indexedDB.open('verte_pwa',2);
+      req.onupgradeneeded = e=>{ const db=e.target.result; if(!db.objectStoreNames.contains('handles')) db.createObjectStore('handles'); if(!db.objectStoreNames.contains('blobs')) db.createObjectStore('blobs'); };
+      req.onsuccess = e=>res(e.target.result);
+      req.onerror = ()=>rej(req.error);
+    });
+    const tx = newDb.transaction(['handles','blobs'],'readwrite');
+    for(const {key,value} of handles) tx.objectStore('handles').put(value,key);
+    for(const {key,value} of blobs) tx.objectStore('blobs').put(value,key);
+    await new Promise((res,rej)=>{ tx.oncomplete=res; tx.onerror=()=>rej(tx.error); });
+    newDb.close();
+    indexedDB.deleteDatabase('folio_pwa');
+  }catch(e){ console.warn('Verte: migration from folio failed',e); }
+}
+
+// ══════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════
 async function init(){
+  await migrateFromFolio();
   try{ cacheDOM(); }catch(e){}
   const vEl = document.getElementById('libVersion');
   if(vEl) vEl.textContent = 'v' + APP_VERSION;
@@ -4133,12 +4192,12 @@ async function init(){
       renderLib();
     }
   }catch(e){
-    console.error('Folio init error:',e);
+    console.error('Verte init error:',e);
     // Fallback: just show library
     try{ showScreen('library'); renderLib(); }catch(e2){}
   }
 }
-init().catch(e=>{ console.error('Folio fatal:',e); try{ showScreen('library'); renderLib(); }catch(e2){} });
+init().catch(e=>{ console.error('Verte fatal:',e); try{ showScreen('library'); renderLib(); }catch(e2){} });
 </script>
 </body>
 </html>

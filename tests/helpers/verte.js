@@ -1,6 +1,6 @@
-// Folio — Shared Playwright test helpers
+// Verte — Shared Playwright test helpers
 //
-// Key constraint: Folio's variables (library, curSent, curWord, etc.) are
+// Key constraint: Verte's variables (library, curSent, curWord, etc.) are
 // declared with `let` in a classic <script>, so they are NOT on `window`.
 // Only `function` declarations (saveLibrary, renderLib, openBook, nudge, etc.)
 // are accessible via window.* from page.evaluate().
@@ -8,25 +8,25 @@
 // Strategy: write to localStorage directly for data injection, use the app's
 // own functions where available, and read DOM attributes for state inspection.
 
-const LS_KEY = 'folio_library_v2';
+const LS_KEY = 'verte_library_v2';
 
 const STORAGE_KEYS = [
-  'folio_library_v2',
-  'folio_pwa_progress_v1',
-  'folio_display_prefs_v1',
-  'folio_sync_hint_v1',
-  'folio_install_dismissed',
+  'verte_library_v2',
+  'verte_pwa_progress_v1',
+  'verte_display_prefs_v1',
+  'verte_sync_hint_v1',
+  'verte_install_dismissed',
 ];
 
-// Clear all Folio localStorage keys before each test
+// Clear all Verte localStorage keys before each test
 async function clearStorage(page) {
   await page.evaluate((keys) => {
     keys.forEach(k => localStorage.removeItem(k));
   }, STORAGE_KEYS);
 }
 
-// Navigate to Folio and wait for the library screen to be visible
-async function gotoFolio(page) {
+// Navigate to Verte and wait for the library screen to be visible
+async function gotoVerte(page) {
   await page.goto('/');
   await page.waitForSelector('#library', { state: 'visible', timeout: 8000 });
 }
@@ -118,7 +118,7 @@ async function getAppState(page) {
     // Read library from localStorage as a fallback
     let libLength = 0;
     try {
-      const raw = localStorage.getItem('folio_library_v2');
+      const raw = localStorage.getItem('verte_library_v2');
       if (raw) libLength = JSON.parse(raw).length;
     } catch (e) {}
 
@@ -144,4 +144,4 @@ async function nudge(page, n) {
   await page.waitForTimeout(100);
 }
 
-export { clearStorage, gotoFolio, injectFixtureBook, openBook, getAppState, nudge };
+export { clearStorage, gotoVerte, injectFixtureBook, openBook, getAppState, nudge };

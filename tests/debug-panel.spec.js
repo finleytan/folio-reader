@@ -1,4 +1,4 @@
-// Folio Debug Panel — Playwright Test Suite
+// Verte Debug Panel — Playwright Test Suite
 //
 // Setup:
 //   npm install -D @playwright/test
@@ -28,7 +28,7 @@ async function pollGlobal(page, fn, timeout = 5000) {
   return false;
 }
 
-test.describe('Folio Debug Panel', () => {
+test.describe('Verte Debug Panel', () => {
 
   test.beforeEach(async ({ page }) => {
     // Auto-accept all confirm dialogs unless the test overrides
@@ -101,7 +101,7 @@ test.describe('Folio Debug Panel', () => {
 
     expect(await g(page, 'library')).toHaveLength(0);
     const ls = await page.evaluate(() => {
-      try { return JSON.parse(localStorage.getItem('folio_library_v2') || '[]'); }
+      try { return JSON.parse(localStorage.getItem('verte_library_v2') || '[]'); }
       catch (e) { return []; }
     });
     expect(ls).toHaveLength(0);
@@ -348,12 +348,12 @@ test.describe('Folio Debug Panel', () => {
       await page.click('.dbg-tab[data-tab="persist"]');
       await page.waitForTimeout(100);
 
-      const before = await page.evaluate(() => localStorage.getItem('folio_library_v2'));
+      const before = await page.evaluate(() => localStorage.getItem('verte_library_v2'));
       page.removeAllListeners('dialog');
       page.on('dialog', d => d.dismiss());
       await page.click('#dbg-clear-ls');
       await page.waitForTimeout(50);
-      expect(await page.evaluate(() => localStorage.getItem('folio_library_v2'))).toBe(before);
+      expect(await page.evaluate(() => localStorage.getItem('verte_library_v2'))).toBe(before);
     });
 
     test('Clear LS — confirm removes key', async ({ page }) => {
@@ -366,18 +366,18 @@ test.describe('Folio Debug Panel', () => {
     test('Reset Prefs — confirm removes key and resets UI', async ({ page }) => {
       await page.click('#dbg-reset-prefs');
       await page.waitForTimeout(100);
-      const key = await page.evaluate(() => localStorage.getItem('folio_display_prefs_v1'));
+      const key = await page.evaluate(() => localStorage.getItem('verte_display_prefs_v1'));
       expect(key).toBeNull();
     });
 
     test('Reset Prefs — cancel leaves key intact', async ({ page }) => {
       // Set a pref so there is something to preserve
-      await page.evaluate(() => localStorage.setItem('folio_display_prefs_v1', '{"theme":"night"}'));
+      await page.evaluate(() => localStorage.setItem('verte_display_prefs_v1', '{"theme":"night"}'));
       page.removeAllListeners('dialog');
       page.on('dialog', d => d.dismiss());
       await page.click('#dbg-reset-prefs');
       await page.waitForTimeout(50);
-      expect(await page.evaluate(() => localStorage.getItem('folio_display_prefs_v1'))).not.toBeNull();
+      expect(await page.evaluate(() => localStorage.getItem('verte_display_prefs_v1'))).not.toBeNull();
     });
 
     test('List IDB Blobs — shows output', async ({ page }) => {
