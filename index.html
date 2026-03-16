@@ -442,6 +442,9 @@ html,body,
 .book-card,.ebook-scroll,.ebook-content{
   transition:background-color .2s,border-color .2s,color .2s;
 }
+.top-bar,.bottom-controls{transition:background-color .2s,border-color .2s,color .2s,opacity .35s ease;}
+body.is-pwa .bars-hidden .top-bar,
+body.is-pwa .bars-hidden .bottom-controls{opacity:0;pointer-events:none;}
 
 /* ── BUTTON PRESS FEEDBACK ── */
 .btn:active,.ic-btn:active,
@@ -1006,6 +1009,8 @@ let pwaRootHandle = null;
 let _contentClickHandler = null;
 let _wasPlayingBeforeFreeze = false;
 let _scrollPauseTimer = null;
+let _barsVisible = true;
+let _barIdleTimer = null;
 let folderFiles = [];
 let _hiddenBooks = [];
 let _fontBody = "'Lora',Georgia,serif";
@@ -1161,6 +1166,7 @@ let _sleepEndTime  = 0;
 let _sleepTickId   = null;
 
 function cycleSleepTimer(){
+  resetBarTimer();
   _sleepTimerIdx = (_sleepTimerIdx + 1) % SLEEP_OPTIONS.length;
   const mins = SLEEP_OPTIONS[_sleepTimerIdx];
   clearSleepTimer();
@@ -1241,6 +1247,7 @@ document.addEventListener('keydown', function(e){
   if(document.getElementById('player')?.style.display==='none') return;
   // Don't fire if a modal is open
   if(_modalIds.some(id=>{const el=document.getElementById(id);return el&&el.style.display!=='none';})) return;
+  resetBarTimer();
 
   switch(e.key){
     case ' ':
@@ -1860,6 +1867,7 @@ function pulseResumeSent(instant=false){
 }
 
 function goLib(){
+  clearBarTimer();
   flushPositionSync();
   stopScrollEngine();
   if(ttsMode) ttsStop();
@@ -1898,6 +1906,7 @@ function setMediaState(s){
   mediaState=s;
 }
 function togglePlay(){
+  resetBarTimer();
   if(ttsMode){ ttsSpeaking?ttsPause():ttsPlay(); return; }
   if(!_audio.src){ showToast('Enable TTS or link an audiobook to play'); return; }
   if(_audio.paused) mediaPlay(); else mediaPause();
@@ -1949,6 +1958,7 @@ function _updateSkipBtns(){
   }
 }
 function skip(s){
+  resetBarTimer();
   if(ttsMode){ const n=Math.abs(s)>=60?(s>0?5:-5):(s>0?1:-1); nudge(n); return; }
   _audio.currentTime=Math.max(0,Math.min(_audio.duration||0,_audio.currentTime+s));
 }
@@ -1960,6 +1970,7 @@ function changeSpeed(dir){
   setRate(next);
 }
 function cycleSpeed(){
+  resetBarTimer();
   const cur=ttsMode?(parseFloat($('rateCustom').value)||1):(_audio.playbackRate||1);
   const idx=RATE_STEPS.findIndex(r=>Math.abs(r-cur)<0.05);
   const next=RATE_STEPS[(idx===-1?2:idx+1)%RATE_STEPS.length];
@@ -2003,6 +2014,7 @@ function updateSpeedBadge(v){
   else{badge.textContent=v+'x';badge.classList.add('show');}
 }
 function setVol(v){
+  resetBarTimer();
   _audio.volume=v;
   const icon=v>0.5?'🔊':v>0?'🔉':'🔇';
   $('volIcon').textContent=icon;
@@ -2014,11 +2026,13 @@ function setVolBoth(v){
   $('volBar').value=v;
 }
 function toggleMute(){
+  resetBarTimer();
   _audio.muted=!_audio.muted;
   const icon=_audio.muted?'🔇':'🔊';
   $('volIcon').textContent=icon;
 }
 function toggleVolPop(){
+  resetBarTimer();
   const pop=$('volPop');
   const isOpen=pop.classList.toggle('open');
   if(isOpen){
@@ -2031,8 +2045,9 @@ function toggleVolPop(){
     document.addEventListener('pointerdown',close);
   }
 }
-function onSeekInput(v){ isSeeking=true; $('tCur').textContent=fmt(_audio.duration*v/100); }
+function onSeekInput(v){ resetBarTimer(); isSeeking=true; $('tCur').textContent=fmt(_audio.duration*v/100); }
 function onSeekChange(v){
+  resetBarTimer();
   if(isFinite(_audio.duration)) _audio.currentTime=_audio.duration*v/100;
   isSeeking=false;
   if(sentenceTimings.length){
@@ -2124,6 +2139,7 @@ function wireAudioEvents(){
     if(transcriptText&&!transcriptWords) buildTimingsFromPlainText();
   });
   audioEl.addEventListener('ended',function(){
+    clearBarTimer();
     setPlayBtnIcon(false);
     stopScrollEngine(); setMediaState('stopped'); saveBookProgress();
     releaseWakeLock();
@@ -2132,10 +2148,12 @@ function wireAudioEvents(){
     showToast('Progress saved','success');
   });
   audioEl.addEventListener('play',function(){
+    resetBarTimer();
     setPlayBtnIcon(true); setMediaState('playing'); startWordTicker();
     acquireWakeLock(); updateMediaSessionState(true); updatePageTitle();
   });
   audioEl.addEventListener('pause',function(){
+    clearBarTimer();
     stopWordTicker();
     if(mediaState==='playing'){ setPlayBtnIcon(false); setMediaState('paused'); releaseWakeLock(); }
     updateMediaSessionState(false); updatePageTitle();
@@ -2225,6 +2243,7 @@ function setTtsRate(v){
 }
 function ttsPlay(){
   if(ttsPaused&&ttsUtterance){ speechSynthesis.resume(); ttsSpeaking=true; ttsPaused=false;
+    resetBarTimer();
     setPlayBtnIcon(true); setMediaState('playing');
     acquireWakeLock(); updateMediaSessionState(true); updatePageTitle(); return; }
   if(curSent>=sentences.length) return;
@@ -2232,6 +2251,7 @@ function ttsPlay(){
   const gen=_ttsGeneration;
   setPlayBtnIcon(true); setMediaState('playing');
   ttsSpeaking=true;
+  resetBarTimer();
   acquireWakeLock(); updateMediaSessionState(true); updatePageTitle();
   const speak=()=>{
     if(mediaState!=='playing'||curSent>=sentences.length){ setPlayBtnIcon(false); setMediaState(ttsPaused?'paused':'stopped'); stopScrollEngine(); releaseWakeLock(); updatePageTitle(); return; }
@@ -2274,11 +2294,13 @@ function ttsPlay(){
   speak();
 }
 function ttsPause(){
+  clearBarTimer();
   speechSynthesis.pause(); ttsPaused=true; ttsSpeaking=false; setMediaState('paused');
   setPlayBtnIcon(false); stopScrollEngine();
   releaseWakeLock(); updateMediaSessionState(false); updatePageTitle();
 }
 function ttsStop(){
+  clearBarTimer();
   speechSynthesis.cancel(); ttsSpeaking=false; ttsPaused=false; ttsUtterance=null;
   setMediaState('stopped'); setPlayBtnIcon(false);
   stopScrollEngine(); releaseWakeLock(); updateMediaSessionState(false); updatePageTitle();
@@ -2424,6 +2446,7 @@ function setHighlightMode(mode){
 // TOC
 // ══════════════════════════════════════════════════════
 function toggleToc(){
+  resetBarTimer();
   tocOpen=!tocOpen;
   document.getElementById('tocSidebar').classList.toggle('collapsed',!tocOpen);
   document.getElementById('tocOverlay').classList.toggle('visible',tocOpen);
@@ -2490,6 +2513,7 @@ function updateTocActive(){
 // OPTIONS PANEL
 // ══════════════════════════════════════════════════════
 function toggleOpts(){
+  resetBarTimer();
   document.getElementById('optPanel').classList.toggle('open');
 }
 function switchOptTab(name,btn){
@@ -2554,12 +2578,57 @@ function toggleOpInfo(el){ const parent=el.closest('.op-ttl')||el.closest('.op-r
     if(_scrollRaf) return; // already queued
     _scrollRaf=requestAnimationFrame(()=>{
       _scrollRaf=null;
+      resetBarTimer();
       if(!autoScroll) return;
       scrollPaused=true;
       if(_scrollPauseTimer) clearTimeout(_scrollPauseTimer);
       _scrollPauseTimer=setTimeout(()=>{ scrollPaused=false; _scrollPauseTimer=null; },2000);
     });
   },{passive:true});
+})();
+
+// ── Auto-hide bars (PWA only) ──
+function _shouldAutoHide(){
+  if(!IS_PWA) return false;
+  if(mediaState!=='playing'&&!(ttsMode&&ttsSpeaking)) return false;
+  if(document.getElementById('optPanel').classList.contains('open')) return false;
+  if(tocOpen) return false;
+  if(_modalIds.some(function(id){var el=document.getElementById(id);return el&&el.style.display!=='none';})) return false;
+  if(document.getElementById('relinkOverlay').style.display!=='none') return false;
+  if(document.getElementById('player').style.display==='none') return false;
+  return true;
+}
+function showBars(){
+  if(!IS_PWA||_barsVisible) return;
+  _barsVisible=true;
+  document.getElementById('player').classList.remove('bars-hidden');
+}
+function hideBars(){
+  if(!IS_PWA||!_barsVisible) return;
+  if(!_shouldAutoHide()) return;
+  _barsVisible=false;
+  document.getElementById('player').classList.add('bars-hidden');
+}
+function resetBarTimer(){
+  if(!IS_PWA) return;
+  showBars();
+  if(_barIdleTimer){clearTimeout(_barIdleTimer);_barIdleTimer=null;}
+  if(_shouldAutoHide()){_barIdleTimer=setTimeout(hideBars,6000);}
+}
+function clearBarTimer(){
+  if(!IS_PWA) return;
+  if(_barIdleTimer){clearTimeout(_barIdleTimer);_barIdleTimer=null;}
+  showBars();
+}
+(function(){
+  if(!IS_PWA) return;
+  var scroll=document.getElementById('eScroll');
+  if(!scroll) return;
+  scroll.addEventListener('dblclick',function(e){
+    if(e.target.closest('a,button,input,select,textarea')) return;
+    if(_barsVisible){if(_shouldAutoHide()) hideBars();}
+    else{resetBarTimer();}
+  });
 })();
 
 // Close opts panel when clicking outside
@@ -4108,6 +4177,8 @@ function __testBridge(action, value){
   if(action==='setAutoScroll'){ autoScroll=value; return; }
   if(action==='setIsSeeking'){ isSeeking=value; return; }
   if(action==='getSyncOffset') return syncOffset;
+  if(action==='getBarsVisible') return _barsVisible;
+  if(action==='resetBarTimer'){ resetBarTimer(); return; }
 }
 
 // ══════════════════════════════════════════════════════
