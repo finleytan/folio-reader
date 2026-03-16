@@ -2,17 +2,25 @@
 
 ---
 
-## v2.2 — 2026-03-16
+## v2.3 — 2026-03-16
 
 ### Added
-- Screen orientation lock setting in Display options (PWA only) — choose Auto, Portrait, or Landscape
-- Preference persisted in display prefs and restored on app load
+- Screen orientation lock setting in Display options (PWA only) — Auto, Portrait, or Landscape pills with info text explaining fullscreen requirement
+- Orientation preference persisted in display prefs and restored on app load
 
 ### Changed
-- Manifest default orientation set to `portrait` (was `any`)
-- Auto-hide bars: manual scroll no longer reappears bars; single tap on reading area shows bars when hidden
-- Bars now fully collapse (height transitions to 0) so reading area expands to fill the screen
-- App version bumped to 2.2.0
+- Transcript banner split into two elements — syncing/loading/ready/warn banners stay below top bar; "no transcript" warning moved above bottom media controls
+- Auto-hide bars: manual scroll no longer shows bars; single tap on reading area shows bars when hidden
+- Bars fully collapse (height:0) so reading area expands to fill the screen
+- Orientation lock enters fullscreen mode (Android requirement); reverts to auto on fullscreen exit
+- Manifest orientation set to `any` (runtime API handles locking)
+- App version bumped to 2.3.0
+
+### Fixed
+- Auto-hide CSS broken after theme change — removed redundant `body.is-pwa` scoping
+- Auto-hide timer never starts — `resetBarTimer()` was called before `setMediaState('playing')`
+- Orientation lock requires fullscreen on Android — now enters fullscreen before locking
+- PWA does not pick up updates until manually closed — added `controllerchange` auto-reload
 
 ---
 
