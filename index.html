@@ -1597,7 +1597,6 @@ function loadDisplayPrefs(){
       if(p.orientation&&p.orientation!=='auto'){
         document.querySelectorAll('[id^=orientPill]').forEach(b=>b.classList.remove('active'));
         document.getElementById('orientPill-'+p.orientation)?.classList.add('active');
-        try{screen.orientation.lock(p.orientation).catch(function(){});}catch(e){}
       }
     }
     updateThemeColor();
@@ -2579,13 +2578,19 @@ function setAlign(a,btn){
 function setOrientation(mode,btn){
   document.querySelectorAll('[id^=orientPill]').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  try{
-    if(typeof screen.orientation.lock==='function'){
-      if(mode==='auto'){ screen.orientation.unlock(); showToast('Unlocked','success'); }
-      else screen.orientation.lock(mode).then(function(){showToast('Locked to '+mode,'success');}).catch(function(err){showToast(err.name+': '+err.message,'warn');});
-    }else{showToast('lock API missing','warn');}
-  }catch(e){showToast('Error: '+e.message,'warn');}
   saveDisplayPrefs();
+  if(typeof screen.orientation.lock!=='function') return;
+  if(mode==='auto'){
+    try{screen.orientation.unlock();}catch(e){}
+    if(document.fullscreenElement) document.exitFullscreen().catch(function(){});
+    return;
+  }
+  var el=document.documentElement;
+  if(el.requestFullscreen){
+    el.requestFullscreen().then(function(){
+      return screen.orientation.lock(mode);
+    }).catch(function(){});
+  }
 }
 function setDefaultWpmFromSlider(v){ wpm=parseInt(v); document.getElementById('defWpmInput').value=wpm; updateWpmLabel(); saveDisplayPrefs(); }
 function setDefaultWpmFromInput(v){ wpm=Math.max(30,Math.min(600,parseInt(v)||150)); document.getElementById('defWpmSlider').value=wpm; document.getElementById('defWpmInput').value=wpm; updateWpmLabel(); saveDisplayPrefs(); }
