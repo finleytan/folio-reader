@@ -1,6 +1,6 @@
 # Folio
 
-Single-file HTML PWA (~4,078 lines). Audiobook/ebook reader with synced highlighting.
+Single-file HTML PWA (~4,142 lines). Audiobook/ebook reader with synced highlighting.
 
 ## CSS variable groups
 - Core palette: `--bg`, `--surface`, `--border`, `--text`, `--accent`, etc.
@@ -19,7 +19,7 @@ Single-file HTML PWA (~4,078 lines). Audiobook/ebook reader with synced highligh
 ## Hard rules
 
 - Single file only — no frameworks, no build step, no splitting index.html
-- Playback state: always call all four together — setPlayBtnIcon, setMediaState, acquireWakeLock/releaseWakeLock, updatePageTitle
+- Playback state: always call all four together — setPlayBtnIcon, setMediaState, acquireWakeLock/releaseWakeLock, updatePageTitle (exception: `mediaPlay` delegates to the `play` event handler — see fragile #37)
 - Never assign `_audio.src` outside `configurePlayerForMode`
 - Always call `saveBookProgress()` not `saveLibrary()` from playback code
 - `IS_PWA` branch is the dividing line — never fix a browser-mode bug in PWA code or vice versa

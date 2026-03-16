@@ -142,6 +142,7 @@ body.theme-hclight{
 .fp-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:600;margin-bottom:2px;}
 .fp-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .fp-name.empty{color:var(--text3);font-style:italic;font-weight:400;}
+.fp-types{font-size:9px;color:var(--text3);opacity:.7;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .fp-clear{width:26px;height:26px;border-radius:5px;background:transparent;border:none;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:background-color .15s,border-color .15s,color .15s;}
 .fp-clear:hover{background:var(--surface2);color:var(--text);}
 .file-pill.clickable{cursor:pointer;}
@@ -277,6 +278,7 @@ body.theme-hclight{
 .tx-banner.ready{display:flex;background:#0a2a18;border-bottom:2px solid #28a060;color:#50e888;animation:tx-ready-in .5s ease;}
 .tx-banner.ready::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#28a060,#50e888,#28a060);opacity:.6;}
 @keyframes tx-ready-in{0%{background:#1a6838;border-bottom-color:#50e888;}50%{background:#124a28;}100%{background:#0a2a18;}}
+.tx-banner.warn{display:flex;background:var(--amber-bg);border-bottom:1px solid var(--amber-border);color:var(--amber-text);}
 .tx-banner.error{display:flex;background:#2a0a08;border-bottom:1px solid #5a2010;color:#e06040;}
 .tx-banner.notx{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:10px 14px;background:var(--amber-bg);border-bottom:1px solid var(--amber-border);}
 .tx-banner.notx .notx-top{display:flex;align-items:center;gap:8px;}
@@ -833,28 +835,28 @@ html,body,
         <div class="file-pill clickable" id="audioPill" onclick="pillClick(event,'audioInput')"
           ondragover="dzOver(event,'audioPill')" ondragleave="dzLeave('audioPill')" ondrop="dzDrop(event,'audio')">
           <span class="fp-icon">🎧</span>
-          <div class="fp-info"><div class="fp-label">Audio File</div><div class="fp-name empty" id="audioName">No file selected</div></div>
+          <div class="fp-info"><div class="fp-label">Audio File</div><div class="fp-name empty" id="audioName">No file selected</div><div class="fp-types">mp3, m4a, m4b, ogg, wav, aac, flac, opus</div></div>
           <input type="file" id="audioInput" accept=".mp3,.m4a,.m4b,.ogg,.wav,.aac,.flac,.opus" style="display:none" onchange="fileChosen(event,'audio')">
           <button class="fp-clear" onclick="clearSlot('audio')" title="Clear">✕</button>
         </div>
         <div class="file-pill clickable" id="ebookPill" onclick="pillClick(event,'ebookInput')"
           ondragover="dzOver(event,'ebookPill')" ondragleave="dzLeave('ebookPill')" ondrop="dzDrop(event,'ebook')">
           <span class="fp-icon">📄</span>
-          <div class="fp-info"><div class="fp-label">Ebook</div><div class="fp-name empty" id="ebookName">No file selected</div></div>
+          <div class="fp-info"><div class="fp-label">Ebook</div><div class="fp-name empty" id="ebookName">No file selected</div><div class="fp-types">epub, txt, html, htm, md, xhtml</div></div>
           <input type="file" id="ebookInput" accept=".txt,.epub,.html,.htm,.md,.xhtml" style="display:none" onchange="fileChosen(event,'ebook')">
           <button class="fp-clear" onclick="clearSlot('ebook')" title="Clear">✕</button>
         </div>
         <div class="file-pill clickable" id="transcriptPill" onclick="pillClick(event,'transcriptInput')"
           ondragover="dzOver(event,'transcriptPill')" ondragleave="dzLeave('transcriptPill')" ondrop="dzDrop(event,'transcript')">
           <span class="fp-icon">📝</span>
-          <div class="fp-info"><div class="fp-label">Transcript (optional)</div><div class="fp-name empty" id="transcriptName">No file selected</div></div>
+          <div class="fp-info"><div class="fp-label">Transcript (optional)</div><div class="fp-name empty" id="transcriptName">No file selected</div><div class="fp-types">json, txt</div></div>
           <input type="file" id="transcriptInput" accept=".json,.txt" style="display:none" onchange="fileChosen(event,'transcript')">
           <button class="fp-clear" onclick="clearSlot('transcript')" title="Clear">✕</button>
         </div>
         <div class="file-pill clickable" id="coverPill" onclick="pillClick(event,'coverInput')"
           ondragover="dzOver(event,'coverPill')" ondragleave="dzLeave('coverPill')" ondrop="dzDrop(event,'cover')">
           <span class="fp-icon">🖼️</span>
-          <div class="fp-info"><div class="fp-label">Cover Image (optional)</div><div class="fp-name empty" id="coverName">No file selected</div></div>
+          <div class="fp-info"><div class="fp-label">Cover Image (optional)</div><div class="fp-name empty" id="coverName">No file selected</div><div class="fp-types">jpg, jpeg, png, webp, gif, avif</div></div>
           <input type="file" id="coverInput" accept=".jpg,.jpeg,.png,.webp,.gif,.avif" style="display:none" onchange="fileChosen(event,'cover')">
           <button class="fp-clear" onclick="clearSlot('cover')" title="Clear">✕</button>
         </div>
@@ -977,7 +979,7 @@ html,body,
 'use strict';
 
 // ── App version ───────────────────────────────────
-const APP_VERSION = '1.18.0';
+const APP_VERSION = '1.19.0';
 
 // ══════════════════════════════════════════════════════
 // STATE
@@ -1334,7 +1336,7 @@ function setPlayBtnIcon(playing){
 
 
 function xh(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function fmt(s){ if(!isFinite(s)||s<0)return '0:00'; const m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
+function fmt(s){ if(!isFinite(s)||s<0)return '0:00'; const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=Math.floor(s%60); if(h>0) return h+':'+(m<10?'0':'')+m+':'+(sec<10?'0':'')+sec; return m+':'+(sec<10?'0':'')+sec; }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
 
 // ══════════════════════════════════════════════════════
@@ -1802,8 +1804,11 @@ function configurePlayerForMode(b, audioSrc, rate){
     _audio.addEventListener('loadedmetadata', function restore(){
       if(b.audioTime){
         _audio.currentTime = b.audioTime;
-      } else if(curSent > 0 && sentenceTimings && sentenceTimings[curSent]){
-        _audio.currentTime = Math.max(0, sentenceTimings[curSent].start - syncOffset);
+      } else {
+        const si = curSent > 0 ? curSent : (b.curSent||0);
+        if(si > 0 && sentenceTimings && sentenceTimings[si]){
+          _audio.currentTime = Math.max(0, sentenceTimings[si].start - syncOffset);
+        }
       }
       _audio.removeEventListener('loadedmetadata', restore);
     });
@@ -1883,7 +1888,10 @@ function seekAudioToSentence(){
   if(ttsMode||curSent<=0||!sentenceTimings) return;
   let t=sentenceTimings[curSent];
   if(!t) for(let i=curSent-1;i>=0;i--){ if(sentenceTimings[i]){t=sentenceTimings[i];break;} }
-  if(t) _audio.currentTime=t.start-syncOffset;
+  if(!t) return;
+  const seekTo=Math.max(0,t.start-syncOffset);
+  if(_audio.readyState>=1){ _audio.currentTime=seekTo; }
+  else { _audio.addEventListener('loadedmetadata',function once(){ _audio.currentTime=seekTo; _audio.removeEventListener('loadedmetadata',once); }); }
 }
 
 function setMediaState(s){
@@ -1898,11 +1906,7 @@ function mediaPlay(){
   if(ttsMode){ ttsPlay(); return; }
   if(!_audio.src){ return; }
   _audio.play().then(()=>{
-    setPlayBtnIcon(true);
-    setMediaState('playing'); startScrollEngine(); startWordTicker();
     acquireWakeLock();
-    updateMediaSessionState(true);
-    updatePageTitle();
   }).catch(()=>{
     setPlayBtnIcon(false);
     setMediaState('paused');
@@ -2649,15 +2653,15 @@ function setBannerState(state,text,detail){
     msg.style.display='';
     det.style.display='';
     if(state==='loading'||state==='syncing'){ icon.style.display='none'; spinner.style.display=''; icon.textContent=''; }
-    else { icon.style.display=''; spinner.style.display='none'; icon.textContent=state==='ready'?'✓':'📝'; icon.className=state==='ready'?'tx-check':''; }
+    else { icon.style.display=''; spinner.style.display='none'; icon.textContent=state==='ready'?'✓':state==='warn'?'⚠':'📝'; icon.className=state==='ready'?'tx-check':''; }
     msg.textContent=text||'';
     det.textContent=detail||'';
   }
-  if(state==='ready'){
+  if(state==='ready'||state==='warn'){
     _bannerHideTimer=setTimeout(()=>{
       b.classList.add('tx-fade');
       setTimeout(()=>{ setBannerState('hidden'); b.classList.remove('tx-fade'); },300);
-    },12000);
+    },state==='warn'?20000:12000);
   }
 }
 // wordTimings[sentIdx] = [{start,end}] one entry per word span in sentence
@@ -2869,9 +2873,13 @@ function getTimingWorker(){
     if(d.wordTimings) wordTimings=d.wordTimings;
     transcriptWords=null; transcriptText=null;
     var matched=sentenceTimings.filter(Boolean).length;
-    setBannerState('ready','Transcript synced · Ready to play',
-      matched+' sentences matched ('+Math.round(matched/sentences.length*100)+'%)');
+    var matchPct=Math.round(matched/sentences.length*100);
+    setBannerState(matchPct<75?'warn':'ready',
+      matchPct<75?'Low transcript match \u2014 audio sync may be unreliable':'Transcript synced \xb7 Ready to play',
+      matched+' sentences matched ('+matchPct+'%)');
     if(d.type==='buildSentenceTimings') showSyncHintOnce();
+    if(!ttsMode&&curSent>0&&isFinite(_audio.currentTime)&&_audio.currentTime<0.5) seekAudioToSentence();
+    else _resyncAndHL();
   };
   _timingWorker.onerror=function(err){
     console.warn('Timing worker error, falling back to sync:',err);
@@ -3071,9 +3079,13 @@ async function _buildSentenceTimingsSync(){
     if(si%YIELD_EVERY===0) await yieldToMain();
   }
   const matched=sentenceTimings.filter(Boolean).length;
-  setBannerState('ready','Transcript synced · Ready to play',
-    matched+' sentences matched ('+Math.round(matched/sentences.length*100)+'%)');
+  const matchPct=Math.round(matched/sentences.length*100);
+  setBannerState(matchPct<75?'warn':'ready',
+    matchPct<75?'Low transcript match \u2014 audio sync may be unreliable':'Transcript synced \xb7 Ready to play',
+    matched+' sentences matched ('+matchPct+'%)');
   transcriptWords=null;
+  if(!ttsMode&&curSent>0&&isFinite(_audio.currentTime)&&_audio.currentTime<0.5) seekAudioToSentence();
+  else _resyncAndHL();
 }
 async function _buildTimingsFromPlainTextSync(){
   setBannerState('syncing','Syncing transcript…','Estimating timing from plain text');
@@ -3100,8 +3112,12 @@ async function _buildTimingsFromPlainTextSync(){
     if(best>=0&&bestScore>0.35) sentenceTimings[si]=txTimings[best];
   });
   const matched=sentenceTimings.filter(Boolean).length;
-  setBannerState('ready','Transcript synced · Ready to play',
-    matched+' sentences matched ('+Math.round(matched/sentences.length*100)+'%)');
+  const matchPct=Math.round(matched/sentences.length*100);
+  setBannerState(matchPct<75?'warn':'ready',
+    matchPct<75?'Low transcript match \u2014 audio sync may be unreliable':'Transcript synced \xb7 Ready to play',
+    matched+' sentences matched ('+matchPct+'%)');
+  if(!ttsMode&&curSent>0&&isFinite(_audio.currentTime)&&_audio.currentTime<0.5) seekAudioToSentence();
+  else _resyncAndHL();
 }
 function similarity(a,b){
   const wa=new Set(a.split(/\s+/).filter(Boolean));
@@ -3218,6 +3234,7 @@ async function loadEbook(book,onDone){
     updateHL();updateProg();saveBookProgress();
   };
   content.addEventListener('click',_contentClickHandler);
+  if(curBookIdx>=0) library[curBookIdx].totalSents=sentences.length||1;
   buildToc();
   if(transcriptWords||transcriptText) await buildSentenceTimings();
   if(onDone) onDone();
@@ -3326,6 +3343,28 @@ async function parseEpub(data){
     }
     return out.length?out:[{type:'text',text:'EPUB parsed but no content found.'}];
   }catch(e){ return [{type:'text',text:'EPUB parse error: '+e.message}]; }
+}
+async function extractEpubMeta(data){
+  try{
+    if(typeof JSZip==='undefined') await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+    if(typeof JSZip==='undefined') await loadScript('https://unpkg.com/jszip@3.10.1/dist/jszip.min.js');
+    if(typeof JSZip==='undefined') return {title:null,author:null};
+    let arrayBuffer;
+    if(typeof data==='string'){
+      const bin=atob(data.includes(',')?data.split(',')[1]:data);
+      const bytes=new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+      arrayBuffer=bytes.buffer;
+    } else { arrayBuffer=data; }
+    const zip=await JSZip.loadAsync(arrayBuffer);
+    const containerXml=await zip.file('META-INF/container.xml').async('string');
+    const rootPath=containerXml.match(/full-path="([^"]+\.opf)"/)?.[1];
+    if(!rootPath) return {title:null,author:null};
+    const opfXml=await zip.file(rootPath).async('string');
+    const title=opfXml.match(/<dc:title[^>]*>([\s\S]*?)<\/dc:title>/i)?.[1]?.trim()||null;
+    const author=opfXml.match(/<dc:creator[^>]*>([\s\S]*?)<\/dc:creator>/i)?.[1]?.trim()||null;
+    return {title,author};
+  }catch(e){ return {title:null,author:null}; }
 }
 function loadScript(src){ return new Promise(res=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=res; document.head.appendChild(s); }); }
 function arrayBufferToBase64(buf){
@@ -3448,13 +3487,14 @@ function folderAssign(idx,slot){
   const btn=document.getElementById(`ffra-${idx}-${slot}`);
   if(btn) btn.classList.add('assigned');
 }
-function addBook(){
+async function addBook(){
   if(!upData.audio&&!upData.ebook) return;
-  const title=document.getElementById('bookTitleInput').value.trim()||'Untitled Book';
+  let title=document.getElementById('bookTitleInput').value.trim()||'Untitled Book';
+  let extractedAuthor=null;
   const finish=(ebookData,txType,txData,coverUrl)=>{
     const ext=upData.ebook?.name.split('.').pop().toLowerCase()||'txt';
     library.push({
-      id:uid(), title,
+      id:uid(), title, author:extractedAuthor,
       audioUrl:upData.audio?URL.createObjectURL(upData.audio):null,
       audioName:upData.audio?.name||null,
       ebookName:upData.ebook?.name||null, ebookData, ebookType:ext,
@@ -3489,7 +3529,21 @@ function addBook(){
     reader.onload=e=>cb(ebookData,txType,txData,e.target.result);
     reader.readAsDataURL(upData.cover);
   };
-  loadEbookData(ed=>loadTx(ed,(ed2,tt,td)=>loadCover(ed2,tt,td,(ed3,tt2,td2,cv)=>finish(ed3,tt2,td2,cv))));
+  loadEbookData(async(ed)=>{
+    if(ed&&upData.ebook){
+      const ext=upData.ebook.name.split('.').pop().toLowerCase();
+      if(ext==='epub'){
+        const meta=await extractEpubMeta(ed);
+        if(meta.title){
+          const autoFromFile=upData.ebook.name.replace(/\.[^.]+$/,'').replace(/[-_.]/g,' ');
+          const autoFromFolder=folderFiles[0]?.webkitRelativePath?.split('/')[0]||'';
+          if(title===autoFromFile||title===autoFromFolder||title==='Untitled Book') title=meta.title;
+        }
+        if(meta.author) extractedAuthor=meta.author;
+      }
+    }
+    loadTx(ed,(ed2,tt,td)=>loadCover(ed2,tt,td,(ed3,tt2,td2,cv)=>finish(ed3,tt2,td2,cv)));
+  });
 }
 
 // ══════════════════════════════════════════════════════
@@ -3972,6 +4026,18 @@ async function pwaOpenBook(i){
       if(t==='epub'){ const ab=await ebookFile.arrayBuffer(); b.ebookData=arrayBufferToBase64(ab); }
       else { b.ebookData=await ebookFile.text(); }
     }catch(e){ console.warn('Folio: ebook load failed',e); showToast('Ebook file not found \u2014 check your library folder','error',4000); }
+  }
+  if(b.ebookData&&b.ebookType==='epub'&&!b.author){
+    const meta=await extractEpubMeta(b.ebookData);
+    let metaChanged=false;
+    if(meta.title&&!getPwaProgress()[b.id]?.title){ b.title=meta.title; $('pTitle').textContent=b.title; metaChanged=true; }
+    if(meta.author){ b.author=meta.author; $('pAuthor').textContent=b.author; metaChanged=true; }
+    if(metaChanged){
+      const all=getPwaProgress(); const entry=all[b.id]||(all[b.id]={});
+      if(meta.title&&!entry.title) entry.title=b.title;
+      if(meta.author) entry.author=b.author;
+      localStorage.setItem(PWA_PROG_KEY,JSON.stringify(all));
+    }
   }
   loadEbook(b,()=>{ curSent=b.curSent||0; curWord=b.curWord||0; updateHL(); updateProg(); seekAudioToSentence(); pulseResumeSent(true); });
   setupMediaSession();

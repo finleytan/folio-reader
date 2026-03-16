@@ -1,3 +1,23 @@
+node_modules/
 tests/node_modules/
 tests/playwright-report/
 tests/test-results/
+test-results/
+
+# Superseded by folio-work-items.md and folio-prompts.md
+folio-prompts.html
+prompts-manager.js
+folio-workflow-prompts.html
+
+# Dev reference — not part of the deployed app
+folio-context.md
+folio-fragile.md
+folio-prompts.md
+folio-work-items.md
+
+*.epub
+package.json
+package-lock.json
+
+# Old versions
+_archive/

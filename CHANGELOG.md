@@ -2,6 +2,24 @@
 
 ---
 
+## v1.19 — 2026-03-16
+
+### Added
+- EPUB metadata auto-extraction — title and author are automatically populated from the OPF `dc:title` and `dc:creator` fields when adding an EPUB (browser mode) or first opening one (PWA mode)
+- File type hints on Add Book modal pills — each slot shows accepted formats (e.g. "mp3, m4a, m4b, ogg, wav, aac, flac, opus")
+- Amber warning banner when transcript match quality is below 75% — replaces the green "Transcript synced" banner with "Low transcript match — audio sync may be unreliable"
+
+### Changed
+- Time display uses H:MM:SS format for audiobooks longer than 1 hour (was raw minutes, e.g. 125:30 → 2:05:30)
+- App version bumped to 1.19.0
+
+### Fixed
+- Highlight starts moving before audio begins playing — playback state is now set exclusively by the `play` event handler, not the `_audio.play()` promise
+- Stale `totalSents` from a previous session poisons progress percentage on re-added books — `loadEbook` now updates `totalSents` immediately after building the DOM
+- Linking audio + transcript to an ebook-only book starts audio at 0:00 instead of the saved reading position — timing build completion now seeks audio to the saved `curSent` position when audio is at the start
+
+---
+
 ## v1.18 — 2026-03-15
 
 ### Added
