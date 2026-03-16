@@ -74,7 +74,7 @@
 | `onSeekChange` | 2049 | Media Controls | ⚠️ Sparse sentenceTimings — linear scan only, not binary search |
 | `_wordTick` | 2072 | Audio Events | ⚠️ curWord=-1 sentinel prevents word-0 flash — do not change to 0 |
 | `startWordTicker` / `stopWordTicker` | 2096 | Audio Events | |
-| `wireAudioEvents` | 2100 | Audio Events | ⚠️ timeupdate self-heal for Samsung audio-focus steal — do not remove. `play` event is the single source of truth for playback state (icon, mediaState, ticker, wake lock). `play` handler calls `resetBarTimer()`; `pause`/`ended` handlers call `clearBarTimer()` |
+| `wireAudioEvents` | 2100 | Audio Events | ⚠️ timeupdate self-heal for Samsung audio-focus steal — do not remove. `play` event is the single source of truth for playback state (icon, mediaState, ticker, wake lock). `play` handler calls `resetBarTimer()` **after** the state quad; `pause`/`ended` handlers call `clearBarTimer()` |
 | `startScrollEngine` | 2166 | Scroll Engine | ⚠️ scrollTimer separate from _scrollPauseTimer — do not merge |
 | `stopScrollEngine` | 2171 | Scroll Engine | |
 | `advanceSent` | 2174 | Scroll Engine | |
@@ -83,7 +83,7 @@
 | `adjustOffset` / `updateOffsetUI` | 2205 | Sync Offset | |
 | `getTtsVoices` | 2219 | TTS | |
 | `setTtsVoice` / `setTtsRate` | 2234 | TTS | |
-| `ttsPlay` | 2244 | TTS | ⚠️ ttsSpeaking owned here — stopScrollEngine must never set it. Reads rate from `rateCustom` input. Calls `resetBarTimer()` after `ttsSpeaking=true` |
+| `ttsPlay` | 2244 | TTS | ⚠️ ttsSpeaking owned here — stopScrollEngine must never set it. Reads rate from `rateCustom` input. Calls `resetBarTimer()` **after** the state quad (see fragile #41) |
 | `ttsPause` / `ttsStop` | 2296 | TTS | Call `clearBarTimer()` |
 | `scrubToPosition` | 2309 | TTS | |
 | `updateHL` | 2330 | Highlighting | ⚠️ sentences[] holds live DOM refs — stale after any #eContent innerHTML wipe |
@@ -107,7 +107,7 @@
 | `setSentPause` / `toggleOpInfo` | 2568 | Options | |
 | `_shouldAutoHide` | 2591 | Auto-Hide Bars | PWA only — returns true when bars can auto-hide (playing, no panels/modals open, on player screen) |
 | `showBars` / `hideBars` | 2601 | Auto-Hide Bars | PWA only — add/remove `bars-hidden` class on `#player` |
-| `resetBarTimer` | 2612 | Auto-Hide Bars | PWA only — show bars + restart 6-second idle timer. Called by all control interactions |
+| `resetBarTimer` | 2612 | Auto-Hide Bars | ⚠️ PWA only — show bars + restart 6-second idle timer. Must be called **after** `setMediaState('playing')` in playback start paths (see fragile #41) |
 | `clearBarTimer` | 2618 | Auto-Hide Bars | PWA only — cancel timer + show bars. Called on pause/stop/ended/goLib |
 | `loadTranscriptData` | 2646 | Transcript | ⚠️ Shows notx banner if no transcript + audio + sentHlOn + !ttsMode |
 | `setBannerState` | 2700 | Transcript | ⚠️ notx state has separate HTML elements (txBannerTop/txBannerActions) from other states. Supports `warn` state (amber, 20s auto-hide) for low match % |

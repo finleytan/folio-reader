@@ -12,10 +12,11 @@
 
 ### Fixed
 - PWA does not pick up updates until manually closed and reopened — added `controllerchange` listener that auto-reloads the page when a new service worker activates
+- Auto-hide timer never starts on playback — `resetBarTimer()` was called before `setMediaState('playing')`, so the guard always saw stale state
 
 ### Changed
 - Service worker cache key bumped from `verte-v1` to `verte-v2`
-- App version bumped to 2.1.0
+- App version bumped to 2.1.1
 
 ---
 
