@@ -25,7 +25,7 @@ Do all of the following before presenting the commit for approval:
    - [CLAUDE.md](CLAUDE.md) — line count if it changed
    - [verte-context.md](verte-context.md) — line numbers, new functions, shifted functions, IIFEs table, data structures, UI architecture
    - [verte-fragile.md](verte-fragile.md) — new fragile areas or gotchas discovered during implementation
-   - [CHANGELOG.md](CHANGELOG.md) — add entry under the current version. Treat small changes, bug fixes, and single small feature updates as **minor** version bumps (x.N+1.0), not patch
+   - [CHANGELOG.md](CHANGELOG.md) — add entry under the current version. Treat small changes, bug fixes, and single small feature updates as **minor** version bumps (x.N+1.0), not patch. If fixing something an error with something just pushed version bumps (x.x.N+1.0)
 
 2. **Check work items**
    - Read [verte-work-items.md](verte-work-items.md) and check if any Active or Backlog items were completed by this session's changes

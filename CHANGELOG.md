@@ -2,6 +2,19 @@
 
 ---
 
+## v2.4 — 2026-03-16
+
+### Added
+- Manual library rescan button in PWA settings panel — rescans folder for new/changed books without restarting the app
+
+### Fixed
+- Horizontal swipe conflicts with text selection — swipe gestures now abort when text is selected
+- loadEbook race condition — rapid book switching no longer causes two books to write to the same DOM
+- Cover and audio blob URLs leaked on PWA rescan — old URLs now revoked before each scan
+- Timing worker blob URL never revoked — URL freed immediately after worker construction
+
+---
+
 ## v2.3 — 2026-03-16
 
 ### Added
