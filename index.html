@@ -442,9 +442,9 @@ html,body,
 .book-card,.ebook-scroll,.ebook-content{
   transition:background-color .2s,border-color .2s,color .2s;
 }
-.top-bar,.bottom-controls{transition:background-color .2s,border-color .2s,color .2s,opacity .35s ease;}
+.top-bar,.bottom-controls{transition:background-color .2s,border-color .2s,color .2s,opacity .35s ease,height .35s ease,min-height .35s ease,padding .35s ease,border-width .35s ease,box-shadow .35s ease;}
 .bars-hidden .top-bar,
-.bars-hidden .bottom-controls{opacity:0;pointer-events:none;}
+.bars-hidden .bottom-controls{opacity:0;pointer-events:none;height:0 !important;min-height:0 !important;overflow:hidden;padding:0;border-width:0;box-shadow:none;}
 
 /* ── BUTTON PRESS FEEDBACK ── */
 .btn:active,.ic-btn:active,
@@ -2624,10 +2624,9 @@ function clearBarTimer(){
   if(!IS_PWA) return;
   var scroll=document.getElementById('eScroll');
   if(!scroll) return;
-  scroll.addEventListener('dblclick',function(e){
+  scroll.addEventListener('click',function(e){
     if(e.target.closest('a,button,input,select,textarea')) return;
-    if(_barsVisible){if(_shouldAutoHide()) hideBars();}
-    else{resetBarTimer();}
+    if(!_barsVisible) resetBarTimer();
   });
 })();
 
