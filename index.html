@@ -2148,9 +2148,9 @@ function wireAudioEvents(){
     showToast('Progress saved','success');
   });
   audioEl.addEventListener('play',function(){
-    resetBarTimer();
     setPlayBtnIcon(true); setMediaState('playing'); startWordTicker();
     acquireWakeLock(); updateMediaSessionState(true); updatePageTitle();
+    resetBarTimer();
   });
   audioEl.addEventListener('pause',function(){
     clearBarTimer();
@@ -2243,9 +2243,9 @@ function setTtsRate(v){
 }
 function ttsPlay(){
   if(ttsPaused&&ttsUtterance){ speechSynthesis.resume(); ttsSpeaking=true; ttsPaused=false;
-    resetBarTimer();
     setPlayBtnIcon(true); setMediaState('playing');
-    acquireWakeLock(); updateMediaSessionState(true); updatePageTitle(); return; }
+    acquireWakeLock(); updateMediaSessionState(true); updatePageTitle();
+    resetBarTimer(); return; }
   if(curSent>=sentences.length) return;
   _ttsGeneration++;
   const gen=_ttsGeneration;
