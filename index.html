@@ -2581,10 +2581,10 @@ function setOrientation(mode,btn){
   if(btn) btn.classList.add('active');
   try{
     if(typeof screen.orientation.lock==='function'){
-      if(mode==='auto') screen.orientation.unlock();
-      else screen.orientation.lock(mode).catch(function(){});
-    }
-  }catch(e){}
+      if(mode==='auto'){ screen.orientation.unlock(); showToast('Unlocked','success'); }
+      else screen.orientation.lock(mode).then(function(){showToast('Locked to '+mode,'success');}).catch(function(err){showToast(err.name+': '+err.message,'warn');});
+    }else{showToast('lock API missing','warn');}
+  }catch(e){showToast('Error: '+e.message,'warn');}
   saveDisplayPrefs();
 }
 function setDefaultWpmFromSlider(v){ wpm=parseInt(v); document.getElementById('defWpmInput').value=wpm; updateWpmLabel(); saveDisplayPrefs(); }
