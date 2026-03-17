@@ -2,6 +2,16 @@
 
 ---
 
+## v2.8.1 — 2026-03-17
+
+### Added
+- "Continue Reading" section pinned at top of library — shows last-opened book, unaffected by search/sort/filter
+
+### Fixed
+- PWA icon filenames mismatched manifest paths (extra dot in filename)
+
+---
+
 ## v2.8 — 2026-03-17
 
 ### Added

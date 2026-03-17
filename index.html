@@ -145,7 +145,14 @@ body.theme-hclight{
   overflow:hidden;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative;will-change:transform;
 }
 .book-card:hover{border-color:var(--accent);box-shadow:0 6px 24px var(--shadow);transform:translateY(-1px);}
-.book-card.now-playing{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);}
+.continue-section{grid-column:1/-1;margin-bottom:4px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.continue-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:8px;}
+.continue-card{border-color:var(--accent);display:flex;flex-direction:row;overflow:hidden;min-height:52px;}
+.continue-card .book-cover{width:120px;min-height:52px;flex-shrink:0;}
+.continue-card .book-cover-art{font-size:15px;}
+.continue-card .book-info{display:flex;flex-direction:column;justify-content:center;padding:6px 12px;min-width:0;flex:1;gap:1px;}
+.continue-card .book-title{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;-webkit-line-clamp:unset;}
+.continue-card .book-cover-badge{top:4px;left:4px;bottom:auto;right:auto;font-size:9px;width:16px;height:16px;border-radius:4px;}
 .book-cover{width:100%;height:120px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
 .book-cover-art{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
@@ -1188,7 +1195,7 @@ html,body,
 'use strict';
 
 // ── App version ───────────────────────────────────
-const APP_VERSION = '2.8.0';
+const APP_VERSION = '2.8.1';
 
 // ══════════════════════════════════════════════════════
 // STATE
@@ -1901,6 +1908,34 @@ function renderLib(){
   const _q=(document.getElementById('libSearch')||{}).value||'';
   const _ql=_q.toLowerCase().trim();
   const _order=_sortedLibIndices();
+  if(_lastOpenedBookIdx>=0&&library[_lastOpenedBookIdx]){
+    const b=library[_lastOpenedBookIdx];
+    const prog=b.totalSents>1?Math.round((b.curSent||0)/(b.totalSents-1)*100):0;
+    const [c1,c2]=coverGrad(b.title);
+    const initials=coverInitials(b.title);
+    const sec=document.createElement('div');
+    sec.className='continue-section';
+    const cvInner=b.coverUrl
+      ?`<img class="book-cover-img" src="${xh(b.coverUrl)}" alt="">`
+      :`<div class="book-cover-art">${xh(initials)}</div>`;
+    const hasA=b.audioUrl||b.audioHandle;
+    sec.innerHTML=`<div class="continue-label">Continue Reading</div>
+      <div class="book-card continue-card">
+        <div class="book-list-accent"></div>
+        <div class="book-cover" style="background:linear-gradient(135deg,${c1},${c2})">
+          ${cvInner}
+          <div class="book-cover-badge">${hasA?'🎧':'📖'}</div>
+        </div>
+        <div class="book-info">
+          <div class="book-title">${xh(b.title)}</div>
+          ${b.author?`<div class="book-meta" style="margin-bottom:2px;color:var(--text2)">${xh(b.author)}</div>`:''}
+          <div class="book-meta book-meta-progress">${prog}% complete</div>
+          <div class="book-prog-bar"><div class="book-prog-fill" style="width:${prog}%"></div></div>
+        </div>
+      </div>`;
+    sec.querySelector('.book-card').addEventListener('click',()=>openBook(_lastOpenedBookIdx));
+    grid.appendChild(sec);
+  }
   _order.forEach(i=>{
     const b=library[i];
     if(_ql&&b.title.toLowerCase().indexOf(_ql)<0&&(!b.author||b.author.toLowerCase().indexOf(_ql)<0)) return;
@@ -1911,7 +1946,7 @@ function renderLib(){
     const [c1,c2]=coverGrad(b.title);
     const initials=coverInitials(b.title);
     const card=document.createElement('div');
-    card.className='book-card'+(i===_lastOpenedBookIdx?' now-playing':'');
+    card.className='book-card';
     const coverInner = b.coverUrl
       ? `<img class="book-cover-img" src="${xh(b.coverUrl)}" alt="">`
       : `<div class="book-cover-art">${xh(initials)}</div>`;
