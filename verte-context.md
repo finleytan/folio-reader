@@ -4,9 +4,9 @@
 
 | Zone | Lines | Contents |
 |------|-------|----------|
-| CSS | 18–634 | All styles |
-| HTML | 636–1194 | 4 screens + 4 modals |
-| JS | 1195–4858 | All logic |
+| CSS | 18–657 | All styles |
+| HTML | 658–1209 | 4 screens + 4 modals |
+| JS | 1210–4932 | All logic |
 
 ### HTML Structure
 

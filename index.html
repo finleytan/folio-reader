@@ -17,52 +17,64 @@
 <noscript><link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
-  --bg:#0C0C0C; --bg2:#181818; --surface:#181818; --surface2:#242424;
-  --border:#282828; --text:#F0EEE8; --text2:#C0B8A8; --text3:#484848;
-  --accent:#C8980A; --hl-bg:rgba(200,152,10,.10); --hl-border:rgba(200,152,10,.40);
-  --word-hl:#C8980A; --shadow:rgba(0,0,0,.50);
+  --bg:#0E1014; --bg2:#181C20; --surface:#1E2228; --surface2:#262C34;
+  --border:#303840; --text:#EEF0F4; --text2:#B0B8C4; --text3:#606870;
+  --accent:#C8980A; --accent-text:#C8980A;
+  --hl-bg:rgba(200,152,10,.10); --hl-border:rgba(200,152,10,.42);
+  --word-hl:#C8980A; --shadow:rgba(0,0,10,.60);
   --font-ui:'DM Sans',sans-serif; --font-body:'Lora',Georgia,serif;
   --font-size:18px; --line-height:1.88; --max-width:680px;
   --radius:14px; --radius-sm:8px; --touch:44px;
-  --amber-bg:#1a1200; --amber-border:#3a2a00; --amber-text:#C8980A; --amber-muted:#a07808;
+  --amber-bg:#141210; --amber-border:#302820; --amber-text:#C8980A; --amber-muted:#a07808;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-ui);overflow:hidden;}
 
 /* ── THEMES ── */
 body.theme-light{
-  --bg:#FBF8F2; --bg2:#F5F0E4; --surface:#E8E0CC; --surface2:#DDD4BC;
-  --border:#C8B890; --text:#0A0C10; --text2:#4A2A08; --text3:#7A5228;
-  --accent:#C8980A; --hl-bg:rgba(200,152,10,.12); --hl-border:rgba(200,152,10,.45);
+  --bg:#F5F0E2; --bg2:#EDE4CE; --surface:#E0D4B8; --surface2:#D4C6A4;
+  --border:#B8A478; --text:#0A0C10; --text2:#2C2010; --text3:#6A5A3A;
+  --accent:#C8980A; --accent-text:#7A5800;
+  --hl-bg:rgba(200,152,10,.13); --hl-border:rgba(200,152,10,.50);
   --word-hl:#C8980A; --shadow:rgba(0,0,0,.10);
-  --amber-bg:#F5E8C0; --amber-border:#C8A060; --amber-text:#4A2A08; --amber-muted:#7A5228;
+  --amber-bg:#EDE4B0; --amber-border:#B8A060; --amber-text:#3A2808; --amber-muted:#6A5030;
+}
+body.theme-slate{
+  --bg:#F1F3F6; --bg2:#E6E9EE; --surface:#D8DCE4; --surface2:#CBD0DA;
+  --border:#ACB4C0; --text:#0A0C10; --text2:#1A2230; --text3:#566070;
+  --accent:#C8980A; --accent-text:#7A5800;
+  --hl-bg:rgba(200,152,10,.11); --hl-border:rgba(200,152,10,.44);
+  --word-hl:#C8980A; --shadow:rgba(0,0,0,.09);
+  --amber-bg:#E8E4D0; --amber-border:#A89870; --amber-text:#2A2010; --amber-muted:#6A5830;
 }
 body.theme-night{
   --bg:#14203A; --bg2:#1E2E50; --surface:#1E2E50; --surface2:#243454;
   --border:#2E4060; --text:#EEF2F8; --text2:#A0B8D0; --text3:#4A6080;
-  --accent:#C8980A; --hl-bg:rgba(200,152,10,.10); --hl-border:rgba(200,152,10,.40);
+  --accent:#C8980A; --accent-text:#C8980A; --hl-bg:rgba(200,152,10,.10); --hl-border:rgba(200,152,10,.40);
   --word-hl:#C8980A; --shadow:rgba(0,0,0,.45);
   --amber-bg:#1a1800; --amber-border:#3a3000; --amber-text:#C8980A; --amber-muted:#a07808;
 }
-body.theme-sepia{
-  --bg:#FDF0D8; --bg2:#F8E8C0; --surface:#EED8A8; --surface2:#E4CCA0;
-  --border:#C8A060; --text:#1C0E04; --text2:#4A2808; --text3:#5A3010;
-  --accent:#C8980A; --hl-bg:rgba(200,152,10,.12); --hl-border:rgba(200,152,10,.45);
-  --word-hl:#C8980A; --shadow:rgba(0,0,0,.12);
-  --amber-bg:#F0D890; --amber-border:#C8A060; --amber-text:#4A2808; --amber-muted:#7A5228;
-}
-body.theme-sage{
-  --bg:#1E3020; --bg2:#162418; --surface:#162418; --surface2:#243828;
-  --border:#2E4830; --text:#E4EEE0; --text2:#B8D0B0; --text3:#507850;
-  --accent:#C8980A; --hl-bg:rgba(200,152,10,.12); --hl-border:rgba(200,152,10,.45);
-  --word-hl:#C8980A; --shadow:rgba(0,0,0,.35);
-  --amber-bg:#1a2010; --amber-border:#3a4820; --amber-text:#C8980A; --amber-muted:#a07808;
+body.theme-umber{
+  --bg:#2A1E14; --bg2:#362818; --surface:#42321E; --surface2:#4E3C28;
+  --border:#604830; --text:#F0E4D0; --text2:#C8A878; --text3:#805840;
+  --accent:#C8980A; --accent-text:#C8980A;
+  --hl-bg:rgba(200,152,10,.15); --hl-border:rgba(200,152,10,.55);
+  --word-hl:#C8980A; --shadow:rgba(0,0,0,.45);
+  --amber-bg:#1C1008; --amber-border:#503818; --amber-text:#C8980A; --amber-muted:#a07808;
 }
 body.theme-hclight{
   --bg:#ffffff; --bg2:#f8f8f8; --surface:#f8f8f8; --surface2:#eeeeee;
   --border:#000000; --text:#000000; --text2:#333333; --text3:#666666;
-  --accent:#0000cc; --hl-bg:#cce5ff; --hl-border:#0000cc; --word-hl:#0000cc;
+  --accent:#0000cc; --accent-text:#0000cc; --hl-bg:#cce5ff; --hl-border:#0000cc; --word-hl:#0000cc;
   --amber-bg:#fffff0; --amber-border:#000000; --amber-text:#000000; --amber-muted:#333333;
+}
+body.theme-hcdark{
+  --bg:#000000; --bg2:#0a0a0a; --surface:#111111; --surface2:#1a1a1a;
+  --border:#ffffff; --text:#ffffff; --text2:#dddddd; --text3:#aaaaaa;
+  --accent:#C8980A; --accent-text:#C8980A;
+  --hl-bg:rgba(200,152,10,.18); --hl-border:#C8980A;
+  --word-hl:#C8980A; --shadow:rgba(0,0,0,.80);
+  --amber-bg:#1a1000; --amber-border:#C8980A; --amber-text:#C8980A; --amber-muted:#a07808;
 }
 
 /* ── SCREENS ── */
@@ -81,7 +93,7 @@ body.theme-hclight{
   font-size:72px;font-weight:400;color:var(--text);
   letter-spacing:.1em;line-height:1;display:inline-block;
 }
-.lib-tagline{font-size:14px;color:var(--accent);margin-top:8px;letter-spacing:.28em;text-transform:uppercase;font-weight:400;}
+.lib-tagline{font-size:14px;color:var(--accent-text);margin-top:8px;letter-spacing:.28em;text-transform:uppercase;font-weight:400;}
 .lib-settings-btn{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:var(--radius-sm);background:transparent;border:none;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .15s,color .15s;}
 .lib-settings-btn:hover{background:var(--surface2);color:var(--text);}
 .lib-settings-btn .ic-svg{width:22px;height:22px;}
@@ -93,11 +105,11 @@ body.theme-hclight{
 .lib-settings-inner{flex:1;overflow-y:auto;padding:16px 20px 40px;max-width:480px;margin:0 auto;width:100%;box-sizing:border-box;}
 .lib-settings-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;}
 .lib-settings-placeholder{font-size:13px;color:var(--text3);margin:0;}
-.lib-set-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px;}
-.theme-swatch{width:32px;height:32px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:border-color .15s,transform .15s;padding:0;position:relative;}
+.lib-set-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px;display:flex;align-items:center;gap:8px;}.lib-set-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.theme-swatch{width:32px;height:32px;border-radius:8px;border:2px solid transparent;cursor:pointer;transition:border-color .15s,transform .15s;padding:0;position:relative;}
 .theme-swatch:hover{transform:scale(1.1);}
 .theme-swatch.active{border-color:var(--text);transform:scale(1.15);box-shadow:inset 0 0 0 2px var(--surface),0 0 0 1px var(--text);}
-.hl-swatch{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:border-color .15s,transform .15s;padding:0;}
+.hl-swatch{width:28px;height:28px;border-radius:6px;border:2px solid transparent;cursor:pointer;transition:border-color .15s,transform .15s;padding:0;}
 .hl-swatch:hover{transform:scale(1.1);}
 .hl-swatch.active{border-color:var(--text);transform:scale(1.15);box-shadow:inset 0 0 0 2px var(--surface),0 0 0 1px var(--text);}
 .lib-view-btn{position:absolute;top:16px;left:16px;width:40px;height:40px;border-radius:var(--radius-sm);background:transparent;border:none;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .15s,color .15s;}
@@ -116,7 +128,7 @@ body.theme-hclight{
 .list-view .book-info{display:flex;flex-direction:column;justify-content:center;padding:6px 8px;min-width:0;flex:1;gap:1px;}
 .list-view .book-title{font-size:24px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;-webkit-line-clamp:unset;margin-bottom:0;}
 .list-view .book-meta{font-size:20px;}
-.list-view .book-meta-progress{font-size:18px;color:var(--accent);font-weight:500;}
+.list-view .book-meta-progress{font-size:18px;color:var(--accent-text);font-weight:500;}
 .list-view .book-meta-progress.not-started{color:var(--text3);font-weight:400;}
 .list-view .book-card-actions{position:static;display:flex;flex-direction:row;align-items:center;justify-content:flex-end;padding:0 6px;gap:8px;opacity:1;flex-shrink:0;}
 .list-view .card-action-btn{width:36px;height:36px;border-radius:7px;font-size:14px;}
@@ -143,6 +155,7 @@ body.theme-hclight{
 .book-card{
   background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
   overflow:hidden;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative;will-change:transform;
+  box-shadow:0 2px 8px rgba(0,0,10,.30);
 }
 .book-card:hover{border-color:var(--accent);box-shadow:0 6px 24px var(--shadow);transform:translateY(-1px);}
 .continue-section{grid-column:1/-1;margin-bottom:4px;padding-bottom:12px;border-bottom:1px solid var(--border);}
@@ -264,7 +277,7 @@ body.theme-hclight{
 .toggle.on::after{left:22px;}
 
 /* ── TOP BAR ── */
-.top-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 10px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:4px;flex-shrink:0;box-shadow:0 2px 12px var(--shadow);z-index:100;position:relative;}
+.top-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 10px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:4px;flex-shrink:0;box-shadow:0 2px 16px var(--shadow), 0 1px 0 rgba(255,255,255,.03);z-index:100;position:relative;}
 .back-btn{width:var(--touch);height:var(--touch);border-radius:var(--radius-sm);background:var(--bg2);border:1px solid var(--border);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background-color .15s,border-color .15s,color .15s;flex-shrink:0;}
 .back-btn:hover{background:var(--surface2);color:var(--text);}
 .bk-info{flex:1;min-width:0;overflow:hidden;text-align:center;}
@@ -308,7 +321,7 @@ body.theme-hclight{
 .rate-sel{background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--font-ui);font-size:12px;padding:5px 8px;border-radius:var(--radius-sm);cursor:pointer;outline:none;}
 
 /* ── SEEK STRIP ── */
-.bottom-controls{background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;box-shadow:0 -2px 12px var(--shadow);}
+.bottom-controls{background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;box-shadow:0 -2px 16px var(--shadow), 0 -1px 0 rgba(255,255,255,.03);}
 .ctrl-row{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:6px 14px 8px;}
 .seek-strip{display:flex;flex-direction:column;padding:8px 14px 0;flex-shrink:0;}
 .seek-row{display:flex;align-items:center;gap:6px;width:100%;}
@@ -333,6 +346,7 @@ body.theme-hclight{
 .vol-pop-label{font-size:11px;color:var(--text3);font-weight:600;font-variant-numeric:tabular-nums;}
 .speed-pill{height:32px;min-width:48px;padding:0 12px;border-radius:8px;border:1px solid rgba(91,141,239,.3);background:rgba(91,141,239,.1);color:var(--accent);font-family:var(--font-ui);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;white-space:nowrap;transition:background-color .15s,border-color .15s;flex-shrink:0;}
 .speed-pill:hover{background:rgba(91,141,239,.2);}
+body.theme-light .speed-pill{color:var(--text2);}
 
 /* ── EBOOK SCRUB BAR ── */
 .ebook-scrub{padding:10px 14px 6px;position:relative;}
@@ -390,7 +404,7 @@ body.theme-hclight{
 .toc-list{flex:1;overflow-y:auto;padding:6px 0;}
 .toc-item{display:block;width:100%;padding:11px 16px;background:transparent;border:none;text-align:left;cursor:pointer;font-family:var(--font-ui);font-size:14px;color:var(--text2);transition:background-color .15s,border-color .15s,color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:3px solid transparent;line-height:1.35;}
 .toc-item:hover{background:var(--bg2);color:var(--text);}
-.toc-item.toc-active{color:var(--accent);border-left-color:var(--accent);background:var(--hl-bg);}
+.toc-item.toc-active{color:var(--accent-text);border-left-color:var(--accent);background:var(--hl-bg);}
 .toc-item.lv2{padding-left:28px;font-size:13px;}
 .toc-item.lv3{padding-left:42px;font-size:12px;color:var(--text3);}
 .toc-num{font-size:10px;color:var(--text3);margin-right:6px;font-variant-numeric:tabular-nums;}
@@ -729,20 +743,21 @@ html,body,
       <button id="rescanBtn" class="btn btn-ghost" style="display:none;width:100%;text-align:left;gap:8px" onclick="pwaScanAndRender();toggleLibSettings()">🔄 Rescan library folder</button>
       <div style="margin-top:8px">
         <div class="lib-set-label">Appearance</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-          <button class="theme-swatch" id="libThemePill-light" onclick="setTheme('light',document.getElementById('themePill-light'))" style="background:#FBF8F2" title="Parchment"></button>
-          <button class="theme-swatch active" id="libThemePill-dark" onclick="setTheme('',document.getElementById('themePill-dark'))" style="background:#0C0C0C" title="Dark"></button>
-          <button class="theme-swatch" id="libThemePill-sepia" onclick="setTheme('sepia',document.getElementById('themePill-sepia'))" style="background:#FDF0D8" title="Sepia"></button>
-          <button class="theme-swatch" id="libThemePill-sage" onclick="setTheme('sage',document.getElementById('themePill-sage'))" style="background:#1E3020" title="Sage"></button>
-          <button class="theme-swatch" id="libThemePill-night" onclick="setTheme('night',document.getElementById('themePill-night'))" style="background:#14203A" title="Midnight"></button>
-          <button class="theme-swatch" id="libThemePill-hclight" onclick="setTheme('hclight',document.getElementById('themePill-hclight'))" style="background:#ffffff;border-color:#ccc" title="Hi-C Light"></button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;margin-bottom:10px">
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-light" onclick="setTheme('light',document.getElementById('themePill-light'))" style="background:#F5F0E2" title="Tallow"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Tallow</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-slate" onclick="setTheme('slate',document.getElementById('themePill-slate'))" style="background:#F1F3F6" title="Quire"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Quire</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-umber" onclick="setTheme('umber',document.getElementById('themePill-umber'))" style="background:#2A1E14" title="Umber"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Umber</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch active" id="libThemePill-dark" onclick="setTheme('',document.getElementById('themePill-dark'))" style="background:#0E1014" title="Iron"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Iron</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-night" onclick="setTheme('night',document.getElementById('themePill-night'))" style="background:#14203A" title="Vesper"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Vesper</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-hclight" onclick="setTheme('hclight',document.getElementById('themePill-hclight'))" style="background:#ffffff;border-color:#ccc" title="Hi-C Light"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Hi-C Light</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-hcdark" onclick="setTheme('hcdark',document.getElementById('themePill-hcdark'))" style="background:#000000;border-color:#ffffff" title="Hi-C Dark"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Hi-C Dark</span></div>
         </div>
         <div class="lib-set-label">Highlight colour</div>
-        <div style="display:flex;gap:8px;margin-bottom:12px">
-          <button class="hl-swatch active" id="hlColorSwatch-blue" onclick="setHlColor('blue')" style="background:#5B8DEF" title="Blue"></button>
-          <button class="hl-swatch" id="hlColorSwatch-amber" onclick="setHlColor('amber')" style="background:#C8980A" title="Amber"></button>
-          <button class="hl-swatch" id="hlColorSwatch-green" onclick="setHlColor('green')" style="background:#4CAF50" title="Green"></button>
-          <button class="hl-swatch" id="hlColorSwatch-rose" onclick="setHlColor('rose')" style="background:#D34F63" title="Rose"></button>
+        <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px">
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch active" id="hlColorSwatch-blue" onclick="setHlColor('blue')" style="background:#5B8DEF" title="Blue"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Blue</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch" id="hlColorSwatch-amber" onclick="setHlColor('amber')" style="background:#C8980A" title="Amber"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Amber</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch" id="hlColorSwatch-green" onclick="setHlColor('green')" style="background:#4CAF50" title="Green"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Green</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch" id="hlColorSwatch-rose" onclick="setHlColor('rose')" style="background:#D34F63" title="Rose"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Rose</span></div>
         </div>
         <div class="lib-set-label">Playback defaults</div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
@@ -892,12 +907,13 @@ html,body,
         <div class="op-sec">
           <div class="op-ttl">Theme</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="theme-swatch" id="themePill-light" onclick="setTheme('light',this)" style="background:#FBF8F2" title="Parchment"></button>
-            <button class="theme-swatch active" id="themePill-dark" onclick="setTheme('',this)" style="background:#0C0C0C" title="Dark"></button>
-            <button class="theme-swatch" id="themePill-sepia" onclick="setTheme('sepia',this)" style="background:#FDF0D8" title="Sepia"></button>
-            <button class="theme-swatch" id="themePill-sage" onclick="setTheme('sage',this)" style="background:#1E3020" title="Sage"></button>
-            <button class="theme-swatch" id="themePill-night" onclick="setTheme('night',this)" style="background:#14203A" title="Midnight"></button>
+            <button class="theme-swatch" id="themePill-light" onclick="setTheme('light',this)" style="background:#F5F0E2" title="Tallow"></button>
+            <button class="theme-swatch" id="themePill-slate" onclick="setTheme('slate',this)" style="background:#F1F3F6" title="Quire"></button>
+            <button class="theme-swatch" id="themePill-umber" onclick="setTheme('umber',this)" style="background:#2A1E14" title="Umber"></button>
+            <button class="theme-swatch active" id="themePill-dark" onclick="setTheme('',this)" style="background:#0E1014" title="Iron"></button>
+            <button class="theme-swatch" id="themePill-night" onclick="setTheme('night',this)" style="background:#14203A" title="Vesper"></button>
             <button class="theme-swatch" id="themePill-hclight" onclick="setTheme('hclight',this)" style="background:#ffffff;border-color:var(--border)" title="Hi-C Light"></button>
+            <button class="theme-swatch" id="themePill-hcdark" onclick="setTheme('hcdark',this)" style="background:#000000;border-color:#ffffff" title="Hi-C Dark"></button>
           </div>
         </div>
         <div class="op-sec">
@@ -1195,7 +1211,7 @@ html,body,
 'use strict';
 
 // ── App version ───────────────────────────────────
-const APP_VERSION = '2.8.1';
+const APP_VERSION = '2.9.0';
 
 // ══════════════════════════════════════════════════════
 // STATE
@@ -1981,16 +1997,29 @@ function renderLib(){
   });
   if(!IS_PWA){
     if(library.length===0){
-      const onboard=document.createElement('div');
-      onboard.className='onboard-card';
-      onboard.innerHTML='<div class="onboard-title">Welcome to Verte</div><div class="onboard-body">Read ebooks with synced audio highlighting.<br>Add a book to get started — you\'ll need an audio file (.mp3, .m4b, etc.) and an ebook (.epub, .txt, .html, or .md).<br>Add a Whisper transcript (.json) for word-level sync.</div>';
-      grid.appendChild(onboard);
+      const empty=document.createElement('div');
+      empty.className='add-card';
+      empty.style.cssText='display:flex;flex-direction:column;align-items:center;text-align:center;padding:32px 24px;cursor:default;';
+      empty.innerHTML='<svg width="160" height="80" viewBox="0 0 160 80" fill="none" xmlns="http://www.w3.org/2000/svg">'
+        +'<rect x="5" y="72" width="150" height="4" rx="2" fill="var(--border)"/>'
+        +'<rect x="15" y="16" width="20" height="56" rx="3" fill="var(--surface2)" stroke="var(--border)" stroke-width="1.5"/>'
+        +'<rect x="40" y="8" width="18" height="64" rx="3" fill="var(--surface2)" stroke="var(--border)" stroke-width="1.5"/>'
+        +'<rect x="63" y="20" width="24" height="52" rx="3" fill="var(--surface2)" stroke="var(--border)" stroke-width="1.5"/>'
+        +'<rect x="92" y="12" width="22" height="60" rx="3" fill="var(--surface2)" stroke="var(--border)" stroke-width="1.5"/>'
+        +'<rect x="120" y="18" width="28" height="54" rx="3" fill="none" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="4 3"/>'
+        +'<text x="134" y="52" text-anchor="middle" font-size="20" font-weight="700" fill="var(--border)">+</text>'
+        +'</svg>'
+        +'<div style="font-size:17px;font-weight:700;color:var(--text);margin-top:20px;margin-bottom:8px">Your shelf is empty</div>'
+        +'<div style="font-size:13px;color:var(--text2);line-height:1.6;max-width:260px;margin:0 auto 24px">Add your first book to get started. You\u2019ll need an ebook file \u2014 and optionally an audio file for synchronized highlighting.</div>'
+        +'<button onclick="openModal()" style="background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:11px 22px;font-size:13px;font-weight:700;font-family:var(--font-ui);cursor:pointer;display:inline-flex;align-items:center;gap:6px">+ Add your first book</button>';
+      grid.appendChild(empty);
+    }else{
+      const add=document.createElement('div');
+      add.className='add-card';
+      add.innerHTML='<div class="add-card-icon">+</div><div style="font-size:13px;font-weight:500">Add Book</div>';
+      add.onclick=()=>openModal();
+      grid.appendChild(add);
     }
-    const add=document.createElement('div');
-    add.className='add-card';
-    add.innerHTML='<div class="add-card-icon">+</div><div style="font-size:13px;font-weight:500">Add Book</div>';
-    add.onclick=()=>openModal();
-    grid.appendChild(add);
   }
   if(IS_PWA&&_hiddenBooks.length){
     const section=document.createElement('div');
@@ -3033,7 +3062,7 @@ function _applyHlColor(key){
     rose:{bg:'rgba(211,79,99,.12)',border:'rgba(211,79,99,.45)',word:'#D34F63'}
   };
   var c=colors[key||hlColor]||colors.blue;
-  var s=document.documentElement.style;
+  var s=document.body.style;
   s.setProperty('--hl-bg',c.bg);
   s.setProperty('--hl-border',c.border);
   s.setProperty('--word-hl',c.word);

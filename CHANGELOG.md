@@ -2,6 +2,27 @@
 
 ---
 
+## v2.9.0 — 2026-03-17
+
+### Added
+- **HC Dark theme** — pure black background (#000), white text, gold accent; high-contrast dark-mode companion to HC Light
+- **Tallow theme** — warm parchment light theme (#F5F0E2 base) replacing the old Parchment/Sepia themes
+- **Quire theme** — cool blue-grey light theme (#F1F3F6 base) for a clean, neutral reading surface
+- **Umber theme** — warm dark mid-tone (#2A1E14 base) replacing the old Sage theme
+- **Iron theme** — cool blue-grey dark (#0E1014 base) replacing the old plain Dark theme; depth shadows on top/bottom bars and book cards
+- `--accent-text` CSS variable — brand gold on dark themes, WCAG-AA-compliant darkened gold (#7A5800) on light themes; used by lib tagline, progress text, and TOC active item
+
+### Changed
+- Vesper theme (formerly Midnight) — display name only; class `theme-night` unchanged
+- Sepia theme removed; Sage theme removed
+- Speed-pill color scoped to Tallow theme only (`body.theme-light .speed-pill`)
+- Depth shadows added to `.top-bar`, `.bottom-controls`, and `.book-card`
+
+### Fixed
+- `_applyHlColor` now sets `--hl-bg`/`--hl-border`/`--word-hl` on `document.body.style` instead of `document.documentElement.style` — light-theme highlight colour selection was broken because `body.theme-xxx{}` class rules override html-level inline styles
+
+---
+
 ## v2.8.1 — 2026-03-17
 
 ### Added
