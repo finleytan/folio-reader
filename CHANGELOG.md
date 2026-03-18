@@ -2,6 +2,34 @@
 
 ---
 
+## v2.11.0 — 2026-03-17
+
+### Changed
+- **Unified settings panel** — replaced separate `#libSettingsPanel` (library) and `#optPanel` (player) with a single full-screen `#settingsPanel` overlay accessible from both screens
+- Settings panel uses 4 tabs: Appearance, Playback, Library, Advanced
+- All settings element IDs consolidated to `s*` prefix (e.g. `sTheme-*`, `sHlMode-*`, `sFontSize`)
+- Library gear button opens Appearance tab; player gear button opens Playback tab
+- `configurePlayerForMode` now applies `_defaultHlMode` for audio books instead of hardcoding 'word'
+- `toggleTtsMode` now restores `_defaultHlMode` when TTS is enabled instead of hardcoding 'sentence'
+
+### Added
+- `openSettings(tab)` / `closeSettings()` / `switchSettingsTab(name)` functions for unified panel control
+- `_defaultHlMode` variable — user's preferred highlight mode for new books, persisted separately from current session state as `defaultHlMode` in display prefs
+- `setDefaultHlMode(mode)` function — called from Library tab default HL pills
+- Speed slider + preset buttons in Playback tab (`sSpeed`, `sSpeedLbl`)
+- `__testBridge` actions: `getBook`, `getHlState`, `getMatchStats`, `getWordTimings` for diagnostics
+
+### Removed
+- `#libSettingsPanel` HTML and all `lib-settings-*` CSS classes
+- `#optPanel` HTML and all `op-*` / `opt-panel` CSS classes
+- Duplicate settings IDs (`libThemePill-*`, `hlColorSwatch2-*`, `defHlPill-*`, `libDefWpmSlider`, etc.)
+- Outside-click close handler for old dropdown options panel
+
+### Fixed
+- `loadDisplayPrefs` restore of `suppressSpeedToast` toggle — was referencing wrong ID (`suppressSpeedToggle` instead of `suppressSpeedToastToggle`)
+
+---
+
 ## v2.10.0 — 2026-03-17
 
 ### Changed

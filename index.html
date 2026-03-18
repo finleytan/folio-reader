@@ -15,7 +15,9 @@
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" as="script">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
+<!-- #region CSS -->
 <style>
+/* #region Theme Variables */
 :root{
   --bg:#0E1014; --bg2:#181C20; --surface:#1E2228; --surface2:#262C34;
   --border:#303840; --text:#EEF0F4; --text2:#B0B8C4; --text3:#606870;
@@ -76,7 +78,9 @@ body.theme-hcdark{
   --word-hl:#5B8DEF; --shadow:rgba(0,0,0,.80);
   --amber-bg:#1a1000; --amber-border:#C8980A; --amber-text:#C8980A; --amber-muted:#a07808;
 }
+/* #endregion Theme Variables */
 
+/* #region Layout & Components */
 /* ── SCREENS ── */
 #pwaFirstRun,#pwaRegrant,#library{
   height:100vh;display:none;flex-direction:column;align-items:center;overflow-y:auto;
@@ -97,15 +101,6 @@ body.theme-hcdark{
 .lib-settings-btn{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:var(--radius-sm);background:transparent;border:none;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .15s,color .15s;}
 .lib-settings-btn:hover{background:var(--surface2);color:var(--text);}
 .lib-settings-btn .ic-svg{width:22px;height:22px;}
-.lib-settings-panel{position:fixed;inset:0;z-index:300;background:var(--bg);display:none;flex-direction:column;overflow:hidden;}
-.lib-settings-panel.open{display:flex;}
-.lib-settings-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0;max-width:480px;margin:0 auto;width:100%;box-sizing:border-box;}
-.lib-settings-close{width:36px;height:36px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text3);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .15s,color .15s;}
-.lib-settings-close:hover{background:var(--surface2);color:var(--text);}
-.lib-settings-inner{flex:1;overflow-y:auto;padding:16px 20px 40px;max-width:480px;margin:0 auto;width:100%;box-sizing:border-box;}
-.lib-settings-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;}
-.lib-settings-placeholder{font-size:13px;color:var(--text3);margin:0;}
-.lib-set-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px;display:flex;align-items:center;gap:8px;}.lib-set-label::after{content:'';flex:1;height:1px;background:var(--border);}
 .theme-swatch{width:32px;height:32px;border-radius:8px;border:2px solid transparent;cursor:pointer;transition:border-color .15s,transform .15s;padding:0;position:relative;}
 .theme-swatch:hover{transform:scale(1.1);}
 .theme-swatch.active{border-color:var(--text);transform:scale(1.15);box-shadow:inset 0 0 0 2px var(--surface),0 0 0 1px var(--text);}
@@ -258,6 +253,29 @@ body.theme-hcdark{
 .binfo-slot-remove{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:background-color .15s,border-color .15s,color .15s;}
 .binfo-slot-remove:hover{background:rgba(220,80,80,.15);border-color:rgba(220,80,80,.5);color:#e06050;}
 
+/* ── SETTINGS PANEL (unified) ── */
+.settings-panel{position:fixed;inset:0;z-index:300;background:var(--bg);display:none;flex-direction:column;overflow:hidden;}
+.settings-panel.open{display:flex;}
+.settings-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;flex-shrink:0;max-width:480px;margin:0 auto;width:100%;box-sizing:border-box;}
+.settings-title{font-size:14px;font-weight:600;color:var(--text);}
+.settings-close{width:36px;height:36px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text3);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .15s,color .15s;}
+.settings-close:hover{background:var(--surface2);color:var(--text);}
+.settings-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;max-width:480px;margin:0 auto;width:100%;box-sizing:border-box;padding:0 20px;}
+.settings-tab{flex:1;padding:10px 4px;font-size:12px;font-weight:600;border:none;background:transparent;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;font-family:var(--font-ui);white-space:nowrap;}
+.settings-tab:hover{color:var(--text2);}
+.settings-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.settings-inner{flex:1;overflow-y:auto;padding:16px 20px 40px;max-width:480px;margin:0 auto;width:100%;box-sizing:border-box;}
+.s-section{margin-bottom:16px;}
+.s-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.s-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.s-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.s-lbl{font-size:13px;color:var(--text2);flex:1;}
+.s-val{font-size:12px;color:var(--accent);font-weight:600;min-width:38px;text-align:right;flex-shrink:0;}
+.s-slider{flex:1;accent-color:var(--accent);cursor:pointer;}
+.s-desc{font-size:12px;color:var(--text3);line-height:1.5;padding:0 0 6px;font-style:italic;}
+.s-info-btn{font-size:11px;color:var(--text3);cursor:pointer;margin-left:4px;vertical-align:middle;user-select:none;}
+.s-info-btn:hover{color:var(--accent);}
+
 /* ── BUTTONS ── */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--radius-sm);font-family:var(--font-ui);font-size:13px;font-weight:600;cursor:pointer;transition:background-color .15s,border-color .15s,color .15s;border:1px solid transparent;white-space:nowrap;}
 .btn-primary{background:var(--accent);color:white;}
@@ -296,28 +314,6 @@ body.theme-hcdark{
 .speed-badge{display:none;font-size:10px;font-weight:700;color:var(--accent);background:rgba(91,141,239,.12);border-radius:4px;padding:1px 5px;margin-left:-4px;align-self:center;pointer-events:none;font-family:var(--font-ui);flex-shrink:0;min-width:30px;text-align:center;}
 .speed-badge.show{display:inline-block;}
 
-/* ── OPTIONS PANEL ── */
-.opt-panel{
-  position:absolute;top:60px;right:12px;width:300px;
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  box-shadow:0 8px 32px var(--shadow);z-index:200;padding:0;
-  display:none;flex-direction:column;max-height:80vh;overflow:hidden;
-}
-.opt-panel.open{display:flex;}
-.op-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
-.op-tab{flex:1;padding:10px 4px;font-size:12px;font-weight:600;border:none;background:transparent;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:background-color .15s,border-color .15s,color .15s;font-family:var(--font-ui);}
-.op-tab:hover{color:var(--text2);}
-.op-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.op-tab-body{flex:1;overflow-y:auto;padding:4px 0 8px;}
-.op-sec{padding:10px 16px 4px;}
-.op-ttl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:700;margin-bottom:8px;}
-.op-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.op-lbl{font-size:13px;color:var(--text2);flex:1;}
-.op-val{font-size:12px;color:var(--accent);font-weight:600;min-width:38px;text-align:right;flex-shrink:0;}
-.op-slider{flex:1;accent-color:var(--accent);cursor:pointer;}
-.op-info-btn{font-size:11px;color:var(--text3);cursor:pointer;margin-left:4px;vertical-align:middle;user-select:none;}
-.op-info-btn:hover{color:var(--accent);}
-.op-desc{font-size:12px;color:var(--text3);line-height:1.5;padding:0 0 6px;font-style:italic;}
 .rate-sel{background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--font-ui);font-size:12px;padding:5px 8px;border-radius:var(--radius-sm);cursor:pointer;outline:none;}
 
 /* ── SEEK STRIP ── */
@@ -475,6 +471,9 @@ body.theme-light .speed-pill{color:var(--text2);}
 .pwa-regrant-title{font-family:var(--font-body);font-size:20px;margin-bottom:8px;}
 .pwa-regrant-sub{font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:22px;}
 
+/* #endregion Layout & Components */
+
+/* #region Responsive & Animation */
 /* ── DESKTOP ── */
 @media(min-width:640px){
   #library{padding:48px 24px 32px;}
@@ -489,7 +488,6 @@ body.theme-light .speed-pill{color:var(--text2);}
   .seek-strip-bar::-webkit-slider-thumb{width:16px;height:16px;}
   .ebook-scrub{padding:10px 18px 6px;}
   .ctrl-row{padding:6px 18px 8px;}
-  .opt-panel{top:68px;right:16px;}
   .toc-item{padding:7px 16px;font-size:13px;}
   .ebook-scroll{padding:52px 36px 60px;}
   .book-card-actions{opacity:0;transition:opacity .2s;}
@@ -514,7 +512,6 @@ body.theme-light .speed-pill{color:var(--text2);}
   .ctrl-row{padding:6px 8px calc(8px + env(safe-area-inset-bottom,0px));gap:2px;}
   .ctrl-row .skip-btn{width:40px;height:40px;}
   .ctrl-row .skip-btn .ic-svg{width:24px;height:24px;}
-  .opt-panel{position:fixed;top:auto !important;bottom:0;left:0;right:0;width:auto !important;border-radius:20px 20px 0 0;max-height:78vh;padding-bottom:env(safe-area-inset-bottom,0px);}
   .lib-grid{grid-template-columns:repeat(2,1fr);gap:12px;padding:0 14px 40px;}
   .lib-toolbar{padding:0 14px 10px;}
   .lib-header{padding:28px 20px 20px;}
@@ -538,7 +535,7 @@ audio{display:none;}
 /* ── SMOOTH THEME TRANSITION ── */
 html,body,
 #library,#player,#pwaFirstRun,#pwaRegrant,
-.top-bar,.bottom-controls,.opt-panel,
+.top-bar,.bottom-controls,.settings-panel,
 .modal,.relink-sheet,.toc-sidebar,
 .book-card,.ebook-scroll,.ebook-content{
   transition:background-color .2s,border-color .2s,color .2s;
@@ -550,7 +547,7 @@ html,body,
 /* ── BUTTON PRESS FEEDBACK ── */
 .btn:active,.ic-btn:active,
 .back-btn:active,.play-btn:active,.card-action-btn:active,
-.pill:active,.ipill:active,.op-tab:active{
+.pill:active,.ipill:active,.settings-tab:active{
   transform:scale(0.93);
   transition:transform .08s;
 }
@@ -653,11 +650,15 @@ html,body,
   *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;}
   .ebook-scroll{scroll-behavior:auto;}
 }
+/* #endregion Responsive & Animation */
 
 </style>
+<!-- #endregion CSS -->
 </head>
 <body>
+<!-- #region HTML Templates -->
 <div id="toastContainer" aria-live="polite"></div>
+<!-- #region Install Banner -->
 <div id="installBanner">
   <div style="font-size:22px;flex-shrink:0">📚</div>
   <div class="install-banner-text">
@@ -667,7 +668,9 @@ html,body,
   <button class="btn btn-primary" style="font-size:12px;padding:7px 14px;flex-shrink:0" onclick="installPWA()">Install</button>
   <button class="install-banner-x" onclick="dismissInstall()" aria-label="Dismiss">✕</button>
 </div>
+<!-- #endregion Install Banner -->
 
+<!-- #region PWA Screens -->
 <!-- ════ PWA FIRST-RUN ════ -->
 <div id="pwaFirstRun" style="display:none">
   <div class="lib-header">
@@ -702,14 +705,16 @@ html,body,
     </div>
   </div>
 </div>
+<!-- #endregion PWA Screens -->
 
+<!-- #region Library Screen -->
 <!-- ════ LIBRARY ════ -->
 <div id="library" style="display:none">
   <div class="lib-header">
     <button id="libViewBtn" class="lib-view-btn" onclick="toggleLibView()" aria-label="Toggle view">
       <svg class="ic-svg" viewBox="0 0 24 24" id="libViewIcon"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
     </button>
-    <button class="lib-settings-btn" onclick="toggleLibSettings()" aria-label="Settings">
+    <button class="lib-settings-btn" onclick="openSettings('appearance')" aria-label="Settings">
       <svg class="ic-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     </button>
     <div class="lib-logo" role="img" aria-label="Verte">
@@ -731,78 +736,6 @@ html,body,
     <div id="libVersion" style="font-size:10px;color:var(--text3);margin-top:8px;letter-spacing:.04em"></div>
     <div id="pwaFolderBadge" style="display:none;margin-top:8px;font-size:11px;color:var(--text3);cursor:pointer" onclick="pwaFolderChangeTap()">📁 <span id="pwaFolderName"></span> · <span style="color:var(--accent)">Change</span></div>
   </div>
-  <div class="lib-settings-panel" id="libSettingsPanel">
-    <div class="lib-settings-header">
-      <div>
-        <div class="lib-settings-title">Settings</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px">Saved automatically</div>
-      </div>
-      <button class="lib-settings-close" onclick="toggleLibSettings()" aria-label="Close">✕</button>
-    </div>
-    <div class="lib-settings-inner">
-      <button id="rescanBtn" class="btn btn-ghost" style="display:none;width:100%;text-align:left;gap:8px" onclick="pwaScanAndRender();toggleLibSettings()">🔄 Rescan library folder</button>
-      <div style="margin-top:8px">
-        <div class="lib-set-label">Appearance</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;margin-bottom:10px">
-          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-light" onclick="setTheme('light',document.getElementById('themePill-light'))" style="background:#F5F0E2" title="Tallow"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Tallow</span></div>
-          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-slate" onclick="setTheme('slate',document.getElementById('themePill-slate'))" style="background:#F1F3F6" title="Quire"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Quire</span></div>
-          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-umber" onclick="setTheme('umber',document.getElementById('themePill-umber'))" style="background:#2A1E14" title="Umber"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Umber</span></div>
-          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch active" id="libThemePill-dark" onclick="setTheme('',document.getElementById('themePill-dark'))" style="background:#0E1014" title="Iron"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Iron</span></div>
-          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-night" onclick="setTheme('night',document.getElementById('themePill-night'))" style="background:#14203A" title="Vesper"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Vesper</span></div>
-          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-hclight" onclick="setTheme('hclight',document.getElementById('themePill-hclight'))" style="background:#ffffff;border-color:#ccc" title="Hi-C Light"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Hi-C Light</span></div>
-          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="libThemePill-hcdark" onclick="setTheme('hcdark',document.getElementById('themePill-hcdark'))" style="background:#000000;border-color:#ffffff" title="Hi-C Dark"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Hi-C Dark</span></div>
-        </div>
-        <div class="lib-set-label">Highlight colour</div>
-        <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:12px">
-          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch" id="hlColorSwatch-yellow" onclick="setHlColor('yellow')" style="background:#F5D800" title="Yellow"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Yellow</span></div>
-          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch active" id="hlColorSwatch-blue" onclick="setHlColor('blue')" style="background:#5B8DEF" title="Blue"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Blue</span></div>
-          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch" id="hlColorSwatch-pink" onclick="setHlColor('pink')" style="background:#E8507A" title="Pink"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Pink</span></div>
-          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch" id="hlColorSwatch-green" onclick="setHlColor('green')" style="background:#4CAF50" title="Green"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Green</span></div>
-        </div>
-        <div class="lib-set-label">Playback defaults</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <span style="font-size:11px;color:var(--text3);white-space:nowrap">Speed</span>
-          <input id="defSpeedSlider" type="range" min="0.5" max="3" step="0.25" value="1" oninput="setDefaultSpeed(this.value)" style="flex:1;accent-color:var(--accent)">
-          <span id="defSpeedLbl" style="font-size:11px;color:var(--text2);min-width:38px;text-align:right">1.00x</span>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
-          <button class="pill" id="defHlPill-off" onclick="setHighlightMode('off');_syncDefHlPills()">Off</button>
-          <button class="pill" id="defHlPill-sentence" onclick="setHighlightMode('sentence');_syncDefHlPills()">Sentence</button>
-          <button class="pill active" id="defHlPill-word" onclick="setHighlightMode('word');_syncDefHlPills()">Sentence + Word</button>
-        </div>
-        <div class="lib-set-label">Notifications</div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0">
-          <span style="font-size:12px;color:var(--text2)">Hide "no transcript" banner</span>
-          <button class="toggle" id="suppressNotxToggle" onclick="toggleSuppressNotxBanner()"></button>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0">
-          <span style="font-size:12px;color:var(--text2)">Hide speed change toasts</span>
-          <button class="toggle" id="suppressSpeedToastToggle" onclick="toggleSuppressSpeedToast()"></button>
-        </div>
-        <div class="lib-set-label" style="margin-top:8px">Library</div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0">
-          <span style="font-size:12px;color:var(--text2)">Confirm before deleting</span>
-          <button class="toggle on" id="confirmDeleteToggle" onclick="toggleConfirmDelete()"></button>
-        </div>
-        <div class="lib-set-label" style="margin-top:14px">Advanced</div>
-        <div style="margin-bottom:10px">
-          <div style="font-size:12px;color:var(--text2);margin-bottom:6px">TTS scroll speed</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <input id="libDefWpmSlider" type="range" min="30" max="600" step="10" value="150" oninput="setDefaultWpmFromSlider(this.value);this.nextElementSibling.value=this.value" style="flex:1;accent-color:var(--accent)">
-            <input id="libDefWpmInput" type="number" min="30" max="600" step="10" value="150" onchange="setDefaultWpmFromInput(this.value)" style="width:56px;padding:4px 6px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:var(--font-ui);text-align:center;">
-          </div>
-          <div id="libWpmSpeedLbl" style="font-size:11px;color:var(--text3);margin-top:4px">Normal</div>
-        </div>
-        <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="margin-top:12px;width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text2);font-size:12px;font-family:var(--font-ui);cursor:pointer;text-align:left">About Verte</button>
-        <div style="display:none;color:var(--text3);font-size:12px;line-height:1.7;margin-top:8px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">
-          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Verte</div>
-          <div>Audiobook &amp; Ebook Reader</div>
-          <div id="libAboutVersion" style="opacity:.6;margin-top:4px"></div>
-          <div style="margin-top:8px;opacity:.5">Listen. Read. Disappear.</div>
-        </div>
-      </div>
-    </div>
-  </div>
   <div class="lib-toolbar" id="libToolbar">
     <div class="lib-search-wrap">
       <svg class="lib-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
@@ -813,7 +746,200 @@ html,body,
   </div>
   <div class="lib-grid" id="libGrid"></div>
 </div>
+<!-- #endregion Library Screen -->
 
+<!-- #region Settings Panel -->
+<!-- ════ SETTINGS PANEL (unified) ════ -->
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-header">
+    <div>
+      <div class="settings-title">Settings</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px">Saved automatically</div>
+    </div>
+    <button class="settings-close" onclick="closeSettings()" aria-label="Close">✕</button>
+  </div>
+  <div class="settings-tabs">
+    <button class="settings-tab active" id="sTabBtn-appearance" onclick="switchSettingsTab('appearance',this)">Appearance</button>
+    <button class="settings-tab" id="sTabBtn-playback" onclick="switchSettingsTab('playback',this)">Playback</button>
+    <button class="settings-tab" id="sTabBtn-library" onclick="switchSettingsTab('library',this)">Library</button>
+    <button class="settings-tab" id="sTabBtn-advanced" onclick="switchSettingsTab('advanced',this)">Advanced</button>
+  </div>
+  <div class="settings-inner">
+    <!-- ── APPEARANCE ── -->
+    <div class="settings-tab-body" id="sTab-appearance">
+      <div class="s-section">
+        <div class="s-label">Theme</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start">
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="sTheme-light" onclick="setTheme('light',this)" style="background:#F5F0E2" title="Tallow"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Tallow</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="sTheme-slate" onclick="setTheme('slate',this)" style="background:#F1F3F6" title="Quire"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Quire</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="sTheme-umber" onclick="setTheme('umber',this)" style="background:#2A1E14" title="Umber"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Umber</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch active" id="sTheme-dark" onclick="setTheme('',this)" style="background:#0E1014" title="Iron"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Iron</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="sTheme-night" onclick="setTheme('night',this)" style="background:#14203A" title="Vesper"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Vesper</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="sTheme-hclight" onclick="setTheme('hclight',this)" style="background:#ffffff;border-color:#ccc" title="Hi-C Light"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Hi-C Light</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="theme-swatch" id="sTheme-hcdark" onclick="setTheme('hcdark',this)" style="background:#000000;border-color:#ffffff" title="Hi-C Dark"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Hi-C Dark</span></div>
+        </div>
+      </div>
+      <div class="s-section">
+        <div class="s-label">Highlight colour</div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch" id="sHlColor-yellow" onclick="setHlColor('yellow')" style="background:#F5D800" title="Yellow"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Yellow</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch active" id="sHlColor-blue" onclick="setHlColor('blue')" style="background:#5B8DEF" title="Blue"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Blue</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch" id="sHlColor-pink" onclick="setHlColor('pink')" style="background:#E8507A" title="Pink"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Pink</span></div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center"><button class="hl-swatch" id="sHlColor-green" onclick="setHlColor('green')" style="background:#4CAF50" title="Green"></button><span style="display:block;font-size:9px;color:var(--text3);text-align:center;margin-top:3px;font-family:var(--font-ui)">Green</span></div>
+        </div>
+      </div>
+      <div class="s-section">
+        <div class="s-label">Font</div>
+        <div class="pills">
+          <button class="pill active" id="sFont-lora" onclick="setFont('Lora,Georgia,serif','lora',this)">Lora</button>
+          <button class="pill" id="sFont-georgia" onclick="setFont('Georgia,serif','georgia',this)">Georgia</button>
+          <button class="pill" id="sFont-sans" onclick="setFont('DM Sans,sans-serif','sans',this)">DM Sans</button>
+          <button class="pill" id="sFont-mono" onclick="setFont('Courier New,monospace','mono',this)">Courier New</button>
+          <button class="pill" id="sFont-dyslexic" onclick="setFont(&quot;'OpenDyslexic',sans-serif&quot;,'dyslexic',this)">OpenDyslexic</button>
+        </div>
+      </div>
+      <div class="s-section">
+        <div class="s-label">Reading</div>
+        <div class="s-row"><span class="s-lbl">Font size</span><div style="display:flex;align-items:center;gap:8px"><span class="s-val" id="sFontSizeLbl">18px</span><input type="range" class="s-slider" id="sFontSize" min="13" max="28" value="18" oninput="setFS(this.value)"></div></div>
+        <div class="s-row"><span class="s-lbl">Line height</span><div style="display:flex;align-items:center;gap:8px"><span class="s-val" id="sLineHeightLbl">1.88</span><input type="range" class="s-slider" id="sLineHeight" min="1.3" max="2.4" step="0.05" value="1.88" oninput="setLH(this.value)"></div></div>
+        <div class="s-row"><span class="s-lbl">Width</span><div style="display:flex;align-items:center;gap:8px"><span class="s-val" id="sMaxWidthLbl">680px</span><input type="range" class="s-slider" id="sMaxWidth" min="380" max="900" step="20" value="680" oninput="setMW(this.value)"></div></div>
+        <div class="s-row"><span class="s-lbl">Align</span><div class="pills"><button class="ipill active" id="sAlign-left" onclick="setAlign('left',this)">L</button><button class="ipill" id="sAlign-justify" onclick="setAlign('justify',this)">J</button><button class="ipill" id="sAlign-center" onclick="setAlign('center',this)">C</button></div></div>
+      </div>
+      <div class="s-section" id="sOrientSec" style="display:none">
+        <div class="s-label">Orientation</div>
+        <div class="pills">
+          <button class="pill active" id="sOrient-auto" onclick="setOrientation('auto',this)">Auto</button>
+          <button class="pill" id="sOrient-portrait" onclick="setOrientation('portrait',this)">Portrait</button>
+          <button class="pill" id="sOrient-landscape" onclick="setOrientation('landscape',this)">Landscape</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5">Locking enters fullscreen. Reverts to auto when you exit fullscreen.</div>
+      </div>
+    </div>
+
+    <!-- ── PLAYBACK ── -->
+    <div class="settings-tab-body" id="sTab-playback" style="display:none">
+      <div class="s-section">
+        <div class="s-label">Highlight</div>
+        <div class="s-row" style="margin-top:2px">
+          <div class="pills" style="width:100%">
+            <button class="pill" id="sHlMode-off" onclick="setHighlightMode('off')" style="flex:1;text-align:center">Off</button>
+            <button class="pill" id="sHlMode-sentence" onclick="setHighlightMode('sentence')" style="flex:1.4;text-align:center">Sentence</button>
+            <button class="pill" id="sHlMode-word" onclick="setHighlightMode('word')" style="flex:2.2;text-align:center">Sentence + Word</button>
+          </div>
+        </div>
+      </div>
+      <div class="s-section">
+        <div class="s-label">Controls</div>
+        <div class="s-row"><span class="s-lbl">Auto-scroll</span><button class="toggle on" id="sAutoScroll" onclick="toggleAS()"></button></div>
+        <div class="s-row" style="gap:8px">
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" id="sResyncBtn" onclick="resync()">↺ Resync</button>
+        </div>
+        <div class="s-row" id="sOffsetRow" style="display:none">
+          <span class="s-lbl">Sync offset <span class="s-info-btn" onclick="toggleOpInfo(this)">ⓘ</span></span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button class="btn btn-ghost" style="font-size:12px;padding:4px 10px" onclick="adjustOffset(-0.5)">-0.5s</button>
+            <span id="sOffsetVal" style="font-size:13px;min-width:48px;text-align:center">0.0s</span>
+            <button class="btn btn-ghost" style="font-size:12px;padding:4px 10px" onclick="adjustOffset(+0.5)">+0.5s</button>
+          </div>
+        </div>
+        <div class="s-desc" id="sOffsetDescRow" style="display:none">Shifts highlighting earlier or later to correct misalignment with the audio.</div>
+      </div>
+      <div class="s-section">
+        <div class="s-label">Speed</div>
+        <input type="hidden" id="sRateCustom" value="1">
+        <div class="s-row">
+          <input type="range" class="s-slider" id="sSpeed" min="0.5" max="3" step="0.25" value="1" oninput="setRate(this.value)" style="flex:1">
+          <span class="s-val" id="sSpeedLbl">1.00×</span>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="rate-preset-btn" onclick="setRate(0.75)">0.75×</button>
+          <button class="rate-preset-btn active" onclick="setRate(1)">1×</button>
+          <button class="rate-preset-btn" onclick="setRate(1.25)">1.25×</button>
+          <button class="rate-preset-btn" onclick="setRate(1.5)">1.5×</button>
+          <button class="rate-preset-btn" onclick="setRate(2)">2×</button>
+        </div>
+      </div>
+      <div class="s-section">
+        <div class="s-label">Sentence pause <span style="font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">(TTS only)</span></div>
+        <div class="s-row"><span class="s-val" id="sSentPauseLbl">500ms</span><input type="range" class="s-slider" id="sSentPause" min="0" max="2000" step="50" value="500" oninput="setSentPause(this.value)"></div>
+      </div>
+      <div class="s-section" id="sTtsVoiceSec" style="display:none">
+        <div class="s-label">TTS Voice</div>
+        <div class="s-row">
+          <select id="sTtsVoice" class="rate-sel" style="flex:1;min-width:0;max-width:100%;font-size:12px" onchange="setTtsVoice(this.value)">
+            <option>Loading voices…</option>
+          </select>
+        </div>
+      </div>
+      <div class="s-section">
+        <div class="s-label">Sleep timer</div>
+        <div class="s-row">
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="cycleSleepTimer()">🌙 Cycle sleep timer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LIBRARY ── -->
+    <div class="settings-tab-body" id="sTab-library" style="display:none">
+      <div class="s-section">
+        <div class="s-label">Defaults for new books</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+          <button class="pill" id="sDefHl-off" onclick="setDefaultHlMode('off')">Off</button>
+          <button class="pill" id="sDefHl-sentence" onclick="setDefaultHlMode('sentence')">Sentence</button>
+          <button class="pill active" id="sDefHl-word" onclick="setDefaultHlMode('word')">Sentence + Word</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-size:11px;color:var(--text3);white-space:nowrap">Speed</span>
+          <input id="sDefSpeed" type="range" min="0.5" max="3" step="0.25" value="1" oninput="setDefaultSpeed(this.value)" style="flex:1;accent-color:var(--accent)">
+          <span id="sDefSpeedLbl" style="font-size:11px;color:var(--text2);min-width:38px;text-align:right">1.00x</span>
+        </div>
+      </div>
+      <div class="s-section">
+        <div class="s-label">Library</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0">
+          <span style="font-size:12px;color:var(--text2)">Confirm before deleting</span>
+          <button class="toggle on" id="sConfirmDelete" onclick="toggleConfirmDelete()"></button>
+        </div>
+      </div>
+      <div class="s-section">
+        <div class="s-label">Notifications</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0">
+          <span style="font-size:12px;color:var(--text2)">Hide "no transcript" banner</span>
+          <button class="toggle" id="sSuppressNotx" onclick="toggleSuppressNotxBanner()"></button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0">
+          <span style="font-size:12px;color:var(--text2)">Hide speed change toasts</span>
+          <button class="toggle" id="sSuppressSpeed" onclick="toggleSuppressSpeedToast()"></button>
+        </div>
+      </div>
+      <button id="sRescanBtn" class="btn btn-ghost" style="display:none;width:100%;text-align:left;gap:8px;margin-top:8px" onclick="pwaScanAndRender();closeSettings()">🔄 Rescan library folder</button>
+    </div>
+
+    <!-- ── ADVANCED ── -->
+    <div class="settings-tab-body" id="sTab-advanced" style="display:none">
+      <div class="s-section">
+        <div class="s-label">TTS scroll speed</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input id="sWpmSlider" type="range" min="30" max="600" step="10" value="150" oninput="setDefaultWpmFromSlider(this.value)" style="flex:1;accent-color:var(--accent)">
+          <input id="sWpmInput" type="number" min="30" max="600" step="10" value="150" onchange="setDefaultWpmFromInput(this.value)" style="width:56px;padding:4px 6px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:var(--font-ui);text-align:center;">
+        </div>
+        <div id="sWpmLbl" style="font-size:11px;color:var(--text3);margin-top:4px">Normal</div>
+      </div>
+      <div class="s-section" style="margin-top:16px">
+        <div class="s-label">About</div>
+        <div style="color:var(--text3);font-size:12px;line-height:1.7">
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Verte</div>
+          <div>Audiobook &amp; Ebook Reader</div>
+          <div id="sVersion" style="opacity:.6;margin-top:4px"></div>
+          <div style="margin-top:8px;opacity:.5">Listen. Read. Disappear.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- #endregion Settings Panel -->
+
+<!-- #region Player Screen -->
 <!-- ════ PLAYER ════ -->
 <div id="player">
   <audio id="audio" preload="metadata"></audio>
@@ -837,129 +963,10 @@ html,body,
     <button class="ic-btn" id="ttsToggleBtn" onclick="toggleTtsMode()" title="Text-to-speech" aria-label="Text-to-speech" style="display:none">
       <svg class="ic-svg" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
     </button>
-    <button class="ic-btn" id="optBtn" onclick="toggleOpts()" aria-label="Settings">
+    <button class="ic-btn" id="optBtn" onclick="openSettings('playback')" aria-label="Settings">
       <svg class="ic-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     </button>
 
-    <!-- OPTIONS PANEL -->
-    <div class="opt-panel" id="optPanel">
-      <div class="op-tabs">
-        <button class="op-tab active" onclick="switchOptTab('playback',this)">Playback</button>
-        <button class="op-tab" onclick="switchOptTab('display',this)">Display</button>
-        <button class="op-tab" onclick="switchOptTab('advanced',this)">Advanced</button>
-      </div>
-      <div class="op-tab-body" id="opTab-playback">
-        <div class="op-sec" id="ttsVoiceSec" style="display:none">
-          <div class="op-ttl">TTS Voice</div>
-          <div class="op-row">
-            <select id="ttsVoiceSel" class="rate-sel" style="flex:1;min-width:0;max-width:100%;font-size:12px" onchange="setTtsVoice(this.value)">
-              <option>Loading voices…</option>
-            </select>
-          </div>
-        </div>
-        <div class="op-sec">
-          <div class="op-ttl">Sentence Pause <span class="op-info-btn" onclick="toggleOpInfo(this)">ⓘ</span></div>
-          <div class="op-desc" style="display:none">Adds a gap between sentences during TTS playback. Has no effect in audio mode.</div>
-          <div class="op-row"><span class="op-val" id="sentPauseLbl">500ms</span><input type="range" class="op-slider" min="0" max="2000" step="50" value="500" oninput="setSentPause(this.value)"></div>
-        </div>
-        <div class="op-sec">
-          <div class="op-ttl">Highlight <span class="op-info-btn" onclick="toggleOpInfo(this)">ⓘ</span></div>
-          <div class="op-desc" style="display:none">
-            <strong style="color:var(--text2)">Off</strong> — no highlighting while playing.<br>
-            <strong style="color:var(--text2)">Sentence</strong> — the sentence currently being read glows.<br>
-            <strong style="color:var(--text2)">Sentence + Word</strong> — sentence glows and a moving underline tracks each word.
-          </div>
-          <div class="op-row" style="margin-top:2px">
-            <div class="pills" style="width:100%">
-              <button class="pill" id="hlPill-off" onclick="setHighlightMode('off')" style="flex:1;text-align:center">Off</button>
-              <button class="pill" id="hlPill-sentence" onclick="setHighlightMode('sentence')" style="flex:1.4;text-align:center">Sentence</button>
-              <button class="pill" id="hlPill-word" onclick="setHighlightMode('word')" style="flex:2.2;text-align:center">Sentence + Word</button>
-            </div>
-          </div>
-          <div class="op-row" style="margin-top:6px;gap:8px">
-            <span class="op-lbl" style="flex:none;font-size:11px">Colour</span>
-            <button class="hl-swatch" id="hlColorSwatch2-yellow" onclick="setHlColor('yellow')" style="background:#F5D800" title="Yellow"></button>
-            <button class="hl-swatch active" id="hlColorSwatch2-blue" onclick="setHlColor('blue')" style="background:#5B8DEF" title="Blue"></button>
-            <button class="hl-swatch" id="hlColorSwatch2-pink" onclick="setHlColor('pink')" style="background:#E8507A" title="Pink"></button>
-            <button class="hl-swatch" id="hlColorSwatch2-green" onclick="setHlColor('green')" style="background:#4CAF50" title="Green"></button>
-          </div>
-        </div>
-        <input type="hidden" id="rateCustom" value="1">
-        <div class="op-sec">
-          <div class="op-ttl">Controls</div>
-          <div class="op-row"><span class="op-lbl">Auto-scroll <span class="op-info-btn" onclick="toggleOpInfo(this)">ⓘ</span></span><button class="toggle on" id="asToggle" onclick="toggleAS()"></button></div>
-          <div class="op-desc" style="display:none">Keeps the current sentence in view during playback.</div>
-          <div class="op-row" style="gap:8px">
-            <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" id="resyncBtn" onclick="resync()">↺ Resync</button>
-          </div>
-          <div class="op-row" id="offsetRow" style="display:none">
-            <span class="op-lbl">Sync offset <span class="op-info-btn" onclick="toggleOpInfo(this)">ⓘ</span></span>
-            <div style="display:flex;align-items:center;gap:6px">
-              <button class="btn btn-ghost" style="font-size:12px;padding:4px 10px" onclick="adjustOffset(-0.5)">-0.5s</button>
-              <span id="offsetVal" style="font-size:13px;min-width:48px;text-align:center">0.0s</span>
-              <button class="btn btn-ghost" style="font-size:12px;padding:4px 10px" onclick="adjustOffset(+0.5)">+0.5s</button>
-            </div>
-          </div>
-          <div class="op-desc" id="offsetDescRow" style="display:none">Shifts highlighting earlier or later to correct misalignment with the audio.</div>
-        </div>
-      </div>
-      <div class="op-tab-body" id="opTab-display" style="display:none">
-        <div class="op-sec">
-          <div class="op-ttl">Theme</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="theme-swatch" id="themePill-light" onclick="setTheme('light',this)" style="background:#F5F0E2" title="Tallow"></button>
-            <button class="theme-swatch" id="themePill-slate" onclick="setTheme('slate',this)" style="background:#F1F3F6" title="Quire"></button>
-            <button class="theme-swatch" id="themePill-umber" onclick="setTheme('umber',this)" style="background:#2A1E14" title="Umber"></button>
-            <button class="theme-swatch active" id="themePill-dark" onclick="setTheme('',this)" style="background:#0E1014" title="Iron"></button>
-            <button class="theme-swatch" id="themePill-night" onclick="setTheme('night',this)" style="background:#14203A" title="Vesper"></button>
-            <button class="theme-swatch" id="themePill-hclight" onclick="setTheme('hclight',this)" style="background:#ffffff;border-color:var(--border)" title="Hi-C Light"></button>
-            <button class="theme-swatch" id="themePill-hcdark" onclick="setTheme('hcdark',this)" style="background:#000000;border-color:#ffffff" title="Hi-C Dark"></button>
-          </div>
-        </div>
-        <div class="op-sec">
-          <div class="op-ttl">Font</div>
-          <div class="pills">
-            <button class="pill active" id="fontPill-lora" onclick="setFont('Lora,Georgia,serif','lora',this)">Lora</button>
-            <button class="pill" id="fontPill-georgia" onclick="setFont('Georgia,serif','georgia',this)">Georgia</button>
-            <button class="pill" id="fontPill-sans" onclick="setFont('DM Sans,sans-serif','sans',this)">DM Sans</button>
-            <button class="pill" id="fontPill-mono" onclick="setFont('Courier New,monospace','mono',this)">Courier New</button>
-            <button class="pill" id="fontPill-dyslexic" onclick="setFont(&quot;'OpenDyslexic',sans-serif&quot;,'dyslexic',this)">OpenDyslexic</button>
-          </div>
-        </div>
-        <div class="op-sec">
-          <div class="op-ttl">Reading</div>
-          <div class="op-row"><span class="op-lbl">Font size</span><div style="display:flex;align-items:center;gap:8px"><span class="op-val" id="fsLbl">18px</span><input type="range" class="op-slider" id="fsSlider" min="13" max="28" value="18" oninput="setFS(this.value)"></div></div>
-          <div class="op-row"><span class="op-lbl">Line height</span><div style="display:flex;align-items:center;gap:8px"><span class="op-val" id="lhLbl">1.88</span><input type="range" class="op-slider" id="lhSlider" min="1.3" max="2.4" step="0.05" value="1.88" oninput="setLH(this.value)"></div></div>
-          <div class="op-row"><span class="op-lbl">Width</span><div style="display:flex;align-items:center;gap:8px"><span class="op-val" id="mwLbl">680px</span><input type="range" class="op-slider" id="mwSlider" min="380" max="900" step="20" value="680" oninput="setMW(this.value)"></div></div>
-          <div class="op-row"><span class="op-lbl">Align</span><div class="pills"><button class="ipill active" id="alignPill-left" onclick="setAlign('left',this)">L</button><button class="ipill" id="alignPill-justify" onclick="setAlign('justify',this)">J</button><button class="ipill" id="alignPill-center" onclick="setAlign('center',this)">C</button></div></div>
-        </div>
-        <div class="op-sec" id="orientSec" style="display:none">
-          <div class="op-ttl">Orientation</div>
-          <div class="pills">
-            <button class="pill active" id="orientPill-auto" onclick="setOrientation('auto',this)">Auto</button>
-            <button class="pill" id="orientPill-portrait" onclick="setOrientation('portrait',this)">Portrait</button>
-            <button class="pill" id="orientPill-landscape" onclick="setOrientation('landscape',this)">Landscape</button>
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5">Locking enters fullscreen. Reverts to auto when you exit fullscreen.</div>
-        </div>
-      </div>
-      <div class="op-tab-body" id="opTab-advanced" style="display:none">
-        <div class="op-sec">
-          <div class="op-ttl">TTS Scroll Speed</div>
-          <div class="op-row" style="gap:8px">
-            <input id="defWpmSlider" type="range" min="30" max="600" step="10" value="150" oninput="setDefaultWpmFromSlider(this.value)" style="flex:1;accent-color:var(--accent)">
-            <input id="defWpmInput" type="number" min="30" max="600" step="10" value="150" onchange="setDefaultWpmFromInput(this.value)" style="width:56px;padding:4px 6px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:var(--font-ui);text-align:center;">
-          </div>
-          <div id="wpmSpeedLbl" style="font-size:11px;color:var(--text3);margin-top:4px">Normal</div>
-        </div>
-        <div class="op-sec" style="color:var(--text3);font-size:12px;line-height:1.7">
-          <div class="op-ttl">About</div>
-          <div>Verte — Audiobook &amp; Ebook Reader</div>
-          <div id="aboutVersion" style="opacity:.5;margin-top:2px"></div>
-          <div style="margin-top:4px;opacity:.6">Settings are saved automatically.</div>
-        </div>
-      </div>
-    </div>
   </div><!-- /top-bar -->
 
   <!-- TRANSCRIPT BANNER (syncing states — below top bar) -->
@@ -1045,7 +1052,9 @@ html,body,
   </div>
 
 </div><!-- /player -->
+<!-- #endregion Player Screen -->
 
+<!-- #region Modals -->
 <!-- ════ ADD BOOK MODAL ════ -->
 <div class="modal-overlay" id="modal" style="display:none" onclick="closeOvl(event)" role="dialog" aria-modal="true" aria-label="Add new book">
   <div class="modal">
@@ -1206,12 +1215,16 @@ html,body,
     </div>
   </div>
 </div>
+<!-- #endregion Modals -->
+<!-- #endregion HTML Templates -->
 
+<!-- #region JavaScript -->
 <script>
 'use strict';
 
+// #region State & Constants
 // ── App version ───────────────────────────────────
-const APP_VERSION = '2.10.0';
+const APP_VERSION = '2.11.0';
 
 // ══════════════════════════════════════════════════════
 // STATE
@@ -1225,7 +1238,7 @@ let curSent = 0; let curWord = 0;
 let autoScroll = true; let scrollPaused = false; let scrollTimer = null; let _programmaticScroll = false;
 let wpm = 150; let sentPauseMs = 500;
 let defaultPlaybackRate = 1; let hlColor = 'blue'; let suppressNotxBanner = false; let suppressSpeedToast = false; let confirmDelete = true;
-let mediaState = 'stopped'; let tocOpen = false; let wordHlOn = true; let sentHlOn = true;
+let mediaState = 'stopped'; let tocOpen = false; let wordHlOn = true; let sentHlOn = true; let _defaultHlMode = 'word';
 let isSeeking = false;
 let sentenceTimings = [];
 let syncOffset = 0;
@@ -1265,7 +1278,9 @@ const DISPLAY_PREFS_KEY = 'verte_display_prefs_v1';
 const IDB_NAME = 'verte_pwa'; const IDB_STORE = 'handles'; const IDB_BLOB_STORE = 'blobs';
 const BLOB_FIELDS = ['ebookData','transcriptData','coverUrl'];
 const SYNC_HINT_KEY = 'verte_sync_hint_v1';
+// #endregion State & Constants
 
+// #region Core Utilities (toast, wake lock, media session, sleep timer)
 // ══════════════════════════════════════════════════════
 // TOAST NOTIFICATIONS
 // ══════════════════════════════════════════════════════
@@ -1434,7 +1449,9 @@ function _updateSleepBadge(){
   badge.textContent = remaining + 'm';
   badge.style.display = 'inline';
 }
+// #endregion Core Utilities
 
+// #region Keyboard & Modal Navigation
 // ══════════════════════════════════════════════════════
 // MODAL KEYBOARD NAV (Escape to close, focus trap)
 // ══════════════════════════════════════════════════════
@@ -1523,7 +1540,9 @@ document.addEventListener('keydown', function(e){
       break;
   }
 });
+// #endregion Keyboard & Modal Navigation
 
+// #region PWA Install & DOM Cache
 // ══════════════════════════════════════════════════════
 // PWA INSTALL PROMPT
 // ══════════════════════════════════════════════════════
@@ -1583,7 +1602,9 @@ function setPlayBtnIcon(playing){
 function xh(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmt(s){ if(!isFinite(s)||s<0)return '0:00'; const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=Math.floor(s%60); if(h>0) return h+':'+(m<10?'0':'')+m+':'+(sec<10?'0':'')+sec; return m+':'+(sec<10?'0':'')+sec; }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+// #endregion PWA Install & DOM Cache
 
+// #region Persistence (IndexedDB, localStorage, display prefs)
 // ══════════════════════════════════════════════════════
 // INDEXEDDB (PWA folder handle storage)
 // ══════════════════════════════════════════════════════
@@ -1768,22 +1789,23 @@ function saveDisplayPrefs(){
   const prefs={
     theme:document.body.className.replace('theme-',''),
     fontBody:_fontBody,
-    fontKey: document.querySelector('.pill.active[id^=fontPill]')?.id?.replace('fontPill-','') || 'lora',
+    fontKey: document.querySelector('.pill.active[id^=sFont-]')?.id?.replace('sFont-','') || 'lora',
     fontSize:_fontSize+'px',
     lineHeight:String(_lineHeight),
     maxWidth:_maxWidth+'px',
     textAlign:document.getElementById('eContent')?.style.textAlign||'left',
     wordHl:wordHlOn, sentHl:sentHlOn,
     hlMode:!sentHlOn?'off':wordHlOn?'word':'sentence',
+    defaultHlMode:_defaultHlMode,
     wpm, sentPauseMs,
-    orientation: document.querySelector('.pill.active[id^=orientPill]')?.id?.replace('orientPill-','') || 'auto',
+    orientation: document.querySelector('.pill.active[id^=sOrient-]')?.id?.replace('sOrient-','') || 'auto',
     autoScroll:autoScroll,
     defaultPlaybackRate:defaultPlaybackRate,
     hlColor:hlColor,
     suppressNotxBanner:suppressNotxBanner,
     suppressSpeedToast:suppressSpeedToast,
     confirmDelete:confirmDelete,
-    ttsVoiceIdx:parseInt(document.getElementById('ttsVoiceSel')?.value||'0',10)||0,
+    ttsVoiceIdx:parseInt(document.getElementById('sTtsVoice')?.value||'0',10)||0,
   };
   localStorage.setItem(DISPLAY_PREFS_KEY,JSON.stringify(prefs));
 }
@@ -1792,20 +1814,17 @@ function loadDisplayPrefs(){
     const p=JSON.parse(localStorage.getItem(DISPLAY_PREFS_KEY)||'{}');
     if(p.theme!==undefined){
       document.body.className=p.theme?'theme-'+p.theme:'';
-      document.querySelectorAll('[id^=themePill]').forEach(b=>b.classList.remove('active'));
-      const tid=p.theme?'themePill-'+p.theme:'themePill-dark';
+      document.querySelectorAll('[id^=sTheme-]').forEach(b=>b.classList.remove('active'));
+      const tid=p.theme?'sTheme-'+p.theme:'sTheme-dark';
       document.getElementById(tid)?.classList.add('active');
-      document.querySelectorAll('[id^=libThemePill]').forEach(b=>b.classList.remove('active'));
-      var ltid=p.theme?'libThemePill-'+p.theme:'libThemePill-dark';
-      document.getElementById(ltid)?.classList.add('active');
     }
     if(p.fontBody){
       // Migrate old font-family name for OpenDyslexic (CDN changed)
       if(p.fontBody.includes('Open Dyslexic')) p.fontBody=p.fontBody.replace('Open Dyslexic','OpenDyslexic');
       _fontBody=p.fontBody;
       document.documentElement.style.setProperty('--font-body',p.fontBody);
-      document.querySelectorAll('[id^=fontPill]').forEach(b=>b.classList.remove('active'));
-      if(p.fontKey) document.getElementById('fontPill-'+p.fontKey)?.classList.add('active');
+      document.querySelectorAll('[id^=sFont-]').forEach(b=>b.classList.remove('active'));
+      if(p.fontKey) document.getElementById('sFont-'+p.fontKey)?.classList.add('active');
       if(p.fontKey==='dyslexic'&&!document.getElementById('font-opendyslexic')){
         const link=document.createElement('link');
         link.id='font-opendyslexic'; link.rel='stylesheet';
@@ -1817,46 +1836,64 @@ function loadDisplayPrefs(){
         document.head.appendChild(b);
       }
     }
-    if(p.fontSize){ _fontSize=parseInt(p.fontSize); document.documentElement.style.setProperty('--font-size',p.fontSize); const v=parseInt(p.fontSize); document.getElementById('fsSlider').value=v; document.getElementById('fsLbl').textContent=p.fontSize; }
-    if(p.lineHeight){ _lineHeight=parseFloat(p.lineHeight); document.documentElement.style.setProperty('--line-height',p.lineHeight); document.getElementById('lhSlider').value=parseFloat(p.lineHeight); document.getElementById('lhLbl').textContent=parseFloat(p.lineHeight).toFixed(2); }
-    if(p.maxWidth){ _maxWidth=parseInt(p.maxWidth); document.documentElement.style.setProperty('--max-width',p.maxWidth); const v=parseInt(p.maxWidth); document.getElementById('mwSlider').value=v; document.getElementById('mwLbl').textContent=p.maxWidth; }
-    if(p.textAlign){ const ec=document.getElementById('eContent'); if(ec) ec.style.textAlign=p.textAlign; document.querySelectorAll('[id^=alignPill]').forEach(b=>b.classList.remove('active')); document.getElementById('alignPill-'+p.textAlign)?.classList.add('active'); }
-    if(p.wordHl!==undefined){ wordHlOn=p.wordHl; const wt=document.getElementById('wordHlToggle'); if(wt) wt.classList.toggle('on',wordHlOn); }
-    if(p.sentHl!==undefined){ sentHlOn=p.sentHl; const st=document.getElementById('sentHlToggle'); if(st) st.classList.toggle('on',sentHlOn); }
+    if(p.fontSize){ _fontSize=parseInt(p.fontSize); document.documentElement.style.setProperty('--font-size',p.fontSize); const v=parseInt(p.fontSize); document.getElementById('sFontSize').value=v; document.getElementById('sFontSizeLbl').textContent=p.fontSize; }
+    if(p.lineHeight){ _lineHeight=parseFloat(p.lineHeight); document.documentElement.style.setProperty('--line-height',p.lineHeight); document.getElementById('sLineHeight').value=parseFloat(p.lineHeight); document.getElementById('sLineHeightLbl').textContent=parseFloat(p.lineHeight).toFixed(2); }
+    if(p.maxWidth){ _maxWidth=parseInt(p.maxWidth); document.documentElement.style.setProperty('--max-width',p.maxWidth); const v=parseInt(p.maxWidth); document.getElementById('sMaxWidth').value=v; document.getElementById('sMaxWidthLbl').textContent=p.maxWidth; }
+    if(p.textAlign){ const ec=document.getElementById('eContent'); if(ec) ec.style.textAlign=p.textAlign; document.querySelectorAll('[id^=sAlign-]').forEach(b=>b.classList.remove('active')); document.getElementById('sAlign-'+p.textAlign)?.classList.add('active'); }
+    if(p.wordHl!==undefined){ wordHlOn=p.wordHl; }
+    if(p.sentHl!==undefined){ sentHlOn=p.sentHl; }
     // hlMode overrides individual booleans if present (new format)
     if(p.hlMode){
       if(p.hlMode==='off'){    sentHlOn=false; wordHlOn=false; }
       else if(p.hlMode==='sentence'){ sentHlOn=true;  wordHlOn=false; }
       else if(p.hlMode==='word'){     sentHlOn=true;  wordHlOn=true;  }
     }
+    if(p.defaultHlMode) _defaultHlMode=p.defaultHlMode; else if(p.hlMode) _defaultHlMode=p.hlMode;
     _syncHlPills();
-    if(p.wpm){ wpm=p.wpm; document.getElementById('defWpmSlider').value=wpm; document.getElementById('defWpmInput').value=wpm; updateWpmLabel(); }
-    if(p.sentPauseMs!==undefined){ sentPauseMs=p.sentPauseMs; document.getElementById('sentPauseLbl').textContent=sentPauseMs+'ms'; }
+    _syncDefHlPills();
+    if(p.wpm){ wpm=p.wpm; document.getElementById('sWpmSlider').value=wpm; document.getElementById('sWpmInput').value=wpm; updateWpmLabel(); }
+    if(p.sentPauseMs!==undefined){ sentPauseMs=p.sentPauseMs; document.getElementById('sSentPauseLbl').textContent=sentPauseMs+'ms'; }
     if(IS_PWA){
-      document.getElementById('orientSec').style.display='';
+      document.getElementById('sOrientSec').style.display='';
       if(p.orientation&&p.orientation!=='auto'){
-        document.querySelectorAll('[id^=orientPill]').forEach(b=>b.classList.remove('active'));
-        document.getElementById('orientPill-'+p.orientation)?.classList.add('active');
+        document.querySelectorAll('[id^=sOrient-]').forEach(b=>b.classList.remove('active'));
+        document.getElementById('sOrient-'+p.orientation)?.classList.add('active');
       }
     }
-    if(p.autoScroll!==undefined){ autoScroll=p.autoScroll; var ast=document.getElementById('asToggle'); if(ast) ast.classList.toggle('on',autoScroll); }
-    if(p.defaultPlaybackRate!==undefined){ defaultPlaybackRate=p.defaultPlaybackRate; var dsl=document.getElementById('defSpeedSlider'); if(dsl) dsl.value=defaultPlaybackRate; var dsLbl=document.getElementById('defSpeedLbl'); if(dsLbl) dsLbl.textContent=defaultPlaybackRate.toFixed(2)+'x'; }
+    if(p.autoScroll!==undefined){ autoScroll=p.autoScroll; var ast=document.getElementById('sAutoScroll'); if(ast) ast.classList.toggle('on',autoScroll); }
+    if(p.defaultPlaybackRate!==undefined){ defaultPlaybackRate=p.defaultPlaybackRate; var dsl=document.getElementById('sDefSpeed'); if(dsl) dsl.value=defaultPlaybackRate; var dsLbl=document.getElementById('sDefSpeedLbl'); if(dsLbl) dsLbl.textContent=defaultPlaybackRate.toFixed(2)+'x'; }
     if(p.hlColor){ hlColor=['yellow','blue','pink','green'].includes(p.hlColor)?p.hlColor:'blue'; if(typeof _applyHlColor==='function') _applyHlColor(); }
     if(p.ttsVoiceIdx!==undefined){ window._pendingTtsVoiceIdx=p.ttsVoiceIdx; }
-    if(p.suppressNotxBanner!==undefined){ suppressNotxBanner=p.suppressNotxBanner; var snt=document.getElementById('suppressNotxToggle'); if(snt) snt.classList.toggle('on',suppressNotxBanner); }
-    if(p.suppressSpeedToast!==undefined){ suppressSpeedToast=p.suppressSpeedToast; var sst=document.getElementById('suppressSpeedToggle'); if(sst) sst.classList.toggle('on',suppressSpeedToast); }
-    if(p.confirmDelete!==undefined){ confirmDelete=p.confirmDelete; var cdt=document.getElementById('confirmDeleteToggle'); if(cdt) cdt.classList.toggle('on',confirmDelete); }
+    if(p.suppressNotxBanner!==undefined){ suppressNotxBanner=p.suppressNotxBanner; var snt=document.getElementById('sSuppressNotx'); if(snt) snt.classList.toggle('on',suppressNotxBanner); }
+    if(p.suppressSpeedToast!==undefined){ suppressSpeedToast=p.suppressSpeedToast; var sst=document.getElementById('sSuppressSpeed'); if(sst) sst.classList.toggle('on',suppressSpeedToast); }
+    if(p.confirmDelete!==undefined){ confirmDelete=p.confirmDelete; var cdt=document.getElementById('sConfirmDelete'); if(cdt) cdt.classList.toggle('on',confirmDelete); }
     updateThemeColor();
   }catch(e){}
 }
+// #endregion Persistence
 
+// #region Library UI
 // ══════════════════════════════════════════════════════
 // LIBRARY UI
 // ══════════════════════════════════════════════════════
-function toggleLibSettings(){
-  const panel=$('libSettingsPanel');
-  panel.classList.toggle('open');
+function openSettings(tab){
+  const panel=$('settingsPanel');
+  if(panel.classList.contains('open')){ panel.classList.remove('open'); return; }
+  switchSettingsTab(tab||'appearance');
+  panel.classList.add('open');
 }
+function closeSettings(){
+  $('settingsPanel').classList.remove('open');
+}
+function switchSettingsTab(name,btn){
+  document.querySelectorAll('.settings-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.settings-tab-body').forEach(t=>t.style.display='none');
+  var tabBtn=btn||document.getElementById('sTabBtn-'+name);
+  if(tabBtn) tabBtn.classList.add('active');
+  var body=document.getElementById('sTab-'+name);
+  if(body) body.style.display='';
+}
+function toggleLibSettings(){ openSettings('appearance'); }
 function toggleLibView(){
   _libView=_libView==='grid'?'list':'grid';
   try{localStorage.setItem('verte_lib_view_v1',_libView);}catch(e){}
@@ -2194,14 +2231,14 @@ function configurePlayerForMode(b, audioSrc, rate){
   $('seekStrip').style.display = canTts ? 'none' : '';
   $('ttsToggleBtn').style.display = canTts ? '' : 'none';
   $('ttsToggleBtn').classList.remove('active');
-  $('ttsVoiceSec').style.display = canTts ? '' : 'none';
+  $('sTtsVoiceSec').style.display = canTts ? '' : 'none';
   $('ctrlRow').style.display = canTts ? 'none' : '';
   _showEbookScrub(sentences.length > 0);
   if(_ebookScrubEl) _ebookScrubEl.classList.toggle('scrub-sole', canTts);
   $('bottomControls').style.display = (canTts && !sentences.length) ? 'none' : '';
   _updateSkipBtns();
   if(canTts) setHighlightMode('off');
-  else if(!sentHlOn) setHighlightMode('word');
+  else setHighlightMode(_defaultHlMode || 'word');
   if(!canTts && audioSrc){
     if(_audio.src && _audio.src.startsWith('blob:')) URL.revokeObjectURL(_audio.src);
     _audio.src = audioSrc;
@@ -2231,7 +2268,8 @@ function toggleTtsMode(){
   _ebookScrubEl.classList.toggle('scrub-sole',!ttsMode);
   _updateSkipBtns();
   if(ttsMode){
-    if(!sentHlOn) setHighlightMode('sentence');
+    var mode=_defaultHlMode==='off'?'sentence':(_defaultHlMode||'word');
+    setHighlightMode(mode);
   } else {
     ttsStop();
     setHighlightMode('off');
@@ -2279,7 +2317,7 @@ function goLib(){
   setMediaState('stopped');
   document.getElementById('library').style.display='flex';
   document.getElementById('player').style.display='none';
-  document.getElementById('optPanel').classList.remove('open');
+  document.getElementById('settingsPanel').classList.remove('open');
   curBookIdx=-1; transcriptWords=null; transcriptText=null; sentenceTimings=[]; wordTimings=[]; syncOffset=0; _pendingTimingBookIdx=-1;
   if(_plainTextRetryListener){ _audio.removeEventListener('loadedmetadata',_plainTextRetryListener); _plainTextRetryListener=null; }
   if(_timingWorkerTimeout){ clearTimeout(_timingWorkerTimeout); _timingWorkerTimeout=null; }
@@ -2292,7 +2330,9 @@ function goLib(){
   updatePageTitle();
   renderLib();
 }
+// #endregion Library UI
 
+// #region Playback (media controls, audio events, scroll, word highlight)
 // ══════════════════════════════════════════════════════
 // MEDIA CONTROLS
 // ══════════════════════════════════════════════════════
@@ -2375,7 +2415,7 @@ function changeSpeed(dir){
 }
 function cycleSpeed(){
   resetBarTimer();
-  const cur=ttsMode?(parseFloat($('rateCustom').value)||1):(_audio.playbackRate||1);
+  const cur=ttsMode?(parseFloat($('sRateCustom').value)||1):(_audio.playbackRate||1);
   const idx=RATE_STEPS.findIndex(r=>Math.abs(r-cur)<0.05);
   const next=RATE_STEPS[(idx===-1?2:idx+1)%RATE_STEPS.length];
   setRate(next);
@@ -2399,8 +2439,12 @@ function setRate(v){
   document.querySelectorAll('.rate-preset-btn').forEach((btn,i)=>{
     if(i<presets.length) btn.classList.toggle('active',Math.abs(presets[i]-v)<0.001);
   });
-  const rc=$('rateCustom');
+  const rc=$('sRateCustom');
   if(rc) rc.value=v;
+  const ss=$('sSpeed');
+  if(ss) ss.value=v;
+  const sl=$('sSpeedLbl');
+  if(sl) sl.textContent=parseFloat(v).toFixed(2)+'×';
   const ri=$('rateBtnInline');
   if(ri) ri.textContent=v+'×';
   const ttsLbl=document.getElementById('ttsRateLbl');
@@ -2600,7 +2644,7 @@ function resync(){
     if(sentenceTimings[i]&&t>=sentenceTimings[i].start) best=i;
   }
   curSent=best; curWord=0; updateHL(); updateProg();
-  document.getElementById('resyncBtn').style.display='none';
+  document.getElementById('sResyncBtn').style.display='none';
 }
 function adjustOffset(delta){
   syncOffset=Math.round((syncOffset+delta)*10)/10;
@@ -2609,7 +2653,7 @@ function adjustOffset(delta){
   if(curBookIdx>=0){ library[curBookIdx].syncOffset=syncOffset; if(!IS_PWA) saveLibrary(); else savePwaProgress(); }
 }
 function updateOffsetUI(){
-  const el=$('offsetVal');
+  const el=$('sOffsetVal');
   if(el) el.textContent=(syncOffset>=0?'+':'')+syncOffset.toFixed(1)+'s';
 }
 
@@ -2617,7 +2661,7 @@ function updateOffsetUI(){
 // TTS
 // ══════════════════════════════════════════════════════
 function getTtsVoices(){
-  const sel=document.getElementById('ttsVoiceSel');
+  const sel=document.getElementById('sTtsVoice');
   const populate=()=>{
     const voices=speechSynthesis.getVoices();
     if(!voices.length) return;
@@ -2665,7 +2709,7 @@ function ttsPlay(){
     updateHL(); updateProg(); if(autoScroll) scrollToSent(curSent);
     const utt=new SpeechSynthesisUtterance(s.text);
     ttsUtterance=utt;
-    utt.rate=parseFloat($('rateCustom').value)||1;
+    utt.rate=parseFloat($('sRateCustom').value)||1;
     if(ttsVoice) utt.voice=ttsVoice;
     utt.onboundary=ev=>{
       if(ev.name!=='word'||!sentHlOn||!wordHlOn) return;
@@ -2818,7 +2862,9 @@ function _wireEbookScrub(){
   _ebookScrubThumb.addEventListener('pointerup',onUp);
   _ebookScrubThumb.addEventListener('pointercancel',onUp);
 }
+// #endregion Playback
 
+// #region Reader UI (highlighting, TOC, settings, bars)
 // ══════════════════════════════════════════════════════
 // HIGHLIGHTING & PROGRESS
 // ══════════════════════════════════════════════════════
@@ -2869,33 +2915,37 @@ function scrollToSent(idx,instant=false){
 }
 function toggleAS(){
   autoScroll=!autoScroll;
-  document.getElementById('asToggle').classList.toggle('on',autoScroll);
+  document.getElementById('sAutoScroll').classList.toggle('on',autoScroll);
   saveDisplayPrefs();
 }
 function toggleSuppressNotxBanner(){
   suppressNotxBanner=!suppressNotxBanner;
-  var el=document.getElementById('suppressNotxToggle'); if(el) el.classList.toggle('on',suppressNotxBanner);
+  var el=document.getElementById('sSuppressNotx'); if(el) el.classList.toggle('on',suppressNotxBanner);
   saveDisplayPrefs();
 }
 function toggleSuppressSpeedToast(){
   suppressSpeedToast=!suppressSpeedToast;
-  var el=document.getElementById('suppressSpeedToastToggle'); if(el) el.classList.toggle('on',suppressSpeedToast);
+  var el=document.getElementById('sSuppressSpeed'); if(el) el.classList.toggle('on',suppressSpeedToast);
   saveDisplayPrefs();
 }
 function toggleConfirmDelete(){
   confirmDelete=!confirmDelete;
-  var el=document.getElementById('confirmDeleteToggle'); if(el) el.classList.toggle('on',confirmDelete);
+  var el=document.getElementById('sConfirmDelete'); if(el) el.classList.toggle('on',confirmDelete);
   saveDisplayPrefs();
 }
 function setDefaultSpeed(v){
   defaultPlaybackRate=parseFloat(v)||1;
-  var lbl=document.getElementById('defSpeedLbl'); if(lbl) lbl.textContent=defaultPlaybackRate.toFixed(2)+'x';
+  var lbl=document.getElementById('sDefSpeedLbl'); if(lbl) lbl.textContent=defaultPlaybackRate.toFixed(2)+'x';
   saveDisplayPrefs();
 }
 function _syncDefHlPills(){
-  var mode=!sentHlOn?'off':wordHlOn?'word':'sentence';
-  document.querySelectorAll('[id^=defHlPill]').forEach(function(b){b.classList.remove('active');});
-  var el=document.getElementById('defHlPill-'+mode); if(el) el.classList.add('active');
+  document.querySelectorAll('[id^=sDefHl-]').forEach(function(b){b.classList.remove('active');});
+  var el=document.getElementById('sDefHl-'+_defaultHlMode); if(el) el.classList.add('active');
+}
+function setDefaultHlMode(mode){
+  _defaultHlMode=mode;
+  _syncDefHlPills();
+  saveDisplayPrefs();
 }
 function toggleWordHl(){
   wordHlOn=!wordHlOn;
@@ -2934,7 +2984,7 @@ function _resyncAndHL(){
 function _syncHlPills(){
   const mode=!sentHlOn?'off':wordHlOn?'word':'sentence';
   ['off','sentence','word'].forEach(m=>{
-    document.getElementById('hlPill-'+m)?.classList.toggle('active',m===mode);
+    document.getElementById('sHlMode-'+m)?.classList.toggle('active',m===mode);
   });
 }
 function setHighlightMode(mode){
@@ -3034,23 +3084,11 @@ function updateTocActive(){
 // ══════════════════════════════════════════════════════
 // OPTIONS PANEL
 // ══════════════════════════════════════════════════════
-function toggleOpts(){
-  resetBarTimer();
-  document.getElementById('optPanel').classList.toggle('open');
-}
-function switchOptTab(name,btn){
-  document.querySelectorAll('.op-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.op-tab-body').forEach(t=>t.style.display='none');
-  btn.classList.add('active');
-  document.getElementById('opTab-'+name).style.display='';
-}
+function toggleOpts(){ openSettings('playback'); }
 function setTheme(t,btn){
   document.body.className=t?'theme-'+t:'';
-  document.querySelectorAll('[id^=themePill],[id^=libThemePill]').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  var libKey=t||'dark';
-  var libPill=document.getElementById('libThemePill-'+libKey);
-  if(libPill) libPill.classList.add('active');
+  document.querySelectorAll('[id^=sTheme-]').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
   updateThemeColor();
   _applyHlColor();
   saveDisplayPrefs();
@@ -3070,10 +3108,9 @@ function _applyHlColor(key){
   s.setProperty('--hl-border',dark?c.hlBorderDark:c.hlBorder);
   s.setProperty('--word-hl',c.wordHl);
   document.documentElement.style.setProperty('--word-hl-text',c.wordText);
-  document.querySelectorAll('[id^=hlColorSwatch-],[id^=hlColorSwatch2-]').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('[id^=sHlColor-]').forEach(function(b){b.classList.remove('active');});
   var k=key||hlColor;
-  var el=document.getElementById('hlColorSwatch-'+k); if(el) el.classList.add('active');
-  var el2=document.getElementById('hlColorSwatch2-'+k); if(el2) el2.classList.add('active');
+  var el=document.getElementById('sHlColor-'+k); if(el) el.classList.add('active');
 }
 function setHlColor(key){
   hlColor=key;
@@ -3097,21 +3134,21 @@ function setFont(f,key,btn){
   }
   _fontBody=f;
   document.documentElement.style.setProperty('--font-body',f);
-  document.querySelectorAll('[id^=fontPill]').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('[id^=sFont-]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   saveDisplayPrefs();
 }
-function setFS(v){ _fontSize=parseInt(v); document.documentElement.style.setProperty('--font-size',v+'px'); document.getElementById('fsLbl').textContent=v+'px'; saveDisplayPrefs(); }
-function setLH(v){ _lineHeight=parseFloat(v); document.documentElement.style.setProperty('--line-height',v); document.getElementById('lhLbl').textContent=parseFloat(v).toFixed(2); saveDisplayPrefs(); }
-function setMW(v){ _maxWidth=parseInt(v); document.documentElement.style.setProperty('--max-width',v+'px'); document.getElementById('mwLbl').textContent=v+'px'; saveDisplayPrefs(); }
+function setFS(v){ _fontSize=parseInt(v); document.documentElement.style.setProperty('--font-size',v+'px'); document.getElementById('sFontSizeLbl').textContent=v+'px'; saveDisplayPrefs(); }
+function setLH(v){ _lineHeight=parseFloat(v); document.documentElement.style.setProperty('--line-height',v); document.getElementById('sLineHeightLbl').textContent=parseFloat(v).toFixed(2); saveDisplayPrefs(); }
+function setMW(v){ _maxWidth=parseInt(v); document.documentElement.style.setProperty('--max-width',v+'px'); document.getElementById('sMaxWidthLbl').textContent=v+'px'; saveDisplayPrefs(); }
 function setAlign(a,btn){
   const ec=document.getElementById('eContent'); if(ec) ec.style.textAlign=a;
-  document.querySelectorAll('[id^=alignPill]').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('[id^=sAlign-]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   saveDisplayPrefs();
 }
 function setOrientation(mode,btn){
-  document.querySelectorAll('[id^=orientPill]').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('[id^=sOrient-]').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   saveDisplayPrefs();
   if(typeof screen.orientation.lock!=='function') return;
@@ -3127,15 +3164,14 @@ function setOrientation(mode,btn){
     }).catch(function(){});
   }
 }
-function setDefaultWpmFromSlider(v){ wpm=parseInt(v); var el=document.getElementById('defWpmInput'); if(el) el.value=wpm; var el2=document.getElementById('libDefWpmSlider'); if(el2) el2.value=wpm; var el3=document.getElementById('libDefWpmInput'); if(el3) el3.value=wpm; updateWpmLabel(); saveDisplayPrefs(); }
-function setDefaultWpmFromInput(v){ wpm=Math.max(30,Math.min(600,parseInt(v)||150)); var ids=['defWpmSlider','defWpmInput','libDefWpmSlider','libDefWpmInput']; ids.forEach(function(id){var el=document.getElementById(id);if(el)el.value=wpm;}); updateWpmLabel(); saveDisplayPrefs(); }
+function setDefaultWpmFromSlider(v){ wpm=parseInt(v); var el=document.getElementById('sWpmInput'); if(el) el.value=wpm; updateWpmLabel(); saveDisplayPrefs(); }
+function setDefaultWpmFromInput(v){ wpm=Math.max(30,Math.min(600,parseInt(v)||150)); var sl=document.getElementById('sWpmSlider'); if(sl) sl.value=wpm; var inp=document.getElementById('sWpmInput'); if(inp) inp.value=wpm; updateWpmLabel(); saveDisplayPrefs(); }
 function updateWpmLabel(){
   var txt=wpm<80?'Very slow':wpm<120?'Slow':wpm<180?'Normal':wpm<250?'Fast':wpm<350?'Very fast':'Speed reader';
-  var lbl=document.getElementById('wpmSpeedLbl'); if(lbl) lbl.textContent=txt;
-  var lbl2=document.getElementById('libWpmSpeedLbl'); if(lbl2) lbl2.textContent=txt;
+  var lbl=document.getElementById('sWpmLbl'); if(lbl) lbl.textContent=txt;
 }
-function setSentPause(v){ sentPauseMs=parseInt(v); document.getElementById('sentPauseLbl').textContent=v+'ms'; saveDisplayPrefs(); }
-function toggleOpInfo(el){ const parent=el.closest('.op-ttl')||el.closest('.op-row'); const desc=parent?parent.nextElementSibling:null; if(desc&&desc.classList.contains('op-desc')) desc.style.display=desc.style.display==='none'?'block':'none'; }
+function setSentPause(v){ sentPauseMs=parseInt(v); document.getElementById('sSentPauseLbl').textContent=v+'ms'; saveDisplayPrefs(); }
+function toggleOpInfo(el){ const parent=el.closest('.s-label')||el.closest('.s-row'); const desc=parent?parent.nextElementSibling:null; if(desc&&desc.classList.contains('s-desc')) desc.style.display=desc.style.display==='none'?'block':'none'; }
 
 // ── Scroll-pause detection: passive listener, throttled via rAF ──
 (function(){
@@ -3159,7 +3195,7 @@ function toggleOpInfo(el){ const parent=el.closest('.op-ttl')||el.closest('.op-r
 function _shouldAutoHide(){
   if(!IS_PWA) return false;
   if(mediaState!=='playing'&&!(ttsMode&&ttsSpeaking)) return false;
-  if(document.getElementById('optPanel').classList.contains('open')) return false;
+  if(document.getElementById('settingsPanel').classList.contains('open')) return false;
   if(tocOpen) return false;
   if(_modalIds.some(function(id){var el=document.getElementById(id);return el&&el.style.display!=='none';})) return false;
   if(document.getElementById('relinkOverlay').style.display!=='none') return false;
@@ -3198,22 +3234,17 @@ function clearBarTimer(){
   });
 })();
 
-// Close opts panel when clicking outside
-document.addEventListener('click',(e)=>{
-  const panel=document.getElementById('optPanel');
-  const btn=document.getElementById('optBtn');
-  if(panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)){
-    panel.classList.remove('open');
-  }
-});
+// Close settings panel when clicking outside (handled by full-screen overlay — no outside-click needed)
+// #endregion Reader UI
 
+// #region Transcript & Timing
 // ══════════════════════════════════════════════════════
 // TRANSCRIPT
 // ══════════════════════════════════════════════════════
 async function loadTranscriptData(b){
   transcriptWords=null; transcriptText=null; sentenceTimings=[]; wordTimings=[];
-  document.getElementById('resyncBtn').style.display='none';
-  document.getElementById('offsetRow').style.display='none';
+  document.getElementById('sResyncBtn').style.display='none';
+  document.getElementById('sOffsetRow').style.display='none';
   setBannerState('hidden');
   if(!b.transcriptType){
     if((b.audioUrl||b.audioHandle)&&sentHlOn&&!ttsMode) setBannerState('notx','No transcript','Highlighting requires a transcript in audio mode');
@@ -3257,8 +3288,8 @@ async function loadTranscriptData(b){
       setBannerState('ready','Transcript loaded','Plain text — timing estimated');
     }
     if(sentences.length) await buildSentenceTimings();
-    document.getElementById('resyncBtn').style.display='';
-    document.getElementById('offsetRow').style.display='';
+    document.getElementById('sResyncBtn').style.display='';
+    document.getElementById('sOffsetRow').style.display='';
   }catch(e){
     setBannerState('error','Error parsing transcript: '+e.message);
   }
@@ -4077,7 +4108,9 @@ function arrayBufferToBase64(buf){
   }
   return btoa(result);
 }
+// #endregion Transcript & Timing
 
+// #region Modals (add book, transcript, link audio, edit book, relink)
 // ══════════════════════════════════════════════════════
 // ADD BOOK MODAL
 // ══════════════════════════════════════════════════════
@@ -4293,8 +4326,8 @@ function removeTranscript(){
   b.transcriptName=null; b.transcriptType=null; b.transcriptData=null;
   transcriptWords=null; transcriptText=null; sentenceTimings=[];
   setBannerState('hidden');
-  document.getElementById('resyncBtn').style.display='none';
-  document.getElementById('offsetRow').style.display='none';
+  document.getElementById('sResyncBtn').style.display='none';
+  document.getElementById('sOffsetRow').style.display='none';
   if(!IS_PWA) saveLibrary();
   closeTxModal();
 }
@@ -4334,7 +4367,7 @@ function saveLinkAudio(){
   _audio.addEventListener('loadedmetadata',()=>seekAudioToSentence(),{once:true});
   $('seekStrip').style.display='';
   $('ttsToggleBtn').style.display='none';
-  $('ttsVoiceSec').style.display='none';
+  $('sTtsVoiceSec').style.display='none';
   if(!b.transcriptType&&sentHlOn&&!ttsMode) setBannerState('notx','No transcript','Highlighting requires a transcript in audio mode');
   if(!IS_PWA) saveLibrary();
   closeLinkAudioModal();
@@ -4512,7 +4545,9 @@ function rlLoad(f){
   document.getElementById('relinkOverlay').style.display='none';
   openBook(curBookIdx);
 }
+// #endregion Modals
 
+// #region PWA File System & Screen Router
 // ══════════════════════════════════════════════════════
 // PWA FILE SYSTEM
 // ══════════════════════════════════════════════════════
@@ -4570,7 +4605,7 @@ async function pwaScanAndRender(){
   const badge=document.getElementById('pwaFolderBadge');
   if(badge) badge.style.display='';
   showScreen('library');
-  const rescanBtn=document.getElementById('rescanBtn');
+  const rescanBtn=document.getElementById('sRescanBtn');
   const settingsEmpty=document.getElementById('libSettingsEmpty');
   if(rescanBtn){ rescanBtn.style.display='flex'; }
   if(settingsEmpty) settingsEmpty.style.display='none';
@@ -4828,6 +4863,10 @@ function __testBridge(action, value){
   if(action==='getSyncOffset') return syncOffset;
   if(action==='getBarsVisible') return _barsVisible;
   if(action==='resetBarTimer'){ resetBarTimer(); return; }
+  if(action==='getBook') return curBookIdx>=0?library[curBookIdx]:null;
+  if(action==='getHlState') return {sentHlOn:sentHlOn,wordHlOn:wordHlOn,defaultHlMode:_defaultHlMode,curSent:curSent,curWord:curWord};
+  if(action==='getMatchStats'){ var matched=sentenceTimings.filter(function(t){return t!==undefined;}).length; return {matched:matched,total:sentenceTimings.length,pct:sentenceTimings.length?Math.round(matched/sentenceTimings.length*100):0}; }
+  if(action==='getWordTimings') return wordTimings;
 }
 
 // ══════════════════════════════════════════════════════
@@ -4887,7 +4926,9 @@ async function migrateFromFolio(){
     indexedDB.deleteDatabase('folio_pwa');
   }catch(e){ console.warn('Verte: migration from folio failed',e); }
 }
+// #endregion PWA File System & Screen Router
 
+// #region Init
 // ══════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════
@@ -4896,10 +4937,8 @@ async function init(){
   try{ cacheDOM(); }catch(e){}
   const vEl = document.getElementById('libVersion');
   if(vEl) vEl.textContent = 'v' + APP_VERSION;
-  const avEl = document.getElementById('aboutVersion');
+  const avEl = document.getElementById('sVersion');
   if(avEl) avEl.textContent = 'Version ' + APP_VERSION;
-  const lavEl = document.getElementById('libAboutVersion');
-  if(lavEl) lavEl.textContent = 'Version ' + APP_VERSION;
   try{ _cacheScrollMetrics(); window.addEventListener('resize',_cacheScrollMetrics,{passive:true}); }catch(e){}
   try{ wireAudioEvents(); }catch(e){}
   try{ _wireEbookScrub(); }catch(e){}
@@ -4931,6 +4970,8 @@ async function init(){
   }
 }
 init().catch(e=>{ console.error('Verte fatal:',e); try{ showScreen('library'); renderLib(); }catch(e2){} });
+// #endregion Init
 </script>
+<!-- #endregion JavaScript -->
 </body>
 </html>

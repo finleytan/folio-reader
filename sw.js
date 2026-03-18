@@ -1,6 +1,6 @@
 // Verte Service Worker — offline caching
 // Cache version: bump this string to force a cache refresh on update
-const CACHE = 'verte-v7';
+const CACHE = 'verte-v8';
 
 // Everything Verte needs to run offline
 const PRECACHE = [
