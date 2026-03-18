@@ -6,7 +6,7 @@
 |------|-------|----------|
 | CSS | 18–656 | All styles — wrapped in `#region CSS` with sub-regions: Theme Variables, Layout & Components, Responsive & Animation |
 | HTML | 657–1221 | 4 screens + unified settings panel + 4 modals — wrapped in `#region HTML Templates` with sub-regions: Install Banner, PWA Screens, Library Screen, Settings Panel, Player Screen, Modals |
-| JS | 1222–4971 | All logic — wrapped in `#region JavaScript` with sub-regions: State & Constants, Core Utilities, Keyboard & Modal Navigation, PWA Install & DOM Cache, Persistence, Library UI, Playback, Reader UI, Transcript & Timing, Modals, PWA File System & Screen Router, Init |
+| JS | 1222–5012 | All logic — wrapped in `#region JavaScript` with sub-regions: State & Constants, Core Utilities, Keyboard & Modal Navigation, PWA Install & DOM Cache, Persistence, Library UI, Playback, Reader UI, Transcript & Timing, Modals, PWA File System & Screen Router, Init |
 
 ### HTML Structure
 
@@ -141,51 +141,51 @@
 | `resetBarTimer` | 3280 | Auto-Hide Bars | ⚠️ PWA only — show bars + restart 6-second idle timer. Must be called **after** `setMediaState('playing')` in playback start paths (see fragile #41) |
 | `clearBarTimer` | 3286 | Auto-Hide Bars | PWA only — cancel timer + show bars. Called on pause/stop/ended/goLib |
 | `setBannerState` | 3362 | Transcript | ⚠️ Manages two banner elements. `notx` branch returns early if `suppressNotxBanner` is true |
-| `_timingWorkerFn` | 3398 | Transcript | ⚠️ Two copies of splitSentences + matching logic — worker copy must stay in sync (~3398) |
-| `getTimingWorker` | 3576 | Transcript | ⚠️ Revokes blob URL immediately after Worker construction. Worker `onmessage` calls `seekAudioToSentence()` (if audio at 0 + curSent > 0) or `_resyncAndHL()` after timings built |
-| `buildSentenceTimings` | 3619 | Transcript | ⚠️ Sparse sentenceTimings — linear scan only, not binary search. Posts to worker and returns before timings exist — resync happens in worker onmessage |
-| `buildTimingsFromPlainText` | 3653 | Transcript | |
-| `_buildSentenceTimingsSync` | 3686 | Transcript | Calls `seekAudioToSentence()` or `_resyncAndHL()` after timings built |
-| `_buildTimingsFromPlainTextSync` | 3816 | Transcript | Calls `seekAudioToSentence()` or `_resyncAndHL()` after timings built |
-| `similarity` / `updateTranscriptUI` | 3848 | Transcript | |
-| `yieldToMain` | 3863 | Ebook | |
-| `loadEbook` | 3869 | Ebook | ⚠️ Uses `_ebookLoadGen` cancellation guard — stale loads abort after yields. Sets `totalSents` on book object after DOM build. Applies `item.cls` and `item.wordFmts` for inline formatting |
-| `splitSentences` | 3980 | Ebook | ⚠️ Two copies must stay in sync — worker copy inside _timingWorkerFn (~3398) |
-| `parseTxt` / `parseMd` / `parseHtml` | 3999 | Ebook | `parseMd` uses two-pass regex: first strips paired markers (`**bold**`), then sweeps isolated `*_\`~` chars |
-| `extractFromDom` | 4021 | Ebook | ⚠️ Preserves inline formatting (italic, smallcaps) via `wordFmts`. Recognizes div classes (extract, num, right, center) as `cls`. Strips noise spans (pagebreak, spacec, gray, space, border). Maps `<p class="x-sg-chapter-heading">` to level-1 headings |
-| `parseEpub` | 4106 | Ebook | |
-| `extractEpubMeta` | 4143 | Ebook | Extracts `dc:title` and `dc:creator` from EPUB OPF metadata via regex. Loads JSZip if needed. Returns `{title, author}` or nulls on failure |
-| `arrayBufferToBase64` | 4166 | Ebook | |
-| `openModal` / `closeModal` | 4182 | Add Book Modal | |
-| `resetModal` | 4185 | Add Book Modal | |
-| `pillClick` | 4192 | Add Book Modal | Opens file picker for the clicked pill; skips if clear button was clicked |
-| `folderChosen` | 4217 | Add Book Modal | |
-| `folderAssign` | 4279 | Add Book Modal | |
-| `addBook` | 4288 | Add Book Modal | ⚠️ Async — extracts EPUB metadata after reading ebook data. Uses extracted title only if current title matches auto-generated filename/folder name. Stores extracted author on book object. Sets `status:'new'` on new books |
-| `openTranscriptModal` | 4350 | Transcript Modal | |
-| `saveTranscript` / `removeTranscript` | 4379 | Transcript Modal | |
-| `openLinkAudioModal` | 4402 | Link Audio Modal | |
-| `saveLinkAudio` | 4423 | Link Audio Modal | ⚠️ Shows notx banner if no transcript after linking audio |
-| `openEditBookModal` | 4444 | Edit Book Modal | Opens from library pencil icon; populates title, author, and file slots |
-| `_renderEditBookSlots` | 4457 | Edit Book Modal | Builds binfo-slot rows; shows amber "needs relink" badge on audio slot when URL lost |
-| `closeEditBookModal` | 4486 | Edit Book Modal | |
-| `saveEditBook` | 4491 | Edit Book Modal | Saves title and author; persists to localStorage (browser) or PWA_PROG_KEY (PWA) |
-| `editBookReassign` | 4514 | Edit Book Modal | Handles file replacement for audio/ebook/transcript/cover from library |
-| `showRelink` / `closeRelink` | 4567 | Relink | ⚠️ `showRelink` checks dismiss flags before showing. `closeRelink` no longer resets `curBookIdx` |
-| `rlDontRemind` / `rlDismissBook` / `rlDismissAll` / `rlDismissCancel` | 4578 | Relink | "Don't remind me" flow: per-book (`relinkDismissed`) or global (`verte_relink_dismissed_all` localStorage) |
-| `rlLoad` | 4601 | Relink | |
-| `pwaFolderChangeTap` | 4618 | PWA | ⚠️ Pre-pick warning only — pwaPickFolder commits immediately (see fragile #18) |
-| `pwaPickFolder` | 4634 | PWA | |
-| `pwaRegrantAccess` | 4643 | PWA | |
-| `pwaScanAndRender` | 4656 | PWA | ⚠️ Revokes stale cover + audio blob URLs before rescanning. Shows rescan button in settings panel via `sRescanBtn` |
-| `pwaScanBookFolder` | 4731 | PWA | |
-| `getPwaProgress` / `savePwaProgress` | 4785 | PWA | `savePwaProgress` persists `lastOpened` timestamp. Auto-updates status to 'finished' at ≥95% progress |
-| `pwaOpenBook` | 4797 | PWA | Sets `b.lastOpened`. Auto-updates status from 'new' to 'reading'. Uses `defaultPlaybackRate` as fallback. Extracts EPUB metadata on first open if `b.author` is null |
-| `showScreen` | 4869 | Screen Router | |
-| `pwaCheckOnLaunch` | 4878 | Screen Router | |
-| `__testBridge` | 4919 | Test Bridge | Supports: getSentences, getSentenceTimings, getMediaState, getCurSent, getCurWord, getBarsVisible, getBook, getHlState, getMatchStats, getWordTimings |
-| `migrateFromFolio` | 4942 | Migration | ⚠️ Migrates localStorage keys (`folio_*` → `verte_*`) and IndexedDB (`folio_pwa` → `verte_pwa`). Must run before any storage reads. Uses `indexedDB.databases()` (not available in Safari — OK, targets web + Android only). Idempotent |
-| `init` | 5002 | Init | Calls `await migrateFromFolio()` before `cacheDOM()`. Loads `_libView`, `_libSort`, `_libFilter` from localStorage. Validates filter value against new options. Calls `_wireEbookScrub()` |
+| `_timingWorkerFn` | 3398 | Transcript | ⚠️ Two copies of splitSentences + matching logic — worker copy must stay in sync (~3398). `doPlainTextTimings` now creates synthetic per-word timings and delegates to `doSentenceTimings` |
+| `getTimingWorker` | 3565 | Transcript | ⚠️ Revokes blob URL immediately after Worker construction. Worker `onmessage` calls `seekAudioToSentence()` (if audio at 0 + curSent > 0) or `_resyncAndHL()` after timings built |
+| `buildSentenceTimings` | 3608 | Transcript | ⚠️ Sparse sentenceTimings — linear scan only, not binary search. Posts to worker and returns before timings exist — resync happens in worker onmessage |
+| `buildTimingsFromPlainText` | 3642 | Transcript | Worker message now includes `wordTimings` alongside `sentenceTimings` |
+| `_buildSentenceTimingsSync` | 3675 | Transcript | Calls `seekAudioToSentence()` or `_resyncAndHL()` after timings built |
+| `_buildTimingsFromPlainTextSync` | 3805 | Transcript | Creates synthetic per-word timings from plain text, then delegates to `_buildSentenceTimingsSync` |
+| `similarity` / `updateTranscriptUI` | 3815 | Transcript | |
+| `yieldToMain` | 3830 | Ebook | |
+| `loadEbook` | 3836 | Ebook | ⚠️ Uses `_ebookLoadGen` cancellation guard — stale loads abort after yields. Sets `totalSents` on book object after DOM build. Applies `item.cls` and `item.wordFmts` for inline formatting |
+| `splitSentences` | 3947 | Ebook | ⚠️ Two copies must stay in sync — worker copy inside _timingWorkerFn (~3398) |
+| `parseTxt` / `parseMd` / `parseHtml` | 3966 | Ebook | `parseMd` uses two-pass regex: first strips paired markers (`**bold**`), then sweeps isolated `*_\`~` chars |
+| `extractFromDom` | 3988 | Ebook | ⚠️ Preserves inline formatting (italic, smallcaps) via `wordFmts`. Recognizes div classes (extract, num, right, center) as `cls`. Strips noise spans (pagebreak, spacec, gray, space, border). Maps `<p class="x-sg-chapter-heading">` to level-1 headings |
+| `parseEpub` | 4073 | Ebook | |
+| `extractEpubMeta` | 4110 | Ebook | Extracts `dc:title` and `dc:creator` from EPUB OPF metadata via regex. Loads JSZip if needed. Returns `{title, author}` or nulls on failure |
+| `arrayBufferToBase64` | 4133 | Ebook | |
+| `openModal` / `closeModal` | 4149 | Add Book Modal | |
+| `resetModal` | 4152 | Add Book Modal | |
+| `pillClick` | 4159 | Add Book Modal | Opens file picker for the clicked pill; skips if clear button was clicked |
+| `folderChosen` | 4184 | Add Book Modal | |
+| `folderAssign` | 4246 | Add Book Modal | |
+| `addBook` | 4255 | Add Book Modal | ⚠️ Async — extracts EPUB metadata after reading ebook data. Uses extracted title only if current title matches auto-generated filename/folder name. Stores extracted author on book object. Sets `status:'new'` on new books |
+| `openTranscriptModal` | 4317 | Transcript Modal | |
+| `saveTranscript` / `removeTranscript` | 4346 | Transcript Modal | |
+| `openLinkAudioModal` | 4369 | Link Audio Modal | |
+| `saveLinkAudio` | 4390 | Link Audio Modal | ⚠️ Shows notx banner if no transcript after linking audio |
+| `openEditBookModal` | 4411 | Edit Book Modal | Opens from library pencil icon; populates title, author, and file slots |
+| `_renderEditBookSlots` | 4424 | Edit Book Modal | Builds binfo-slot rows; shows amber "needs relink" badge on audio slot when URL lost |
+| `closeEditBookModal` | 4453 | Edit Book Modal | |
+| `saveEditBook` | 4458 | Edit Book Modal | Saves title and author; persists to localStorage (browser) or PWA_PROG_KEY (PWA) |
+| `editBookReassign` | 4481 | Edit Book Modal | Handles file replacement for audio/ebook/transcript/cover from library |
+| `showRelink` / `closeRelink` | 4534 | Relink | ⚠️ `showRelink` checks dismiss flags before showing. `closeRelink` no longer resets `curBookIdx` |
+| `rlDontRemind` / `rlDismissBook` / `rlDismissAll` / `rlDismissCancel` | 4545 | Relink | "Don't remind me" flow: per-book (`relinkDismissed`) or global (`verte_relink_dismissed_all` localStorage) |
+| `rlLoad` | 4568 | Relink | |
+| `pwaFolderChangeTap` | 4585 | PWA | ⚠️ Pre-pick warning only — pwaPickFolder commits immediately (see fragile #18) |
+| `pwaPickFolder` | 4601 | PWA | |
+| `pwaRegrantAccess` | 4610 | PWA | |
+| `pwaScanAndRender` | 4623 | PWA | ⚠️ Revokes stale cover + audio blob URLs before rescanning. Shows rescan button in settings panel via `sRescanBtn` |
+| `pwaScanBookFolder` | 4698 | PWA | |
+| `getPwaProgress` / `savePwaProgress` | 4752 | PWA | `savePwaProgress` persists `lastOpened` timestamp. Auto-updates status to 'finished' at ≥95% progress |
+| `pwaOpenBook` | 4764 | PWA | Sets `b.lastOpened`. Auto-updates status from 'new' to 'reading'. Uses `defaultPlaybackRate` as fallback. Extracts EPUB metadata on first open if `b.author` is null |
+| `showScreen` | 4836 | Screen Router | |
+| `pwaCheckOnLaunch` | 4845 | Screen Router | |
+| `__testBridge` | 4886 | Test Bridge | Supports: getSentences, getSentenceTimings, getMediaState, getCurSent, getCurWord, getBarsVisible, getBook, getHlState, getMatchStats, getWordTimings |
+| `migrateFromFolio` | 4909 | Migration | ⚠️ Migrates localStorage keys (`folio_*` → `verte_*`) and IndexedDB (`folio_pwa` → `verte_pwa`). Must run before any storage reads. Uses `indexedDB.databases()` (not available in Safari — OK, targets web + Android only). Idempotent |
+| `init` | 4969 | Init | Calls `await migrateFromFolio()` before `cacheDOM()`. Loads `_libView`, `_libSort`, `_libFilter` from localStorage. Validates filter value against new options. Calls `_wireEbookScrub()` |
 
 ---
 
@@ -195,8 +195,8 @@
 |----------|------|---------|
 | Scroll-pause detection | 3240 | Passive scroll listener on `#eScroll`, throttled via rAF. Sets `scrollPaused=true` for 2s |
 | Auto-hide tap | 3291 | PWA only — `click` on `#eScroll` shows bars when hidden (single tap to reveal) |
-| Swipe gestures | 4898 | Touch-swipe left/right on `#eScroll` for skip. ⚠️ Aborts when text is selected (`getSelection()` guard) |
-| SW registration + auto-reload | 4912 | Registers `sw.js`; `controllerchange` listener reloads page when new SW activates |
+| Swipe gestures | 4869 | Touch-swipe left/right on `#eScroll` for skip. ⚠️ Aborts when text is selected (`getSelection()` guard) |
+| SW registration + auto-reload | 4879 | Registers `sw.js`; `controllerchange` listener reloads page when new SW activates |
 
 ---
 

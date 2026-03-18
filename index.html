@@ -3537,27 +3537,16 @@ function _timingWorkerFn(){
   function doPlainTextTimings(sentTexts,txText,audioDuration){
     var n=sentTexts.length;
     var st=new Array(n);
-    var txSents=splitSentences(txText);
-    if(!txSents.length) return {sentenceTimings:st};
-    if(!audioDuration) return {sentenceTimings:st};
-    var txWordCounts=txSents.map(function(s){return s.split(/\s+/).filter(Boolean).length;});
-    var totalWords=txWordCounts.reduce(function(a,b){return a+b;},0)||1;
-    var txTimings=[];
-    var cumTime=0;
-    txSents.forEach(function(ts,ti){
-      var segDur=(txWordCounts[ti]/totalWords)*audioDuration;
-      txTimings.push({start:cumTime,end:cumTime+segDur});
-      cumTime+=segDur;
+    if(!txText||!txText.trim()) return {sentenceTimings:st,wordTimings:new Array(n)};
+    if(!audioDuration) return {sentenceTimings:st,wordTimings:new Array(n)};
+    var words=txText.replace(/[^a-z0-9' ]/gi,' ').toLowerCase().split(/\s+/).filter(Boolean);
+    if(!words.length) return {sentenceTimings:st,wordTimings:new Array(n)};
+    var totalWords=words.length;
+    var syntheticTw=words.map(function(w,i){
+      return {word:w,start:(i/totalWords)*audioDuration,end:((i+1)/totalWords)*audioDuration};
     });
-    sentTexts.forEach(function(text,si){
-      var best=-1,bestScore=0;
-      txSents.forEach(function(ts,ti){
-        var sc=similarity(text.toLowerCase(),ts.toLowerCase());
-        if(sc>bestScore){bestScore=sc;best=ti;}
-      });
-      if(best>=0&&bestScore>0.35) st[si]=txTimings[best];
-    });
-    return {sentenceTimings:st};
+    var sentWordCounts=sentTexts.map(function(t){return t.split(/\s+/).filter(Boolean).length;});
+    return doSentenceTimings(sentTexts,sentWordCounts,syntheticTw);
   }
   self.onmessage=function(e){
     var d=e.data;
@@ -3568,7 +3557,7 @@ function _timingWorkerFn(){
       self.postMessage({type:'buildSentenceTimings',sentenceTimings:r.sentenceTimings,wordTimings:r.wordTimings,bookIdx:d.bookIdx});
     } else if(d.type==='buildTimingsFromPlainText'){
       var r2=doPlainTextTimings(d.sentTexts,d.transcriptText,d.audioDuration);
-      self.postMessage({type:'buildTimingsFromPlainText',sentenceTimings:r2.sentenceTimings,bookIdx:d.bookIdx});
+      self.postMessage({type:'buildTimingsFromPlainText',sentenceTimings:r2.sentenceTimings,wordTimings:r2.wordTimings,bookIdx:d.bookIdx});
     }
   };
 }
@@ -3814,36 +3803,14 @@ async function _buildSentenceTimingsSync(){
   else _resyncAndHL();
 }
 async function _buildTimingsFromPlainTextSync(){
-  setBannerState('syncing','Syncing transcript…','Estimating timing from plain text');
-  await yieldToMain();
-  const txSents=splitSentences(transcriptText);
-  if(!txSents.length) return;
   const dur=isFinite(_audio.duration)?_audio.duration:0;
-  if(!dur) return;
-  const txWordCounts=txSents.map(s=>s.split(/\s+/).filter(Boolean).length);
-  const totalWords=txWordCounts.reduce((a,b)=>a+b,0)||1;
-  const txTimings=[];
-  let cumTime=0;
-  txSents.forEach((ts,ti)=>{
-    const segDur=(txWordCounts[ti]/totalWords)*dur;
-    txTimings.push({start:cumTime,end:cumTime+segDur});
-    cumTime+=segDur;
-  });
-  sentences.forEach((s,si)=>{
-    let best=-1,bestScore=0;
-    txSents.forEach((ts,ti)=>{
-      const sc=similarity(s.text.toLowerCase(),ts.toLowerCase());
-      if(sc>bestScore){bestScore=sc;best=ti;}
-    });
-    if(best>=0&&bestScore>0.35) sentenceTimings[si]=txTimings[best];
-  });
-  const matched=sentenceTimings.filter(Boolean).length;
-  const matchPct=Math.round(matched/sentences.length*100);
-  setBannerState(matchPct<75?'warn':'ready',
-    matchPct<75?'Low transcript match \u2014 audio sync may be unreliable':'Transcript synced \xb7 Ready to play',
-    matched+' sentences matched ('+matchPct+'%)');
-  if(!ttsMode&&curSent>0&&isFinite(_audio.currentTime)&&_audio.currentTime<0.5) seekAudioToSentence();
-  else _resyncAndHL();
+  if(!dur||!transcriptText||!transcriptText.trim()) return;
+  const words=transcriptText.replace(/[^a-z0-9' ]/gi,' ').toLowerCase().split(/\s+/).filter(Boolean);
+  if(!words.length) return;
+  const totalWords=words.length;
+  transcriptWords=words.map((w,i)=>({word:w,start:(i/totalWords)*dur,end:((i+1)/totalWords)*dur}));
+  transcriptText=null;
+  await _buildSentenceTimingsSync();
 }
 function similarity(a,b){
   const wa=new Set(a.split(/\s+/).filter(Boolean));
