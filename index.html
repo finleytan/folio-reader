@@ -1243,7 +1243,7 @@ html,body,
 
 // #region State & Constants
 // ── App version ───────────────────────────────────
-const APP_VERSION = '2.14.0';
+const APP_VERSION = '2.15.0';
 
 // ══════════════════════════════════════════════════════
 // STATE
@@ -2515,14 +2515,16 @@ function skipChapter(dir){
   curSent=tocEntries[target].sentIdx; curWord=-1;
   updateHL(); updateProg(); saveBookProgress();
   if(!ttsMode&&sentenceTimings){
-    // Use end time of last matched sentence before chapter boundary — that's where
-    // the new chapter begins in the audio. Falls back to forward/backward start scan.
+    // Seek to the start of the first matched sentence at or after the target chapter heading.
+    // Falls back to the end of the last matched sentence before it (e.g. unmatched heading).
     let seekTime=null;
-    for(let i=curSent-1;i>=0;i--){ if(sentenceTimings[i]){seekTime=sentenceTimings[i].end;break;} }
+    for(let i=curSent;i<sentences.length;i++){
+      if(sentenceTimings[i]){ seekTime=sentenceTimings[i].start; break; }
+    }
     if(seekTime===null){
-      let t=sentenceTimings[curSent];
-      if(!t) for(let i=curSent+1;i<sentences.length;i++){ if(sentenceTimings[i]){t=sentenceTimings[i];break;} }
-      if(t) seekTime=t.start;
+      for(let i=curSent-1;i>=0;i--){
+        if(sentenceTimings[i]){ seekTime=sentenceTimings[i].end; break; }
+      }
     }
     if(seekTime!==null) _audio.currentTime=Math.max(0,seekTime-syncOffset);
   }
@@ -3019,7 +3021,7 @@ function updateProg(){
   const ch=_resolveChapterAtIdx(curSent);
   let label='';
   if(tocEntries&&tocEntries.length>0){
-    const _chRx=/^(chapter|prologue|epilogue|part|book|act|section|interlude)\b|^\d+$/i;
+    const _chRx=/^(chapter|prologue|epilogue|part|book|act|section|interlude)\b/i;
     const chEntries=tocEntries.filter(e=>_chRx.test(e.text.trim()));
     const countable=chEntries.length>1?chEntries:tocEntries;
     if(countable.length>1){
@@ -3569,6 +3571,13 @@ function _timingWorkerFn(){
     // Pass 1: Anchor pass
     var searchFrom=0;
     var anchorTwIdx=[];
+    var firstChapterSent=0;
+    for(var ci=0;ci<n;ci++){
+      if(sentTexts[ci].replace(/[^a-z0-9' ]/gi,' ').toLowerCase().split(/\s+/).filter(Boolean).length>=6){
+        firstChapterSent=ci;
+        break;
+      }
+    }
     for(var si=0;si<n;si++){
       var tok=sentTokens[si];
       if(!tok.sWords.length) continue;
@@ -3579,7 +3588,9 @@ function _timingWorkerFn(){
       if(r.bestStart>=0&&r.bestScore>=passThresh){
         accept(si,r.bestStart,r.bestEnd);
         anchorTwIdx[si]=r.bestStart;
-        searchFrom=Math.max(searchFrom,r.bestStart+1);
+        if(si>=firstChapterSent){
+          searchFrom=Math.max(searchFrom,r.bestStart+1);
+        }
       }
     }
     // Pass 2: Fill pass
@@ -3828,7 +3839,14 @@ async function _buildSentenceTimingsSync(){
   });
   const YIELD_EVERY=30;
   let searchFrom=0;
+  let firstChapterSent=0;
   const anchorTwIdx=[];
+  for(let ci=0;ci<sentences.length;ci++){
+    if(sentences[ci].el?.textContent?.replace(/[^a-z0-9' ]/gi,' ').toLowerCase().split(/\s+/).filter(Boolean).length>=6){
+      firstChapterSent=ci;
+      break;
+    }
+  }
   for(let si=0;si<sentences.length;si++){
     const {sWords,sSet}=sentTokens[si];
     if(!sWords.length) continue;
@@ -3839,7 +3857,9 @@ async function _buildSentenceTimingsSync(){
     if(bestStart>=0&&bestScore>=passThresh){
       acceptMatch(si,bestStart,bestEnd);
       anchorTwIdx[si]=bestStart;
-      searchFrom=Math.max(searchFrom,bestStart+1);
+      if(si>=firstChapterSent){
+        searchFrom=Math.max(searchFrom,bestStart+1);
+      }
     }
     if(si%YIELD_EVERY===0) await yieldToMain();
   }
@@ -4118,6 +4138,7 @@ function extractFromDom(root){
       return;
     }
     if(BLOCK.has(tag)){
+      if(node.classList&&node.classList.contains('x-sg-toc-body-text')) return;
       var cls=clsFor(node,pCls);
       var r=inl(node);
       if(r.text){
@@ -4172,10 +4193,25 @@ async function parseEpub(data){
       manifest[item.getAttribute('id')]={href:item.getAttribute('href'),mt:item.getAttribute('media-type')};
     });
     const spineItems=Array.from(opfDoc.querySelectorAll('spine itemref')).map(r=>r.getAttribute('idref'));
+    const skipIds=new Set();
+    opfDoc.querySelectorAll('manifest item').forEach(it=>{
+      const props=(it.getAttribute('properties')||'').split(/\s+/);
+      if(props.includes('nav')) skipIds.add(it.getAttribute('id'));
+    });
+    opfDoc.querySelectorAll('guide reference').forEach(ref=>{
+      const type=(ref.getAttribute('type')||'').toLowerCase();
+      if(type==='toc'||type==='toc-page'){
+        const href=(ref.getAttribute('href')||'').split('#')[0];
+        for(const [id,it] of Object.entries(manifest)){
+          if(it.href===href&&spineItems[0]!==id) skipIds.add(id);
+        }
+      }
+    });
     const out=[];
     for(const idref of spineItems){
       const item=manifest[idref];
       if(!item||!item.mt?.includes('html')) continue;
+      if(skipIds.has(idref)) continue;
       const filePath=opfDir+item.href;
       const fileData=await zip.file(filePath)?.async('string');
       if(!fileData) continue;

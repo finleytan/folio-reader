@@ -81,7 +81,7 @@
 | `mediaPlay` / `mediaPause` / `mediaStop` | 2422 | Media Controls | ⚠️ `mediaPlay` only acquires wake lock in `.then()` — all playback state (icon, mediaState, ticker) is set by the `play` event handler in `wireAudioEvents`, not here |
 | `_updateSkipBtns` | 2472 | Media Controls | Swaps skip button icons/labels: circular-arrow+15 for audio, chevrons for TTS; also handles big-skip (1m / 5 sentences). Shows/hides chapter skip buttons based on `tocEntries` availability |
 | `skip` | 2487 | Media Controls | In TTS mode: ±1 sentence (15s) or ±5 sentences (60s). In audio mode: seeks by seconds |
-| `skipChapter` | 2502 | Media Controls | Jumps to next/prev chapter via `tocEntries`. Back: if >3 sentences into chapter jumps to its start, else previous chapter. Audio seek uses end-time of last matched sentence before chapter boundary. Handles TTS restart |
+| `skipChapter` | 2502 | Media Controls | Jumps to next/prev chapter via `tocEntries`. Back: if >3 sentences into chapter jumps to its start, else previous chapter. Audio seek scans forward from chapter heading for first matched sentence start time, falls back to end-time of last matched sentence before boundary. Handles TTS restart |
 | `changeSpeed` | 2474 | Media Controls | |
 | `cycleSpeed` | 2480 | Media Controls | Tap-to-cycle through RATE_STEPS; reads from `sRateCustom` in TTS mode |
 | `setRate` | 2487 | Media Controls | Also syncs `sSpeed` slider and `sSpeedLbl` in settings panel |
@@ -108,7 +108,7 @@
 | `_showEbookScrub` | 2860 | Ebook Scrub | Shows/hides scrub bar; also ensures `#bottomControls` is visible when scrub bar is shown |
 | `_wireEbookScrub` | 2866 | Ebook Scrub | ⚠️ Pointer event handling for ebook scrub bar. Uses `setPointerCapture` for drag. Pauses TTS during scrub, restarts on release. Sets `curWord=-1` on commit (fragile #14). Called from `init()` |
 | `updateHL` | 2939 | Highlighting | ⚠️ sentences[] holds live DOM refs — stale after any #eContent innerHTML wipe |
-| `updateProg` | 2951 | Highlighting | Uses `_resolveChapterAtIdx` for chapter label. Shows chapter counter (`Ch N/M`) filtered by chapter-like headings (Chapter, Prologue, Epilogue, Part, bare numbers). Calls `_updateEbookScrub()` |
+| `updateProg` | 3018 | Highlighting | Uses `_resolveChapterAtIdx` for chapter label. Shows chapter counter (`Ch N/M`) filtered by chapter-like headings (Chapter, Prologue, Epilogue, Part, Section, Interlude). Calls `_updateEbookScrub()` |
 | `_cacheScrollMetrics` | 2960 | Highlighting | |
 | `scrollToSent` | 2967 | Highlighting | |
 | `toggleAS` | 2980 | Highlighting | Now calls `saveDisplayPrefs()` |
@@ -142,19 +142,19 @@
 | `resetBarTimer` | 3280 | Auto-Hide Bars | ⚠️ PWA only — show bars + restart 6-second idle timer. Must be called **after** `setMediaState('playing')` in playback start paths (see fragile #41) |
 | `clearBarTimer` | 3286 | Auto-Hide Bars | PWA only — cancel timer + show bars. Called on pause/stop/ended/goLib |
 | `setBannerState` | 3362 | Transcript | ⚠️ Manages two banner elements. `notx` branch returns early if `suppressNotxBanner` is true |
-| `_timingWorkerFn` | 3398 | Transcript | ⚠️ Two copies of splitSentences + matching logic — worker copy must stay in sync (~3398). `doPlainTextTimings` now creates synthetic per-word timings and delegates to `doSentenceTimings` |
+| `_timingWorkerFn` | 3477 | Transcript | ⚠️ Two copies of splitSentences + matching logic — worker copy must stay in sync (~3477). `doPlainTextTimings` now creates synthetic per-word timings and delegates to `doSentenceTimings`. Pass 1 anchor uses `firstChapterSent` to prevent front-matter titles from advancing `searchFrom` |
 | `getTimingWorker` | 3565 | Transcript | ⚠️ Revokes blob URL immediately after Worker construction. Worker `onmessage` calls `seekAudioToSentence()` (if audio at 0 + curSent > 0) or `_resyncAndHL()` after timings built |
 | `buildSentenceTimings` | 3608 | Transcript | ⚠️ Sparse sentenceTimings — linear scan only, not binary search. Posts to worker and returns before timings exist — resync happens in worker onmessage |
 | `buildTimingsFromPlainText` | 3642 | Transcript | Worker message now includes `wordTimings` alongside `sentenceTimings` |
-| `_buildSentenceTimingsSync` | 3675 | Transcript | Calls `seekAudioToSentence()` or `_resyncAndHL()` after timings built |
+| `_buildSentenceTimingsSync` | 3763 | Transcript | Calls `seekAudioToSentence()` or `_resyncAndHL()` after timings built. Pass 1 anchor uses `firstChapterSent` to prevent front-matter titles from advancing `searchFrom` |
 | `_buildTimingsFromPlainTextSync` | 3805 | Transcript | Creates synthetic per-word timings from plain text, then delegates to `_buildSentenceTimingsSync` |
 | `similarity` / `updateTranscriptUI` | 3815 | Transcript | |
 | `yieldToMain` | 3830 | Ebook | |
 | `loadEbook` | 3836 | Ebook | ⚠️ Uses `_ebookLoadGen` cancellation guard — stale loads abort after yields. Sets `totalSents` on book object after DOM build. Applies `item.cls` and `item.wordFmts` for inline formatting |
 | `splitSentences` | 3947 | Ebook | ⚠️ Two copies must stay in sync — worker copy inside _timingWorkerFn (~3398) |
 | `parseTxt` / `parseMd` / `parseHtml` | 3966 | Ebook | `parseMd` uses two-pass regex: first strips paired markers (`**bold**`), then sweeps isolated `*_\`~` chars |
-| `extractFromDom` | 3988 | Ebook | ⚠️ Preserves inline formatting (italic, smallcaps) via `wordFmts`. Recognizes div classes (extract, num, right, center) as `cls`. Strips noise spans (pagebreak, spacec, gray, space, border). Maps `<p class="x-sg-chapter-heading">` to level-1 headings |
-| `parseEpub` | 4073 | Ebook | |
+| `extractFromDom` | 4086 | Ebook | ⚠️ Preserves inline formatting (italic, smallcaps) via `wordFmts`. Recognizes div classes (extract, num, right, center) as `cls`. Strips noise spans (pagebreak, spacec, gray, space, border). Maps `<p class="x-sg-chapter-heading">` to level-1 headings. Skips `x-sg-toc-body-text` paragraphs (calibre EPUB2 TOC links) |
+| `parseEpub` | 4172 | Ebook | ⚠️ Skips nav/TOC spine items via EPUB3 `properties="nav"` and EPUB2 `<guide type="toc">`. Builds `skipIds` set before spine iteration |
 | `extractEpubMeta` | 4110 | Ebook | Extracts `dc:title` and `dc:creator` from EPUB OPF metadata via regex. Loads JSZip if needed. Returns `{title, author}` or nulls on failure |
 | `arrayBufferToBase64` | 4133 | Ebook | |
 | `openModal` / `closeModal` | 4149 | Add Book Modal | |
