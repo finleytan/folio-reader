@@ -2,6 +2,15 @@
 
 ---
 
+## v2.13.0 — 2026-03-18
+
+### Changed
+- **Continue Reading card** — now renders as a full book card with status, edit, and delete action buttons (previously a stripped-down duplicate with no actions)
+- Continue Reading book is no longer duplicated in the main grid; it appears only in the Continue Reading section
+- When a different book takes the Continue Reading slot, the previous book reappears in the grid
+
+---
+
 ## v2.11.0 — 2026-03-17
 
 ### Changed

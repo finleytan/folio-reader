@@ -6,7 +6,7 @@
 |------|-------|----------|
 | CSS | 18–656 | All styles — wrapped in `#region CSS` with sub-regions: Theme Variables, Layout & Components, Responsive & Animation |
 | HTML | 657–1221 | 4 screens + unified settings panel + 4 modals — wrapped in `#region HTML Templates` with sub-regions: Install Banner, PWA Screens, Library Screen, Settings Panel, Player Screen, Modals |
-| JS | 1222–5012 | All logic — wrapped in `#region JavaScript` with sub-regions: State & Constants, Core Utilities, Keyboard & Modal Navigation, PWA Install & DOM Cache, Persistence, Library UI, Playback, Reader UI, Transcript & Timing, Modals, PWA File System & Screen Router, Init |
+| JS | 1222–5031 | All logic — wrapped in `#region JavaScript` with sub-regions: State & Constants, Core Utilities, Keyboard & Modal Navigation, PWA Install & DOM Cache, Persistence, Library UI, Playback, Reader UI, Transcript & Timing, Modals, PWA File System & Screen Router, Init |
 
 ### HTML Structure
 
@@ -62,7 +62,7 @@
 | `cycleLibSort` | 1927 | Library UI | Cycles A–Z / Recent / Progress; persists to `verte_lib_sort_v1` |
 | `cycleLibFilter` | 1936 | Library UI | Cycles All / Not Started / Reading / Finished; persists to `verte_lib_filter_v1` |
 | `_sortedLibIndices` | 1945 | Library UI | Returns library indices sorted by current `_libSort` order |
-| `renderLib` | 1956 | Library UI | Shows onboarding card when library is empty (browser mode); applies search/sort/filter using `effectiveStatus` (manual `b.status` or auto-detected from progress); pencil icon opens Edit Book modal; ◐ icon opens status menu; adds `now-playing` class to card matching `_lastOpenedBookIdx` |
+| `renderLib` | 1956 | Library UI | Shows onboarding card when library is empty (browser mode); applies search/sort/filter using `effectiveStatus` (manual `b.status` or auto-detected from progress); pencil icon opens Edit Book modal; ◐ icon opens status menu. Continue Reading section renders full book card with all actions (status/edit/delete); continue-reading book excluded from main grid to avoid duplication |
 | `unhideBook` | 2118 | Library UI | ⚠️ Shows resume/start-over prompt if book has saved progress |
 | `_doUnhide` | 2144 | Library UI | Executes unhide with optional progress reset |
 | `renameBook` | 2158 | Library UI | ⚠️ Remove blur listener before Enter/Escape to prevent double-fire |

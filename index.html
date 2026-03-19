@@ -161,6 +161,7 @@ body.theme-hcdark{
 .continue-card .book-info{display:flex;flex-direction:column;justify-content:center;padding:6px 12px;min-width:0;flex:1;gap:1px;}
 .continue-card .book-title{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;-webkit-line-clamp:unset;}
 .continue-card .book-cover-badge{top:4px;left:4px;bottom:auto;right:auto;font-size:9px;width:16px;height:16px;border-radius:4px;}
+.continue-card .book-card-actions{opacity:1;}
 .book-cover{width:100%;height:120px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
 .book-cover-art{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
@@ -1236,7 +1237,7 @@ html,body,
 
 // #region State & Constants
 // ── App version ───────────────────────────────────
-const APP_VERSION = '2.12.0';
+const APP_VERSION = '2.13.0';
 
 // ══════════════════════════════════════════════════════
 // STATE
@@ -1977,33 +1978,51 @@ function renderLib(){
   const _order=_sortedLibIndices();
   if(_lastOpenedBookIdx>=0&&library[_lastOpenedBookIdx]){
     const b=library[_lastOpenedBookIdx];
+    const ci=_lastOpenedBookIdx;
     const prog=b.totalSents>1?Math.round((b.curSent||0)/(b.totalSents-1)*100):0;
     const [c1,c2]=coverGrad(b.title);
     const initials=coverInitials(b.title);
-    const sec=document.createElement('div');
-    sec.className='continue-section';
+    const hasA=b.audioUrl||b.audioHandle;
+    const effectiveStatus=b.status||(prog>=95?'finished':prog>0||b.lastOpened?'reading':'new');
+    const progLabel=effectiveStatus==='finished'
+      ?'<span class="book-done-badge">FINISHED</span>'
+      :effectiveStatus==='reading'
+        ?`<div class="book-meta book-meta-progress">${prog}% complete</div>`
+        :'<div class="book-meta book-meta-progress not-started">Not started</div>';
+    const accentClass=effectiveStatus!=='new'?'book-list-accent':'book-list-accent accent-none';
     const cvInner=b.coverUrl
       ?`<img class="book-cover-img" src="${xh(b.coverUrl)}" alt="">`
       :`<div class="book-cover-art">${xh(initials)}</div>`;
-    const hasA=b.audioUrl||b.audioHandle;
+    const sec=document.createElement('div');
+    sec.className='continue-section';
     sec.innerHTML=`<div class="continue-label">Continue Reading</div>
       <div class="book-card continue-card">
-        <div class="book-list-accent"></div>
+        <div class="${accentClass}"></div>
         <div class="book-cover" style="background:linear-gradient(135deg,${c1},${c2})">
           ${cvInner}
           <div class="book-cover-badge">${hasA?'🎧':'📖'}</div>
+          <div class="book-cover-bar"><div class="book-cover-prog" style="width:${prog}%"></div></div>
         </div>
         <div class="book-info">
           <div class="book-title">${xh(b.title)}</div>
           ${b.author?`<div class="book-meta" style="margin-bottom:2px;color:var(--text2)">${xh(b.author)}</div>`:''}
-          <div class="book-meta book-meta-progress">${prog}% complete</div>
+          ${progLabel}
           <div class="book-prog-bar"><div class="book-prog-fill" style="width:${prog}%"></div></div>
         </div>
+        <div class="book-card-actions">
+          <button class="card-action-btn" title="Reading status" onclick="markBook(${ci},event)">◐</button>
+          <button class="card-action-btn" title="Edit details" onclick="openEditBookModal(${ci},event)">✏️</button>
+          <button class="card-action-btn" title="${IS_PWA?'Hide':'Delete'}" onclick="deleteBook(${ci},event)">${IS_PWA?'🙈':'🗑️'}</button>
+        </div>
       </div>`;
-    sec.querySelector('.book-card').addEventListener('click',()=>openBook(_lastOpenedBookIdx));
+    sec.querySelector('.book-card').addEventListener('click',(e)=>{
+      if(e.target.closest('.book-card-actions')) return;
+      openBook(ci);
+    });
     grid.appendChild(sec);
   }
   _order.forEach(i=>{
+    if(i===_lastOpenedBookIdx) return;
     const b=library[i];
     if(_ql&&b.title.toLowerCase().indexOf(_ql)<0&&(!b.author||b.author.toLowerCase().indexOf(_ql)<0)) return;
     const prog=b.totalSents>1?Math.round((b.curSent||0)/(b.totalSents-1)*100):0;
